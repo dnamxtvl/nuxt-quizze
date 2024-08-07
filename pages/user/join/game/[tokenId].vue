@@ -1,20 +1,22 @@
 <template>
     <div>
-        <div class="w-full"  v-show="showQuestion">
+        <div class="w-full" v-show="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
                 <p class="text-white text-center fs-2">Wc gần nhất diễn ra vào năm nào?</p>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-4">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in listAnswer" :key="index">
-                    <div class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
-                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index}}</span>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in listAnswer"
+                    :key="index">
+                    <div
+                        class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
+                        <span
+                            class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index}}</span>
                         <p class="text-white fs-2 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
             </div>
             <div class="control-center">
-                <div class="control-center-container user-game-footer" translate="no"
-                    style="opacity: 1;">
+                <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                     <div class="ring d-flex">
                         <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
                             <div class="coccoc-alo-ph-circle"></div>
@@ -26,16 +28,196 @@
                         </span>
                         <div class="divider hidden sm:block"></div>
                         <div>
-                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">1/4</button>
+                            <button
+                                class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">1/4</button>
                         </div>
                     </div>
                     <div class="control-center-actions"></div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="show-meme d-flex justify-content-center align-items-center">
+        <div class="w-full d-flex justify-content-center" v-if="showPreviewEnding">
+            <div class="col-lg-4 col-md-6 col-12 bg-dark-with-opacity rounded row">
+                <div translate="no" class="main-section-title text-center text-white mt-4">
+                    <div class="row">
+                        <p class="font-medium fs-5 text-base text-ds-light-500">Summary</p>
+                        <h4 class="text-white">Remarkable win, keep it up!</h4>
+                    </div>
+                    <div class="row px-4">
+                        <div class="col-lg-4">
+                            <div class="bg-dark rounded pl-4">
+                                <h5 class="text-center pt-2 ml-2 text-white fw-normal">Score</h5>
+                                <h6 class="text-center pt-2 pb-2 text-white fw-normal">1490</h6>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="bg-dark ms-1 rounded pl-4">
+                                <h5 class="text-center pt-2 ml-2 text-white fw-normal">Total</h5>
+                                <h6 class="text-center pt-2 pb-2 ml-2 text-white fw-normal">10</h6>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="bg-dark ms-1 rounded pl-4">
+                                <h5 class="text-center pt-2 ml-2 text-white fw-normal">Correct</h5>
+                                <h6 class="text-center pt-2 pb-2 text-white fw-normal">5</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pt-4 bg-dark rounded">
+                        <h6 class="text-start text-white mt-2 mx-2 fw-normal">Xem lại Câu hỏi</h6>
+                        <div class="col-lg-12 px-4 mb-2">
+                            <div
+                                class="question-preview-content bg-white border border-danger rounded rounded-3 pl-2 mb-3">
+                                <p class="text-black fw-normal fs-5 pt-2 px-4 text-start">1. Wc gần nhất diễn ra vào năm
+                                    nào?</p>
+                                <hr>
+                                </hr>
+                                <div class="question-answer-review px-4 pt-2 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        <label class="form-check-label text-black ms-2" for="flexCheckDefault">
+                                            2021
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2022
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2019
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2012
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="question-preview-content bg-white border border-danger rounded pl-2 mb-3 rounded rounded-3">
+                                <p class="text-black fw-normal fs-5 pt-2 px-4 text-start">1. Wc gần nhất diễn ra vào năm
+                                    nào?</p>
+                                <hr>
+                                </hr>
+                                <div class="question-answer-review px-4 pt-2 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        <label class="form-check-label text-black ms-2" for="flexCheckDefault">
+                                            2021
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2022
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2019
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2012
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="question-preview-content bg-white border border-danger rounded pl-2 mb-3 rounded rounded-3">
+                                <p class="text-black fw-normal fs-5 pt-2 px-4 text-start">1. Wc gần nhất diễn ra vào năm
+                                    nào?</p>
+                                <hr>
+                                </hr>
+                                <div class="question-answer-review px-4 pt-2 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        <label class="form-check-label text-black ms-2" for="flexCheckDefault">
+                                            2021
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2022
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2019
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2012
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="question-preview-content bg-white border border-danger rounded pl-2 mb-3 rounded rounded-3">
+                                <p class="text-black fw-normal fs-5 pt-2 px-4 text-start">1. Wc gần nhất diễn ra vào năm
+                                    nào?</p>
+                                <hr>
+                                </hr>
+                                <div class="question-answer-review px-4 pt-2 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        <label class="form-check-label text-black ms-2" for="flexCheckDefault">
+                                            2021
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2022
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2019
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
+                                            checked>
+                                        <label class="form-check-label text-black ms-2" for="flexCheckChecked">
+                                            2012
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="show-meme d-flex justify-content-center align-items-center">
         <img src="../../../../public/meme/sad/Screenshot from 2024-07-24 19-03-02.png" alt="meme" with="400" height="400" />
+        </div> -->
     </div>
 </template>
 <script lang="ts">
@@ -55,6 +237,7 @@ interface Answer {
 export default defineComponent({
   setup() {
     const showQuestion = ref<boolean>(false);
+    const showPreviewEnding = ref<boolean>(true);
     const listAnswer = ref<Array<Answer>>([
         {
             id: 1,
@@ -85,6 +268,7 @@ export default defineComponent({
     return {
         listAnswer,
         showQuestion,
+        showPreviewEnding,
     }
   }
 })
@@ -454,5 +638,40 @@ export default defineComponent({
     100% {
         transform: rotate(0) scale(1) skew(1deg)
     }
+}
+
+.bg-dark-with-opacity {
+    background-color: #00000080;
+}
+
+.bg-dark {
+    background-color: #000 !important;
+}
+
+.accuracy-bar-wrapper .accuracy-bar {
+    height: 12px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+    display: flex;
+    position: relative;
+}
+
+.accuracy-bar-wrapper .accuracy-bar .accuracy-success-fill {
+    background-color: #00c985;
+    border-radius: 8px 0 0 8px;
+    width: 0;
+    height: 16px;
+    transition: width .2s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.form-check {
+    display: flex;
+}
+
+.bg-white {
+    background-color: #f2f2f2 !important;
 }
 </style>
