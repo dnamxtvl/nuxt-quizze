@@ -296,9 +296,9 @@ definePageMeta({
 
 export default defineComponent({
     setup() {
-        const showPrepare = ref<boolean>(true);
+        const showPrepare = ref<boolean>(false);
         const showQuestion = ref<boolean>(false);
-        const showResult = ref<boolean>(false);
+        const showResult = ref<boolean>(true);
         const listAnswer = ref<Array<Answer>>([
             {
                 id: 1,
@@ -343,6 +343,10 @@ export default defineComponent({
 })
 </script>
 <style scoped>
+.table {
+    background-color: #090909cc;
+}
+
 .body-answer-review {
     background-color: #090909cc;
     border-radius: 1.5rem !important;
