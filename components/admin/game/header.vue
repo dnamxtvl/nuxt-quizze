@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#006d77">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold text-white" href="#">
                 <img src="../../../public/mario_icon.png" width="35" height="35" />
@@ -19,8 +19,8 @@
                     <li class="nav-item ms-2 navbar-brand fw-bold btn btn-outline-dark text-white">
                         976349
                     </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn btn-danger">Thoát</a>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger text-white">Kết thúc</a>
                     </li>
                 </ul>
             </div>
@@ -29,7 +29,7 @@
 </template>
 <script lang="ts">
 export default defineComponent({
-  name: 'UserGameHeader'
+  name: 'AdminGameHeader'
 });
 </script>
 <style scoped>

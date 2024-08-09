@@ -10,7 +10,7 @@
                     <div
                         class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
                         <span
-                            class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index}}</span>
+                            class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index + 1}}</span>
                         <p class="text-white fs-2 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
