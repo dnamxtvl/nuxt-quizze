@@ -263,6 +263,22 @@ export default defineComponent({
 
     onMounted(async () => {
         //ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' });
+        const { $echo }: any = useNuxtApp();
+
+    $echo.join('channel-name')
+        .here((users) => {
+            console.log('Users in channel:', users);
+        })
+        .joining((user) => {
+            console.log('User joined:', user);
+        })
+        .leaving((user) => {
+            console.log('User left:', user);
+        })
+        .listen('MessageSent', (e) => {
+            console.log('Presence Channel:', e);
+        });
+
     });
 
     return {
