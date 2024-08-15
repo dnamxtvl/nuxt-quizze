@@ -1,20 +1,14 @@
 const API_CONST = {
     AUTH: {
-        LOGIN: 'login',
-        LOGOUT: 'logout',
+        LOGIN: 'admin/login',
+        LOGOUT: 'admin/logout',
     },
-    EXTENSION: {
-        LIST: 'extension/index',
-        DEACTIVE_USER: 'extension/delete-user-on-extension',
-        CREATE: 'extension/create-extension',
-        UPDATE: 'extension/update-extension',
-        TOGGLE_ACTIVE: 'extension/toggle-active-extension'
+    QUIZZE: {
+        LIST: 'admin/quizzes/list',
     },
-    UNREVOKE_EXTENSION: {
-        LIST: 'unrevoke-extension-log/get-by-extension-id'
-    },
-    DEPARTMENT: {
-        LIST: 'department/list'
+    ROOM: {
+        CREATE: 'admin/room/create',
+        CHECK_VALID: 'admin/room/check-valid',
     }
 };
 

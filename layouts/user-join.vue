@@ -17,7 +17,6 @@ export default {
 </script>
 
 <style scoped>
-/* Styles riêng cho layout user */
 .layout-user {
   background-image: linear-gradient(rgb(146, 14, 134) 0%, rgb(19, 2, 18) 100%) !important;
   background-size: cover;

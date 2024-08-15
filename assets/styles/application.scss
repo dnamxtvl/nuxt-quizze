@@ -235,3 +235,7 @@ html, body {
   display: flex;
   justify-content: center;
 }
+
+.el-pagination.is-background .btn-prev, .el-pagination.is-background .btn-next, .el-pagination.is-background .el-pager li {
+  padding: 0 !important;
+}

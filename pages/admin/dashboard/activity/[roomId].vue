@@ -7,7 +7,7 @@
                 <div class="row join-code-body rounded">
                     <div class="col-xl-2 col-lg-3 col-md-4 text-white text-center mt-2">Nhập mã tham gia</div>
                     <div class="col-xl-8 col-lg-6 col-md-6 text-center">
-                        <h1 class="text-white random-code">789510</h1>
+                        <h1 class="text-white random-code">{{ code }}</h1>
                     </div>
                     <div class="col-xl-2 col-md-2 icon copy text-center mt-2">
                         <i class="ti ti-copy fs-2 text-white"></i>
@@ -289,6 +289,10 @@ interface Answer {
 
 import { defineComponent, ref } from "vue";
 import type { TabsPaneContext } from 'element-plus'
+import { useRoute } from "vue-router";
+import api from "~/server/api/axios";
+import type { ErrorResponse } from "~/constants/type";
+import { HttpStatusCode } from "axios";
 
 definePageMeta({
     layout: "admin-game",
@@ -296,9 +300,11 @@ definePageMeta({
 
 export default defineComponent({
     setup() {
-        const showPrepare = ref<boolean>(false);
+        const route = useRoute();
+        const code = ref<string>('');
+        const showPrepare = ref<boolean>(true);
         const showQuestion = ref<boolean>(false);
-        const showResult = ref<boolean>(true);
+        const showResult = ref<boolean>(false);
         const listAnswer = ref<Array<Answer>>([
             {
                 id: 1,
@@ -327,8 +333,27 @@ export default defineComponent({
             console.log(tab, event)
         }
 
+        const checkValidRoom = async () => {
+            ElLoading.service({ fullscreen: true });
+            let roomId: string = route.params.roomId;
+            await api.room.checkValidRoom(
+                roomId,
+                (res: any) => {
+                    code.value = res.code;
+                    ElLoading.service({ fullscreen: true }).close();
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    ElLoading.service({ fullscreen: true }).close();
+                    if (err.code === HttpStatusCode.NotFound) {
+                        return navigateTo("/not-found");
+                    }
+                }
+            )
+        }
+
         onMounted(async () => {
-        
+            await checkValidRoom();
         });
 
         return {
@@ -338,6 +363,7 @@ export default defineComponent({
             activeName,
             handleClick,
             showResult,
+            code,
         }
     }
 })

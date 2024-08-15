@@ -1,5 +1,5 @@
 import helperApp from "~/utils/helper";
-import LocalStorageManager from "~/utils/localStorage";
+import { useMainStore } from "~/store";
 import axios from 'axios';
 import { BACKEND_URL_DEFAULT, CODE } from "~/constants/application";
 
@@ -40,7 +40,7 @@ export default class BaseService {
         if (e.response?.hasOwnProperty('status')) {
             if (e.response.status == CODE.AUTHTHENTICATE_FAIL) {
                 helperApp.logOutWhenTokenExpired();
-                return navigateTo('/auth/login');
+                return navigateTo('/admin/login');
             }
 
             let errorsObject: Record<string, string[]>;
@@ -145,10 +145,11 @@ export default class BaseService {
     }
 
     getInstanceAxios = () => {
+        let store = useMainStore();
         const instance = axios.create({
-            baseURL: LocalStorageManager.getItemWithKey('BACKEND_URL_APP_VUE') ?? BACKEND_URL_DEFAULT,
+            baseURL: process.env.BACKEND_URL ?? BACKEND_URL_DEFAULT,
             timeout: 30000,
-            //headers: { 'Authorization': `Bearer ${store.$state.token}` }
+            headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
         instance.defaults.headers.post['Content-Type'] = 'application/json';

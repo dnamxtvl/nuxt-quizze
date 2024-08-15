@@ -199,32 +199,23 @@
                 </li>
                 <!--/ Notification -->
                 <!-- User -->
-                <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                        <div class="avatar avatar-online">
-                            <img src="../../assets/img/avatars/1.png" alt class="h-auto rounded-circle" />
-                        </div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="pages-account-settings-account.html">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0 me-3">
-                                        <div class="avatar avatar-online">
-                                            <img src="../../assets/img/avatars/1.png" alt
-                                                class="h-auto rounded-circle" />
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <span class="fw-semibold d-block">John Doe</span>
-                                        <small class="text-muted">Admin</small>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <!--/ User -->
+                <el-dropdown placement="bottom">
+                    <div class="avatar avatar-online">
+                        <img src="https://i1.sndcdn.com/avatars-000269796491-d5i759-t500x500.jpg" alt class="h-auto rounded-circle" />
+                    </div>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item>
+                                <RiUser2Line size="18px" class="me-1" />
+                                Profile
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="logout">
+                                <RiLogoutCircleFill size="18px" class="me-1" />
+                                Đăng xuất
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </ul>
         </div>
 
@@ -237,7 +228,55 @@
     </nav>
 </template>
 <script lang="ts">
+import { RiUser2Line, RiLogoutCircleFill } from '@remixicon/vue';
+import api from '~/server/api/axios';
+import { ElLoading, ElNotification } from 'element-plus';
+import CookieManager from '~/utils/cookies';
+import LocalStorageManager from '~/utils/localStorage';
+import { JWT_KEY_ACEESS_TOKEN_NAME } from '~/constants/application';
+import { useMainStore } from '~/store';
+
 export default defineComponent({
   name: 'AdminDashboardNavSearch',
+  components: {
+    RiUser2Line,
+    RiLogoutCircleFill,
+  },
+
+  setup() {
+    const store = useMainStore();
+    const logout = async () => {
+      ElLoading.service({ fullscreen: true });
+      await api.auth.logout(
+        {},
+        (res: any) => {
+          ElLoading.service({ fullscreen: true }).close();
+          notifySuccessAndRemoveTokenJwt();
+          return navigateTo("/admin/login");
+        },
+        (err: any) => {
+            alert(242);
+          ElLoading.service({ fullscreen: true }).close();
+          ElNotification({
+            title: "Error",
+            message: err.error.shift(),
+            type: "error",
+          });
+          return navigateTo("admin/login");
+        }
+      );
+    };
+
+    const notifySuccessAndRemoveTokenJwt = () => {
+      ElNotification({ title: "Success", type: "success", showClose: false });
+      CookieManager.removeCookie(JWT_KEY_ACEESS_TOKEN_NAME);
+      LocalStorageManager.setItemWithKey("isLoggedIn", false);
+      store.logout(store.$state);
+    };
+
+    return {
+        logout
+    }
+  }
 });
 </script>
