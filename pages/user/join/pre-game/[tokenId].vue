@@ -5,11 +5,11 @@
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label text-white mt-4 fs-6">Tên Quizizz của bạn
                         là...</label>
-                    <input type="email" class="form-control input-pre-game" id="exampleFormControlInput1"
+                    <input type="text" v-model="username" class="form-control input-pre-game" id="exampleFormControlInput1"
                         placeholder="Điền tên của bạn">
                 </div>
                 <div class="mb-4 w-full">
-                    <button class="btn btn-success w-full input-pre-game fs-5 fw-bold font-600">Bắt đầu</button>
+                    <button @click="createSettingGame" class="btn btn-success w-full input-pre-game fs-5 fw-bold font-600">Bắt đầu</button>
                 </div>
             </div>
         </div>
@@ -46,18 +46,53 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { ElLoading, ElNotification } from "element-plus";
+import { useValidator } from "#imports";
+import { RULES_VALIDATION } from "~/constants/application";
+import api from "~/server/api/axios";
+import { useRoute } from "vue-router";
+import { useMainStore } from "~/store";
+import type { ErrorResponse } from "~/constants/type";
 
 export default defineComponent({
   setup() {
     const valueEnableMeme = ref<boolean>(false);
     const valueEnableVolumn = ref<boolean>(false);
+    const username = ref<string >('');
+    const route = useRoute();
+    const store = useMainStore();
+
+    const createSettingGame = async () => {
+        ElLoading.service({ fullscreen: true });
+        const validator = useValidator();
+        const isUserNameLength = validator.isLength(username.value, 'username', RULES_VALIDATION.USERNAME_LENGTH.MIN, RULES_VALIDATION.USERNAME_LENGTH.MAX);
+        if (isUserNameLength !== true) {
+            ElLoading.service({ fullscreen: true }).close();
+            ElNotification({title: "Error", message: isUserNameLength, type: "error"});
+            return;
+        }
+        
+        await api.gamer.createSetting(
+            {name: username.value, display_meme: valueEnableMeme.value, token: route.params.tokenId, gamer_id: store.$state.gamerId},
+            (res: any) => {
+                ElLoading.service({ fullscreen: true }).close();
+                return navigateTo("/user/join/game/" + route.params.tokenId);
+            },
+            (err: ErrorResponse) => {
+                ElLoading.service({ fullscreen: true }).close();
+                ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+            }
+        )
+    }
 
     onMounted(async () => {
     });
 
     return {
         valueEnableMeme,
-        valueEnableVolumn
+        valueEnableVolumn,
+        username,
+        createSettingGame,
     }
   }
 })

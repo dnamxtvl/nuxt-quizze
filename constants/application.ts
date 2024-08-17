@@ -35,6 +35,9 @@ export const RULES_VALIDATION = {
         MIN: 6,
         MAX: 255
     },
+    CODE: {
+        LENGTH: 6,
+    }
 
 }
 

@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
         return;
     }
 
-    if (to.path === '/admin/login') {
+    if (to.path === '/admin/login' || to.path.includes('/user')) {
         return navigateTo('/admin/dashboard/my-library');
     }
 });

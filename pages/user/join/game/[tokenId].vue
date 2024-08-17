@@ -2,12 +2,12 @@
     <div>
         <div class="w-full" v-show="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
-                <p class="text-white text-center fs-2">Wc gần nhất diễn ra vào năm nào?</p>
+                <p class="text-white text-center fs-2">{{ currentQuestion.title }}</p>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-4">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in listAnswer"
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in currentQuestion.answers"
                     :key="index">
-                    <div
+                    <div @click="submitAnswer(item.id)"
                         class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
                         <span
                             class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index + 1}}</span>
@@ -23,13 +23,13 @@
                             <div class="coccoc-alo-ph-circle-fill"></div>
                             <div class="coccoc-alo-ph-img-circle"></div>
                         </div>
-                        <span class="fs-4 text-white user-name-text me-3">
-                            Nam (VTI.D5)
+                        <span class="fs-4 text-white user-name-text me-3 text-primary">
+                            {{ gamerInfo?.name }}
                         </span>
                         <div class="divider hidden sm:block"></div>
                         <div>
                             <button
-                                class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">1/4</button>
+                                class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{ currentQuestionIndex + 1 }}/{{ listQuestion.length }}</button>
                         </div>
                     </div>
                     <div class="control-center-actions"></div>
@@ -223,6 +223,10 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { ElLoading } from "element-plus";
+import api from "~/server/api/axios";
+import { useRoute } from "vue-router";
+import type { ErrorResponse } from "~/constants/type";
+import { HttpStatusCode } from "axios";
 
 definePageMeta({
   layout: 'user-game'
@@ -232,59 +236,132 @@ interface Answer {
     id: number;
     answer: string;
     isCorrect: boolean;
+    created_at: string;
+}
+
+interface GamerInfo {
+    id: string;
+    name: string;
+    created_at: string
+}
+
+interface ItemQuestion {
+    id: string;
+    title: string;
+    quizze_id: string;
+    answers: Array<Answer>;
+    created_at: string;
 }
 
 export default defineComponent({
   setup() {
-    const showQuestion = ref<boolean>(false);
-    const showPreviewEnding = ref<boolean>(true);
-    const listAnswer = ref<Array<Answer>>([
+    const route = useRoute();
+    const listQuestion = ref<Array<ItemQuestion>>([]);
+    const showQuestion = ref<boolean>(true);
+    const showPreviewEnding = ref<boolean>(false);
+    const gamerInfo = ref<GamerInfo>();
+    const currentQuestion = ref<ItemQuestion>({
+        id: '',
+        title: '',
+        quizze_id: '',
+        answers: [],
+        created_at: ''
+    });
+    const roomId = ref<string>('');
+    const currentRoomStatus = ref<number>(0);
+    const currentScore = ref<number>(0);
+    const currentQuestionIndex = ref<number>(0);
+    const currenListAnswer = ref<Array<Answer>>([
         {
             id: 1,
             answer: '1998',
-            isCorrect: false
+            isCorrect: false,
+            created_at: '2022-10-10 10:10:10'
         },
         {
             id: 2,
             answer: '2022',
-            isCorrect: false
+            isCorrect: false,
+            created_at: '2022-10-10 10:10:10'
         },
         {
             id: 3,
             answer: '2006',
-            isCorrect: true
+            isCorrect: true,
+            created_at: '2022-10-10 10:10:10'
         },
         {
             id: 4,
             answer: '2010',
-            isCorrect: false
+            isCorrect: false,
+            created_at: '2022-10-10 10:10:10'
         }
     ]);
 
+    const getListQuestion = async () => {
+        ElLoading.service({ fullscreen: true });
+        await api.room.listQuestionOfRoom(
+            route.params.tokenId.toString(),
+            (res: any) => {
+                listQuestion.value = res.questions;
+                currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+                gamerInfo.value = res.gamer;
+                roomId.value = res.room.id;
+                currentRoomStatus.value = res.room.status;
+                ElLoading.service({ fullscreen: true }).close();
+            },
+            (err: ErrorResponse) => {
+                ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                ElLoading.service({ fullscreen: true }).close();
+                if (err.code === HttpStatusCode.NotFound) {
+                    return navigateTo("/not-found");
+                }
+            }
+        )
+    }
+
+    const submitAnswer = async (id: number) => {
+        await api.gamer.submitAnswer(
+            {
+                answer_id: id,
+                token: route.params.tokenId.toString()
+            },
+            (res: any) => {
+                currentScore.value = res.score;
+                if (res.score > 0) {
+                    ElNotification({title: "Chúc mừng!", message: "+" + res.score, type: "success"});
+                } else {
+                    ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
+                }
+            },
+            (err: ErrorResponse) => {
+                ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+            }
+        )
+    }
+
     onMounted(async () => {
-        //ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' });
         const { $echo }: any = useNuxtApp();
-
-    $echo.join('channel-name')
-        .here((users) => {
-            console.log('Users in channel:', users);
-        })
-        .joining((user) => {
-            console.log('User joined:', user);
-        })
-        .leaving((user) => {
-            console.log('User left:', user);
-        })
-        .listen('MessageSent', (e) => {
-            console.log('Presence Channel:', e);
-        });
-
+        await getListQuestion();
+        if (currentRoomStatus.value == 0) {
+            ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' });
+        }
+        $echo.channel('admin.start-game.' + roomId.value)
+            .listen('StartGameEvent', (e: any) => {
+                ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+            });
     });
 
     return {
-        listAnswer,
+        currenListAnswer,
         showQuestion,
         showPreviewEnding,
+        currentQuestion,
+        currentQuestionIndex,
+        listQuestion,
+        gamerInfo,
+        submitAnswer,
+        currentScore,
     }
   }
 })

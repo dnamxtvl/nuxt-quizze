@@ -57,5 +57,13 @@ export const useValidator = () => {
       let res = string.match(RULES_VALIDATION.VALID_TIME);
       return !(res == null);
     },
+
+    isValidCode: (code: string) => {
+      if (code == '') {
+        return false;
+      }
+
+      return code.length == RULES_VALIDATION.CODE.LENGTH;
+    }
   }
 }

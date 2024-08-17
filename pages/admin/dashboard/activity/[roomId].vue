@@ -20,22 +20,27 @@
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-primary w-full fs-5">
+                        <button @click="startGame" class="btn btn-primary w-full fs-5">
                             Bắt đầu
                         </button>
                     </div>
+                </div>
+                <div class="row d-flex justify-content-center" v-for="(item, index) in listUserJoined" :key="index">
+                    <span class="text-white text-center">
+                        <RiUser2Fill class="mb-2" :color="getRandomColor()" size="1.5em" /><span class="text-primary fs-4">{{ item.name
+                            }}</span><span class="pb-2"> đã tham gia</span>
+                    </span>
                 </div>
             </div>
         </div>
         <div class="w-full" v-show="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
-                <p class="text-white text-center fs-2">Wc gần nhất diễn ra vào năm nào?</p>
+                <p class="text-white text-center fs-2">{{ currentQuestion.title }}</p>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-4">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in listAnswer"
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in currentQuestion.answers"
                     :key="index">
-                    <div
-                        class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
+                    <div class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
                             1}}</span>
                         <p class="text-white fs-2 text-center">{{ item.answer }}</p>
@@ -51,12 +56,17 @@
                             <div class="coccoc-alo-ph-img-circle"></div>
                         </div>
                         <span class="fs-4 text-white user-name-text me-3">
-                            30
+                            {{ listUserJoined.length}}
                         </span>
                         <div class="divider hidden sm:block"></div>
                         <div>
-                            <button
-                                class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">1/4</button>
+                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{ (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" + listQuestion.length }}
+                            </button>
+                        </div>
+                        <div>
+                            <button @click="nextQuestion(currentQuestion.id)"  v-if="showButtonNext" class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
+                                Tiếp theo
+                            </button>
                         </div>
                     </div>
                     <div class="control-center-actions"></div>
@@ -156,116 +166,18 @@
                         <el-tab-pane label="Câu hỏi" name="second">
                             <div class="row pt-4 rounded rounded-5 body-answer-review">
                                 <div class="col-lg-12 px-4 mb-2">
-                                    <div
+                                    <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">1. Wc gần nhất diễn ra
-                                            vào năm
-                                            nào?</p>
+                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
+                                            {{ (index + 1) + "." + item.title }}
+                                        </p>
                                         <hr>
                                         </hr>
                                         <div class="question-answer-review px-4 pt-2 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckDefault">
+                                            <div class="form-check" v-for="(answer, index) in item.answers">
+                                                <RiCheckFill :color="answer.is_correct ? 'green' : 'red'"/>
                                                 <label class="form-check-label text-white ms-2" for="flexCheckDefault">
-                                                    2021
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2022
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2019
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2012
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">1. Wc gần nhất diễn ra
-                                            vào năm
-                                            nào?</p>
-                                        <hr>
-                                        </hr>
-                                        <div class="question-answer-review px-4 pt-2 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckDefault">
-                                                <label class="form-check-label text-white ms-2" for="flexCheckDefault">
-                                                    2021
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2022
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2019
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2012
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">1. Wc gần nhất diễn ra
-                                            vào năm
-                                            nào?</p>
-                                        <hr>
-                                        </hr>
-                                        <div class="question-answer-review px-4 pt-2 mb-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckDefault">
-                                                <label class="form-check-label text-white ms-2" for="flexCheckDefault">
-                                                    2021
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2022
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2019
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label text-white ms-2" for="flexCheckChecked">
-                                                    2012
+                                                    {{ answer.answer }}
                                                 </label>
                                             </div>
                                         </div>
@@ -284,7 +196,21 @@
 interface Answer {
     id: number;
     answer: string;
-    isCorrect: boolean;
+    is_correct: number;
+}
+
+interface gamerInfo {
+    id: string;
+    name: string;
+    created_at: string
+}
+
+interface ItemQuestion {
+    id: string;
+    title: string;
+    quizze_id: string;
+    answers: Array<Answer>;
+    created_at: string;
 }
 
 import { defineComponent, ref } from "vue";
@@ -293,42 +219,42 @@ import { useRoute } from "vue-router";
 import api from "~/server/api/axios";
 import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";
+import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
+import helperApp from "~/utils/helper";
+import { RoomStatus } from "~/constants/room";
 
 definePageMeta({
     layout: "admin-game",
 })
 
 export default defineComponent({
+    components: {
+        RiUser2Fill,
+        RiCheckFill,
+    },
     setup() {
         const route = useRoute();
         const code = ref<string>('');
         const showPrepare = ref<boolean>(true);
         const showQuestion = ref<boolean>(false);
         const showResult = ref<boolean>(false);
-        const listAnswer = ref<Array<Answer>>([
-            {
-                id: 1,
-                answer: '1998',
-                isCorrect: false
-            },
-            {
-                id: 2,
-                answer: '2022',
-                isCorrect: false
-            },
-            {
-                id: 3,
-                answer: '2006',
-                isCorrect: true
-            },
-            {
-                id: 4,
-                answer: '2010',
-                isCorrect: false
-            }
-        ]);
-
+        const listUserJoined = ref<Array<gamerInfo>>([]);
+            const currentQuestion = ref<ItemQuestion>({
+                id: '',
+                title: '',
+                quizze_id: '',
+                answers: [],
+                created_at: ''
+            });
+        const listAnswer = ref<Array<Answer>>([]);
+            const listQuestion = ref<Array<ItemQuestion>>([]);
         const activeName = ref<string>('first')
+        const showButtonNext = ref<boolean>(false);
+        const roomStatus = ref<number>(0);
+
+        const converBool = (value: number) => {
+            return value == 1
+        }
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
         }
@@ -339,7 +265,12 @@ export default defineComponent({
             await api.room.checkValidRoom(
                 roomId,
                 (res: any) => {
-                    code.value = res.code;
+                    code.value = res.room.code;
+                    listUserJoined.value = res.room.gamers;
+                    listQuestion.value = res.questions;
+                    roomStatus.value = res.room.status;
+                    currentQuestion.value = res.room.current_question_id ?
+                        res.questions.find((item: ItemQuestion) => item.id == res.room.current_question_id) : res.questions[0];
                     ElLoading.service({ fullscreen: true }).close();
                 },
                 (err: ErrorResponse) => {
@@ -352,8 +283,53 @@ export default defineComponent({
             )
         }
 
+        const startGame = async () => {
+            ElLoading.service({ fullscreen: true });
+            await api.room.startGame(
+                route.params.roomId.toString(),
+                (res: any) => {
+                    showPrepare.value = false;
+                    showQuestion.value = true;
+                    ElLoading.service({ fullscreen: true }).close();
+                    showButtonNext.value = false;
+
+                    setTimeout(() => {
+                        showButtonNext.value = true;
+                    }, 30000);
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Warning", message: err.error.shift(), type: "warning"});
+                    ElLoading.service({ fullscreen: true }).close();
+                }
+            )
+        }
+
+        const getRandomColor = () => {
+            return helperApp.getRandomColor();
+        }
+
+        const nextQuestion = async () => {
+            
+        }
+
+        const setRoomStatus = () => {
+            if (roomStatus.value == RoomStatus.HAPPING) {
+                showPrepare.value = false;
+                showQuestion.value = true;
+            }
+            if (roomStatus.value == RoomStatus.PENDING) {
+                showButtonNext.value = true;
+            }
+        }
+
         onMounted(async () => {
+            const { $echo }: any = useNuxtApp();
             await checkValidRoom();
+            setRoomStatus();
+            $echo.private('user.join-room.' + route.params.roomId.toString())
+                .listen('UserJoinRoomEvent', (e: any) => {
+                    listUserJoined.value = e.gamers;
+                });
         });
 
         return {
@@ -364,11 +340,23 @@ export default defineComponent({
             handleClick,
             showResult,
             code,
+            startGame,
+            listUserJoined,
+            getRandomColor,
+            listQuestion,
+            converBool,
+            currentQuestion,
+            showButtonNext,
+            nextQuestion,
         }
     }
 })
 </script>
 <style scoped>
+.table-preview-result .el-tab-pane {
+    overflow-y: scroll;
+    max-height: 920px;
+}
 .table {
     background-color: #090909cc;
 }
