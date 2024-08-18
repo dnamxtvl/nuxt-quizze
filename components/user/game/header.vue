@@ -16,11 +16,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item ms-2 navbar-brand fw-bold btn btn-outline-dark text-white">
+                    <!-- <li class="nav-item ms-2 navbar-brand fw-bold btn btn-outline-dark text-white">
                         976349
-                    </li>
+                    </li> -->
                     <li class="nav-item ms-2">
-                        <a class="nav-link btn btn-danger">Thoát</a>
+                        <button @click="outGame()" class="nav-link btn btn-danger">Thoát</button>
                     </li>
                 </ul>
             </div>
@@ -28,8 +28,33 @@
     </nav>
 </template>
 <script lang="ts">
+import { useRoute } from "vue-router";
+import api from "~/server/api/axios";
+import API_CONST from "~/utils/apiConst";
+import type { ErrorResponse } from "~/constants/type";
+
 export default defineComponent({
-  name: 'UserGameHeader'
+  name: 'UserGameHeader',
+  setup() {
+    const route = useRoute();
+    const outGame = async () => {
+        if (route.path.includes(API_CONST.FRONT_END.USER_GAME)) {
+            await api.gamer.outGame(
+                route.params.tokenId.toString(),
+                (res: any) => {
+                    navigateTo("/user/join");
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                }
+            );
+        }
+    }
+    
+    return {
+        outGame
+    }
+  }
 });
 </script>
 <style scoped>

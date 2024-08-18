@@ -17,4 +17,10 @@ export default class RoomService extends BaseService {
     startGame = async (id: string, success: any, error: any) => {
         await this.post(API_CONST.ROOM.START, {room_id: id}, success, error);
     };
+    nextQuestion = async (params: Object, success: any, error: any) => {
+        await this.post(API_CONST.ROOM.NEXT_QUESTION, params,success, error);
+    };
+    adminEndGame = async (roomId: string, success: any, error: any) => {
+        await this.post(API_CONST.ROOM.ADMIN_END_GAME + '/' + roomId, {}, success, error);
+    };
 }

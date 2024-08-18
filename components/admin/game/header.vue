@@ -16,20 +16,70 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item ms-2 navbar-brand fw-bold btn btn-outline-dark text-white">
-                        976349
-                    </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-danger text-white">Kết thúc</a>
+                        <button @click="showModalEndGame()" class="nav-link btn btn-danger text-white">Kết thúc</button>
                     </li>
                 </ul>
             </div>
+            <el-dialog v-model="centerDialogVisible" :close-on-click-modal="false" title="Warning" width="500" align-center>
+                <span>Bạn có chắc chắn muốn kết thúc màn chơi?</span>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="centerDialogVisible = false">Đóng</el-button>
+                        <el-button type="primary" @click="outGame()">
+                            Xác nhận
+                        </el-button>
+                    </div>
+                </template>
+            </el-dialog>
         </div>
     </nav>
 </template>
 <script lang="ts">
+import { defineComponent, ref } from "vue";
+import { useRoute } from "vue-router";
+import api from "~/server/api/axios";
+import API_CONST from "~/utils/apiConst";
+import type { ErrorResponse } from "~/constants/type";
+
 export default defineComponent({
-  name: 'AdminGameHeader'
+    name: 'AdminGameHeader',
+    props: {
+        code: {
+            type: Number,
+            required: true,
+        },
+    },
+    setup(props) {
+        const route = useRoute();
+        const centerDialogVisible = ref<boolean>(false);
+        const outGame = async () => {
+            if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
+                await api.room.adminEndGame(
+                    route.params.roomId.toString(),
+                    (res: any) => {
+                        navigateTo("/admin/dashboard/my-library");
+                    },
+                    (err: ErrorResponse) => {
+                        ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    }
+                );
+            }
+        }
+
+        const showModalEndGame = () => {
+            centerDialogVisible.value = true;
+        }
+
+        onMounted(() => {});
+
+        return {
+            code: props.code,
+            centerDialogVisible,
+            showModalEndGame,
+            outGame,
+        };
+    },
 });
 </script>
 <style scoped>

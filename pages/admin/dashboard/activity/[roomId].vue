@@ -33,9 +33,10 @@
                 </div>
             </div>
         </div>
-        <div class="w-full" v-show="showQuestion">
+        <div class="w-full" v-if="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
-                <p class="text-white text-center fs-2">{{ currentQuestion.title }}</p>
+                <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}. {{ currentQuestion.title }}</p>
+                <h3 class="text-warning text-center fs-1">{{remainingTime }}</h3>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-4">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in currentQuestion.answers"
@@ -47,33 +48,8 @@
                     </div>
                 </div>
             </div>
-            <div class="control-center">
-                <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
-                    <div class="ring d-flex">
-                        <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
-                            <div class="coccoc-alo-ph-circle"></div>
-                            <div class="coccoc-alo-ph-circle-fill"></div>
-                            <div class="coccoc-alo-ph-img-circle"></div>
-                        </div>
-                        <span class="fs-4 text-white user-name-text me-3">
-                            {{ listUserJoined.length}}
-                        </span>
-                        <div class="divider hidden sm:block"></div>
-                        <div>
-                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{ (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" + listQuestion.length }}
-                            </button>
-                        </div>
-                        <div>
-                            <button @click="nextQuestion(currentQuestion.id)"  v-if="showButtonNext" class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
-                                Tiếp theo
-                            </button>
-                        </div>
-                    </div>
-                    <div class="control-center-actions"></div>
-                </div>
-            </div>
         </div>
-        <div class="table-preview-result" v-show="showResult">
+        <div class="table-preview-result" v-if="showResult">
             <div class="row d-flex justify-content-center">
                 <div class="col-md-5">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
@@ -85,78 +61,19 @@
                                         <th scope="col" class="fs-6 text-white">Tên</th>
                                         <th scope="col" class="fs-6 text-white">Điểm</th>
                                         <th scope="col" class="fs-6 text-white">Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white">Thời gian thực hiện(ms)</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Chi tiết</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th scope="row" class="text-white">1</th>
-                                        <td class="text-white">Mark</td>
-                                        <td class="text-white">Otto</td>
-                                        <td class="text-white">@mdo</td>
+                                    <tr v-for="(item, index) in listGamerResult" :key="index">
+                                        <th scope="row" class="text-white">{{ index + 1 }}</th>
+                                        <td class="text-white">{{ item.name }}</td>
+                                        <td class="text-white">{{ item.gamer_answers_sum_score }}</td>
+                                        <td class="text-white">{{ countQuestionTrue(item) }}</td>
                                         <td class="text-white">
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-white">2</th>
-                                        <td class="text-white">Jacob</td>
-                                        <td class="text-white">Thornton</td>
-                                        <td class="text-white">@fat</td>
-                                        <td class="text-white">
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-white">3</th>
-                                        <td colspan="2" class="text-white">Larry the Bird</td>
-                                        <td class="text-white">@twitter</td>
-                                        <td class="text-white">
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
-                                            </span>
-                                            <span class="badge rounded-pill bg-primary ms-1">
-                                                <p>Q1</p>
-                                                <p>2345</p>
+                                            <span :class="'badge rounded-pill ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
+                                                <p>{{ 'Q' + (key + 1) }}</p>
+                                                <p>{{ getResultQustionColor(item.gamer_answers, question.id).score }}</p>
                                             </span>
                                         </td>
                                     </tr>
@@ -189,6 +106,32 @@
                 </div>
             </div>
         </div>
+        <div class="control-center position-absolute top-725" v-show="showQuestion || showResult">
+            <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
+                <div class="ring d-flex">
+                    <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
+                        <div class="coccoc-alo-ph-circle"></div>
+                        <div class="coccoc-alo-ph-circle-fill"></div>
+                        <div class="coccoc-alo-ph-img-circle"></div>
+                    </div>
+                    <span class="fs-4 text-primary text-center user-name-text me-3">
+                        {{ listUserJoined.length + ' user'}}
+                        <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ code }}</div>
+                    </span>
+                    <div class="divider hidden sm:block"></div>
+                    <div>
+                        <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{ (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" + listQuestion.length }}
+                        </button>
+                    </div>
+                    <div>
+                        <button @click="nextQuestion(currentQuestion.id)"  v-if="showButtonNext" class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
+                            Tiếp theo
+                        </button>
+                    </div>
+                </div>
+                <div class="control-center-actions"></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -214,7 +157,7 @@ interface ItemQuestion {
 }
 
 import { defineComponent, ref } from "vue";
-import type { TabsPaneContext } from 'element-plus'
+import type { TabsPaneContext } from 'element-plus';
 import { useRoute } from "vue-router";
 import api from "~/server/api/axios";
 import type { ErrorResponse } from "~/constants/type";
@@ -251,6 +194,10 @@ export default defineComponent({
         const activeName = ref<string>('first')
         const showButtonNext = ref<boolean>(false);
         const roomStatus = ref<number>(0);
+        const listGamerResult = ref<Array<any>>([]);
+        const remainingTime = ref<number>(0);
+        const remainingTimeReload = ref<number>(0);
+        let intervalId: any;
 
         const converBool = (value: number) => {
             return value == 1
@@ -260,7 +207,6 @@ export default defineComponent({
         }
 
         const checkValidRoom = async () => {
-            ElLoading.service({ fullscreen: true });
             let roomId: string = route.params.roomId;
             await api.room.checkValidRoom(
                 roomId,
@@ -269,6 +215,13 @@ export default defineComponent({
                     listUserJoined.value = res.room.gamers;
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
+                    if (res.room.status == RoomStatus.HAPPING) {
+                        remainingTimeReload.value = res.room.time_remaining;
+                        remainingTime.value = res.room.time_remaining;
+                        // setShowResult(remainingTimeReload.value * 1000);
+                        calculateTimeReply();
+                    }
+                    listGamerResult.value = res.gamers;
                     currentQuestion.value = res.room.current_question_id ?
                         res.questions.find((item: ItemQuestion) => item.id == res.room.current_question_id) : res.questions[0];
                     ElLoading.service({ fullscreen: true }).close();
@@ -290,9 +243,11 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
+                    remainingTime.value = 30;
+                    calculateTimeReply();
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
-
+                    setShowResult(30000);
                     setTimeout(() => {
                         showButtonNext.value = true;
                     }, 30000);
@@ -308,21 +263,110 @@ export default defineComponent({
             return helperApp.getRandomColor();
         }
 
-        const nextQuestion = async () => {
-            
+        const nextQuestion = async (id: string) => {
+            ElLoading.service({ fullscreen: true });
+            await api.room.nextQuestion(
+                {
+                    room_id: route.params.roomId.toString(),
+                    question_id: id
+                },
+                (res: any) => {
+                    ElLoading.service({ fullscreen: true }).close();
+                    let nextQuestionIndex = listQuestion.value.findIndex((item: ItemQuestion) => item.id == id) + 1;
+                    showButtonNext.value = false;
+                    if (nextQuestionIndex < listQuestion.value.length) {
+                        remainingTime.value = 30;
+                        currentQuestion.value = listQuestion.value[nextQuestionIndex];
+                        setShowResult(30000);
+                    }
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    ElLoading.service({ fullscreen: true }).close();
+                }
+            )
+        }
+
+        const setShowResult = (delay: number) => {
+            showResult.value = false;
+            showQuestion.value = true;
+            calculateTimeReply();
+            setTimeout(async () => {
+                await checkValidRoom();
+                showButtonNext.value = true;
+                showResult.value = true;
+                showQuestion.value = false;
+            }, delay);
         }
 
         const setRoomStatus = () => {
+            if (roomStatus.value == RoomStatus.PREPARE) {
+                showPrepare.value = true;
+            }
             if (roomStatus.value == RoomStatus.HAPPING) {
                 showPrepare.value = false;
                 showQuestion.value = true;
             }
             if (roomStatus.value == RoomStatus.PENDING) {
+                showPrepare.value = false;
+                showResult.value = true;
                 showButtonNext.value = true;
+            }
+            if (roomStatus.value == RoomStatus.PREPARE_FINISH) {
+                showPrepare.value = false;
+                showResult.value = true;
+                showQuestion.value = false;
+                showButtonNext.value = false;
             }
         }
 
+        const countQuestionTrue = (item: any) => {
+            return item.gamer_answers.filter((answer: any) => answer.score > 0).length;
+        }
+
+        const getResultQustionColor = (gamerAnswers: any, questionId: string) => {
+            if (gamerAnswers.length == 0) {
+                return {
+                    score: 0,
+                    class: "bg-warning"
+                };
+            }
+
+            let answer = gamerAnswers.filter((answer: any) => answer.question_id == questionId);
+
+            if (answer.length > 0) {
+                if (answer[0].score > 0) {
+                    return {
+                        score: answer[0].score,
+                        class: "bg-success"
+                    };
+                }
+
+                return {
+                    score: 0,
+                    class: "bg-danger"
+                }
+            }
+            
+            return {
+                score: 0,
+                class: "bg-warning"
+            };
+        }
+
+        const calculateTimeReply = () => {
+            intervalId = setInterval(() => {
+                if (remainingTime.value > 0) {
+                    remainingTime.value--;
+                    } else {
+                        clearInterval(intervalId);
+                    }
+                }, 1000
+            );
+        }
+
         onMounted(async () => {
+            ElLoading.service({ fullscreen: true });
             const { $echo }: any = useNuxtApp();
             await checkValidRoom();
             setRoomStatus();
@@ -348,452 +392,14 @@ export default defineComponent({
             currentQuestion,
             showButtonNext,
             nextQuestion,
+            listGamerResult,
+            countQuestionTrue,
+            getResultQustionColor,
+            remainingTime,
         }
     }
 })
 </script>
-<style scoped>
-.table-preview-result .el-tab-pane {
-    overflow-y: scroll;
-    max-height: 920px;
-}
-.table {
-    background-color: #090909cc;
-}
-
-.body-answer-review {
-    background-color: #090909cc;
-    border-radius: 1.5rem !important;
-}
-
-.demo-tabs > .el-tabs__content {
-    padding: 32px;
-    color: #6b778c;
-    font-size: 32px;
-    font-weight: 600;
-}
-
-.body-admin-game {
-    top: 80px;
-    --bs-gutter-x: 0;
-}
-
-.join-code {
-    background-color: #090909cc;
-}
-
-.join-code-body {
-    background-color: #ffffff1a;
-}
-
-.random-code {
-    font-size: 4rem;
-}
-
-.count-member {
-    width: 50px;
-    height: 50px;
-    background-color: #ffffff0d;
-}
-
-.question-title {
-    min-height: 350px;
-    background-color: #00000080;
-}
-.list-answer-item {
-    min-height: 340px;
-    background-color: #00000080;
-}
-.user-name-text {
-    padding-top: 60px;
-}
-.button-num-answer {
-    margin-top: 55px;
-}
-.control-center {
-    margin-top: 20px;
-    background-color: #000;
-    max-height: 160px;
-}
-.divider {
-    background: #ffffff54;
-    flex-shrink: 0;
-    width: 2px;
-    height: 70px;
-    margin: auto 8px;
-}
-.show-meme {
-    min-height: 800px;
-}
-.right-0 {
-    right: 0;
-}
-@media screen and (max-width: 768px) {
-    .list-answer-item {
-        margin-top: 0.75rem;
-        min-height: 100px;
-    }
-}
-.coccoc-alo-ph-circle {
-    width: 160px;
-    height: 160px;
-    top: 0px;
-    left: 20px;
-    position: absolute;
-    background-color: transparent;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    border: 2px solid rgba(30, 30, 30, 0.4);
-    opacity: .1;
-    -webkit-animation: coccoc-alo-circle-anim 1.2s infinite ease-in-out;
-    -moz-animation: coccoc-alo-circle-anim 1.2s infinite ease-in-out;
-    -ms-animation: coccoc-alo-circle-anim 1.2s infinite ease-in-out;
-    -o-animation: coccoc-alo-circle-anim 1.2s infinite ease-in-out;
-    animation: coccoc-alo-circle-anim 1.2s infinite ease-in-out;
-    -webkit-transition: all .5s;
-    -moz-transition: all .5s;
-    -o-transition: all .5s;
-    transition: all .5s;
-}
-
-.coccoc-alo-phone {
-    background-color: transparent;
-    width: 200px;
-    height: 160px;
-    cursor: pointer;
-    z-index: 200000 !important;
-    -webkit-backface-visibility: hidden;
-    -webkit-transform: translateZ(0);
-    -webkit-transition: visibility .5s;
-    -moz-transition: visibility .5s;
-    -o-transition: visibility .5s;
-    transition: visibility .5s;
-    right: 150px;
-    top: 10px;
-}
-
-.coccoc-alo-phone.coccoc-alo-green .coccoc-alo-ph-circle-fill {
-    background-color: rgba(0, 175, 242, 0.5);
-    opacity: .75 !important;
-}
-
-.coccoc-alo-ph-circle-fill {
-    width: 100px;
-    height: 100px;
-    top: 30px;
-    left: 50px;
-    position: absolute;
-    background-color: #000;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    border: 2px solid transparent;
-    opacity: .1;
-    -webkit-animation: coccoc-alo-circle-fill-anim 2.3s infinite ease-in-out;
-    -moz-animation: coccoc-alo-circle-fill-anim 2.3s infinite ease-in-out;
-    -ms-animation: coccoc-alo-circle-fill-anim 2.3s infinite ease-in-out;
-    -o-animation: coccoc-alo-circle-fill-anim 2.3s infinite ease-in-out;
-    animation: coccoc-alo-circle-fill-anim 2.3s infinite ease-in-out;
-    -webkit-transition: all .5s;
-    -moz-transition: all .5s;
-    -o-transition: all .5s;
-    transition: all .5s;
-}
-
-.coccoc-alo-ph-img-circle {
-    width: 60px;
-    height: 60px;
-    top: 50px;
-    left: 70px;
-    position: absolute;
-    background: rgba(30, 30, 30, 0.1) url(https://drive.google.com/uc?id=1V3N2b79QjDWetC_ss9wI3c-xpWDymn9R) no-repeat center center;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    border: 2px solid transparent;
-    opacity: .7;
-    -webkit-animation: coccoc-alo-circle-img-anim 1s infinite ease-in-out;
-    -moz-animation: coccoc-alo-circle-img-anim 1s infinite ease-in-out;
-    -ms-animation: coccoc-alo-circle-img-anim 1s infinite ease-in-out;
-    -o-animation: coccoc-alo-circle-img-anim 1s infinite ease-in-out;
-    animation: coccoc-alo-circle-img-anim 1s infinite ease-in-out;
-}
-
-.coccoc-alo-phone.coccoc-alo-green .coccoc-alo-ph-img-circle {
-    background-color: #00aff2;
-}
-
-.coccoc-alo-phone.coccoc-alo-green .coccoc-alo-ph-circle {
-    border-color: #00aff2;
-    opacity: .5;
-}
-
-.coccoc-alo-phone.coccoc-alo-green.coccoc-alo-hover .coccoc-alo-ph-circle,
-.coccoc-alo-phone.coccoc-alo-green:hover .coccoc-alo-ph-circle {
-    border-color: #75eb50;
-    opacity: .5;
-}
-
-.coccoc-alo-phone.coccoc-alo-green.coccoc-alo-hover .coccoc-alo-ph-circle-fill,
-.coccoc-alo-phone.coccoc-alo-green:hover .coccoc-alo-ph-circle-fill {
-    background-color: rgba(117, 235, 80, 0.5);
-    opacity: .75 !important;
-}
-
-.coccoc-alo-phone.coccoc-alo-green.coccoc-alo-hover .coccoc-alo-ph-img-circle,
-.coccoc-alo-phone.coccoc-alo-green:hover .coccoc-alo-ph-img-circle {
-    background-color: #75eb50;
-}
-
-@-moz-keyframes coccoc-alo-circle-anim {
-    0% {
-        transform: rotate(0) scale(.5) skew(1deg);
-        opacity: .1
-    }
-    30% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .5
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .1
-    }
-}
-
-@-webkit-keyframes coccoc-alo-circle-anim {
-    0% {
-        transform: rotate(0) scale(.5) skew(1deg);
-        opacity: .1
-    }
-    30% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .5
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .1
-    }
-}
-
-@-o-keyframes coccoc-alo-circle-anim {
-    0% {
-        transform: rotate(0) scale(.5) skew(1deg);
-        opacity: .1
-    }
-    30% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .5
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .1
-    }
-}
-
-@keyframes coccoc-alo-circle-anim {
-    0% {
-        transform: rotate(0) scale(.5) skew(1deg);
-        opacity: .1
-    }
-    30% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .5
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .1
-    }
-}
-
-@-moz-keyframes coccoc-alo-circle-fill-anim {
-    0% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .2
-    }
-    100% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-}
-
-@-webkit-keyframes coccoc-alo-circle-fill-anim {
-    0% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .2
-    }
-    100% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-}
-
-@-o-keyframes coccoc-alo-circle-fill-anim {
-    0% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .2
-    }
-    100% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-}
-
-@keyframes coccoc-alo-circle-fill-anim {
-    0% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg);
-        opacity: .2
-    }
-    100% {
-        transform: rotate(0) scale(.7) skew(1deg);
-        opacity: .2
-    }
-}
-
-@-moz-keyframes coccoc-alo-circle-img-anim {
-    0% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    10% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    20% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    30% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    40% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-}
-
-@-webkit-keyframes coccoc-alo-circle-img-anim {
-    0% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    10% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    20% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    30% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    40% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-}
-
-@-o-keyframes coccoc-alo-circle-img-anim {
-    0% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    10% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    20% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    30% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    40% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-}
-
-@keyframes coccoc-alo-circle-img-anim {
-    0% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    10% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    20% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    30% {
-        transform: rotate(-25deg) scale(1) skew(1deg)
-    }
-    40% {
-        transform: rotate(25deg) scale(1) skew(1deg)
-    }
-    50% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-    100% {
-        transform: rotate(0) scale(1) skew(1deg)
-    }
-}
-
-.bg-dark-with-opacity {
-    background-color: #00000080;
-}
-
-.bg-dark {
-    background-color: #000 !important;
-}
-
-.accuracy-bar-wrapper .accuracy-bar {
-    height: 12px;
-    margin-top: 8px;
-    margin-bottom: 2px;
-    display: flex;
-    position: relative;
-}
-
-.accuracy-bar-wrapper .accuracy-bar .accuracy-success-fill {
-    background-color: #00c985;
-    border-radius: 8px 0 0 8px;
-    width: 0;
-    height: 16px;
-    transition: width .2s ease-in-out;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.form-check {
-    display: flex;
-}
-
-.bg-white {
-    background-color: #f2f2f2 !important;
-}
+<style scoped lang="scss">
+@import '~/assets/styles/admin/admin-game.scss';
 </style>

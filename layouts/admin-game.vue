@@ -5,18 +5,26 @@
                 Your browser does not support the video tag. 
             </video>
         </div>
-        <AdminGameHeader class="position-absolute top-0 w-full" />
+        <AdminGameHeader :code="code" class="position-absolute top-0 w-full" />
         <slot />
     </div>
 </template>
   
 <script lang="ts">
+import { defineComponent, ref } from "vue";
 
-export default {
+export default defineComponent({
     components: {
+    },
+    setup(props) {
+        const code = ref<number>(0);
+        onMounted(() => {});
 
-    }
-}
+        return {
+            code
+        };
+    },
+});
 </script>
 
 <style scoped>

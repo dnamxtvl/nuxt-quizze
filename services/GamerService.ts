@@ -8,4 +8,7 @@ export default class GamerService extends BaseService {
     submitAnswer = async (params: Object, success: any, error: any) => {
         await this.post(API_CONST.GAMER.SUBMIT_ANSWER, params, success, error);
     };
+    outGame = async (token: string, success: any, error: any) => {
+        await this.post(API_CONST.GAMER.OUT_GAME + '/' + token, {}, success, error);
+    };
 }
