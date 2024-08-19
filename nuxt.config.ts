@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: false,
+  devServer: {
+    port: 3325
+  },
   app: {
     head: {
       title: 'QUIZZE HYOUBAN',
@@ -12,7 +15,6 @@ export default defineNuxtConfig({
       ]
     },
   },
-
   runtimeConfig: {
     public: {
       BACKEND_URL: process.env.BACKEND_URl,
