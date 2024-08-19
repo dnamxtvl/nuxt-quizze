@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useMainStore } from '~/store';
 
 export default defineNuxtPlugin((nuxtApp) => {
+  const config = useRuntimeConfig()
   const store = useMainStore();
   const headers = {
     'Content-Type': 'application/json',
@@ -12,13 +13,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   };
   const echo = new Echo({
     broadcaster: "reverb",
-    key: "2wmgxd4trrsufo21cglx",
+    key: config.public.REVERB_KEY,
     authorizer: (channel) => {
       return {
         authorize: (socketId, callback) => {
           axios
             .post(
-              "http://laravel_new.local/broadcasting/auth",
+              config.public.BACKEND_URl  + "broadcasting/auth",
               {
                 socket_id: socketId,
                 channel_name: channel.name,

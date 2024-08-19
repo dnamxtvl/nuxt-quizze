@@ -381,6 +381,7 @@ export default defineComponent({
                     gamerResult.value = res.gamer;
                     roomId.value = res.room.id;
                     roomCode.value = res.room.code;
+                    console.log(res);
                     currentRoomStatus.value = res.room.status;
                     if (res.room.status == RoomStatus.HAPPING) {
                         timeReply.value = res.time_remaining;
