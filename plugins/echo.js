@@ -35,7 +35,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       };
     },
-    wsHost: "laravel_new.local",
+    wsHost: config.public.BACKEND_HOST,
     wsPort: 8080,
     wssPort: 8080,
     forceTLS: false,
