@@ -68,7 +68,7 @@
                                     <tr v-for="(item, index) in listGamerResult" :key="index">
                                         <th scope="row" class="text-white">{{ index + 1 }}</th>
                                         <td class="text-white">{{ item.name }}</td>
-                                        <td class="text-white">{{ item.gamer_answers_sum_score }}</td>
+                                        <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(item) }}</td>
                                         <td class="text-white">
                                             <span :class="'badge rounded-pill ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
@@ -156,7 +156,7 @@ interface ItemQuestion {
     created_at: string;
 }
 
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onBeforeUnmount } from "vue";
 import type { TabsPaneContext } from 'element-plus';
 import { useRoute } from "vue-router";
 import api from "~/server/api/axios";
@@ -182,15 +182,15 @@ export default defineComponent({
         const showQuestion = ref<boolean>(false);
         const showResult = ref<boolean>(false);
         const listUserJoined = ref<Array<gamerInfo>>([]);
-            const currentQuestion = ref<ItemQuestion>({
-                id: '',
-                title: '',
-                quizze_id: '',
-                answers: [],
-                created_at: ''
-            });
+        const currentQuestion = ref<ItemQuestion>({
+            id: '',
+            title: '',
+            quizze_id: '',
+            answers: [],
+            created_at: ''
+        });
         const listAnswer = ref<Array<Answer>>([]);
-            const listQuestion = ref<Array<ItemQuestion>>([]);
+        const listQuestion = ref<Array<ItemQuestion>>([]);
         const activeName = ref<string>('first')
         const showButtonNext = ref<boolean>(false);
         const roomStatus = ref<number>(0);
@@ -206,6 +206,8 @@ export default defineComponent({
             console.log(tab, event)
         }
 
+        let countReload = ref<number>(0);
+
         const checkValidRoom = async () => {
             let roomId: string = route.params.roomId;
             await api.room.checkValidRoom(
@@ -216,10 +218,13 @@ export default defineComponent({
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
                     if (res.room.status == RoomStatus.HAPPING) {
-                        remainingTimeReload.value = res.room.time_remaining;
-                        remainingTime.value = res.room.time_remaining;
-                        // setShowResult(remainingTimeReload.value * 1000);
-                        calculateTimeReply();
+                        remainingTimeReload.value = res.time_remaining;
+                        remainingTime.value = res.time_remaining;
+                        console.log(remainingTimeReload.value);
+                        if (countReload.value == 0) {
+                            setShowResult(remainingTimeReload.value * 1000);
+                            countReload.value ++;
+                        }
                     }
                     listGamerResult.value = res.gamers;
                     currentQuestion.value = res.room.current_question_id ?
@@ -244,7 +249,6 @@ export default defineComponent({
                     showPrepare.value = false;
                     showQuestion.value = true;
                     remainingTime.value = 30;
-                    calculateTimeReply();
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     setShowResult(30000);
@@ -264,6 +268,12 @@ export default defineComponent({
         }
 
         const nextQuestion = async (id: string) => {
+            let nextQuestionIndex = listQuestion.value.findIndex((item: ItemQuestion) => item.id == id) + 1;
+            if (nextQuestionIndex == listQuestion.value.length) {
+                ElNotification({title: "Warming", message: "Bạn đã đi hết các câu hỏi", type: "warning"});
+
+                return ;
+            }
             ElLoading.service({ fullscreen: true });
             await api.room.nextQuestion(
                 {
@@ -272,12 +282,19 @@ export default defineComponent({
                 },
                 (res: any) => {
                     ElLoading.service({ fullscreen: true }).close();
-                    let nextQuestionIndex = listQuestion.value.findIndex((item: ItemQuestion) => item.id == id) + 1;
                     showButtonNext.value = false;
                     if (nextQuestionIndex < listQuestion.value.length) {
                         remainingTime.value = 30;
                         currentQuestion.value = listQuestion.value[nextQuestionIndex];
-                        setShowResult(30000);
+                        showResult.value = false;
+                        showQuestion.value = true;
+                        calculateTimeReply();
+                        setTimeout(async () => {
+                            await checkValidRoom();
+                            showButtonNext.value = true;
+                            showResult.value = true;
+                            showQuestion.value = false;
+                        }, 30000);
                     }
                 },
                 (err: ErrorResponse) => {
@@ -366,6 +383,7 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            clearInterval(intervalId);
             ElLoading.service({ fullscreen: true });
             const { $echo }: any = useNuxtApp();
             await checkValidRoom();
@@ -374,6 +392,10 @@ export default defineComponent({
                 .listen('UserJoinRoomEvent', (e: any) => {
                     listUserJoined.value = e.gamers;
                 });
+        });
+
+        onBeforeUnmount(() => {
+            clearInterval(intervalId);
         });
 
         return {

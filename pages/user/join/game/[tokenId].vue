@@ -4,7 +4,7 @@
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
                 <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
                 </p>
-                <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3>
+                <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-4">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
@@ -293,7 +293,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onBeforeUnmount } from "vue";
 import { ElLoading } from "element-plus";
 import api from "~/server/api/axios";
 import { useRoute } from "vue-router";
@@ -385,6 +385,11 @@ export default defineComponent({
                     if (res.room.status == RoomStatus.HAPPING) {
                         timeReply.value = res.time_remaining;
                         calculateTimeReply();
+                        if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+                            setTimeout(async () => {
+                                await getListQuestion();
+                            }, res.time_remaining * 1000);
+                        }
                     }
                     if (res.room.status == RoomStatus.PREPARE_FINISH) {
                         showQuestion.value = false;
@@ -404,6 +409,9 @@ export default defineComponent({
         }
 
         const submitAnswer = async (id: number) => {
+            if (timeReply.value == 0) {
+                return ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: 5000});
+            }
             await api.gamer.submitAnswer(
                 {
                     answer_id: id,
@@ -474,6 +482,7 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            clearInterval(intervalId);
             const { $echo }: any = useNuxtApp();
             await getListQuestion();
             if (currentRoomStatus.value == 0) {
@@ -498,6 +507,10 @@ export default defineComponent({
                 }).listen('AdminEndgameEvent', (e: any) => {
                     centerDialogVisible.value = true;
                 });
+        });
+
+        onBeforeUnmount(() => {
+            clearInterval(intervalId);
         });
 
         return {

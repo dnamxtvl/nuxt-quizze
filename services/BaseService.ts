@@ -148,7 +148,7 @@ export default class BaseService {
         let store = useMainStore();
         const instance = axios.create({
             baseURL: process.env.BACKEND_URL ?? BACKEND_URL_DEFAULT,
-            timeout: 30000,
+            timeout: 300000,
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
