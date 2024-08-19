@@ -149,7 +149,6 @@ export default defineComponent({
                     return navigateTo("/admin/dashboard/activity/" + res.id);
                 },
                 (err: ErrorResponse) => {
-                    console.log(err.error);
                     ElNotification({title: "Error",message: err.error.shift(),type: "error"});
                 }
             )

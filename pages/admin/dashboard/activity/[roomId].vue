@@ -220,7 +220,6 @@ export default defineComponent({
                     if (res.room.status == RoomStatus.HAPPING) {
                         remainingTimeReload.value = res.time_remaining;
                         remainingTime.value = res.time_remaining;
-                        console.log(remainingTimeReload.value);
                         if (countReload.value == 0) {
                             setShowResult(remainingTimeReload.value * 1000);
                             countReload.value ++;
