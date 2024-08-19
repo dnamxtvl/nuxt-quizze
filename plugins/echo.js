@@ -36,8 +36,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       };
     },
     wsHost: config.public.BACKEND_HOST,
-    wsPort: 8086,
-    wssPort: 8086,
+    wsPort: 8080,
+    wssPort: 8080,
     forceTLS: false,
     enabledTransports: ["ws", "wss"],
     auth: {
