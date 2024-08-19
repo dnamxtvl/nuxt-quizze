@@ -22,7 +22,7 @@
 import { defineComponent, ref } from "vue";
 import { useValidator } from "#imports";
 import { ElNotification } from "element-plus";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import type { ErrorResponse } from "~/constants/type";
 import { useMainStore } from "~/store";
 import CookieManager from "~/utils/cookies";

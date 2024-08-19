@@ -47,7 +47,7 @@
                             <ul class="list-unstyled m-0">
                                 <div class="email-list-item" data-starred="true" data-bs-toggle="sidebar"
                                     data-target="#app-email-view">
-                                    <div class="d-flex align-items-center" v-for="(item, index) in listQuizzes"
+                                    <div v-if="listQuizzes.length > 0" class="d-flex align-items-center" v-for="(item, index) in listQuizzes"
                                         :key="index">
                                         <div class="flex flex-col items-center bg-primary">
                                             <div class="h-18 w-18 relative rounded-sm overflow-hidden bg-lilac">
@@ -110,7 +110,7 @@
 import { defineComponent, ref } from "vue";
 import type { ErrorResponse, ItemQuizze } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 
 definePageMeta({
     layout: "admin-dashboard",

@@ -295,7 +295,7 @@
 <script lang="ts">
 import { defineComponent, ref, onBeforeUnmount } from "vue";
 import { ElLoading } from "element-plus";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import { useRoute } from "vue-router";
 import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";

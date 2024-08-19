@@ -38,7 +38,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import API_CONST from "~/utils/apiConst";
 import type { ErrorResponse } from "~/constants/type";
 

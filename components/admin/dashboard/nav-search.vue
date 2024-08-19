@@ -229,7 +229,7 @@
 </template>
 <script lang="ts">
 import { RiUser2Line, RiLogoutCircleFill } from '@remixicon/vue';
-import api from '~/server/api/axios';
+import api from '~/api/axios';
 import { ElLoading, ElNotification } from 'element-plus';
 import CookieManager from '~/utils/cookies';
 import LocalStorageManager from '~/utils/localStorage';

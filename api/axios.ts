@@ -1,7 +1,7 @@
 import AuthService from "~/services/AuthService";
 import QuizzeService from "~/services/QuizzeService";
 import RoomService from "~/services/RoomService";
-import GamerService from "../../services/GamerService";
+import GamerService from "~/services/GamerService";
 
 const api = {
   auth: new AuthService('/'),

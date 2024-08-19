@@ -49,7 +49,7 @@ import { defineComponent, ref } from "vue";
 import { ElLoading, ElNotification } from "element-plus";
 import { useValidator } from "#imports";
 import { RULES_VALIDATION } from "~/constants/application";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import { useRoute } from "vue-router";
 import { useMainStore } from "~/store";
 import type { ErrorResponse } from "~/constants/type";

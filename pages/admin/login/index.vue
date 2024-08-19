@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import { ElLoading } from "element-plus";
 import LocalStorageManager from "~/utils/localStorage";
 import CookieManager from "~/utils/cookies";

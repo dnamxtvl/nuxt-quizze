@@ -159,7 +159,7 @@ interface ItemQuestion {
 import { defineComponent, ref, onBeforeUnmount } from "vue";
 import type { TabsPaneContext } from 'element-plus';
 import { useRoute } from "vue-router";
-import api from "~/server/api/axios";
+import api from "~/api/axios";
 import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
