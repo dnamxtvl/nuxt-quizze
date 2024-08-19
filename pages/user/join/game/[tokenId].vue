@@ -426,7 +426,7 @@ export default defineComponent({
                     }
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Error", message: err.error.shift(), type: "error", duration: 5000});
+                    ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: 5000});
                 }
             )
         }
