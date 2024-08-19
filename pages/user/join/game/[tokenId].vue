@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="w-full" v-show="showQuestion">
+        <div class="w-full" v-show="showQuestion && currentRoomStatus > 0">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
                 <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
                 </p>
@@ -490,6 +490,7 @@ export default defineComponent({
             }
             $echo.channel('admin.start-game.' + roomId.value)
                 .listen('StartGameEvent', (e: any) => {
+                    currentRoomStatus.value = RoomStatus.HAPPING;
                     timeReply.value = 30;
                     calculateTimeReply();
                     ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
@@ -532,6 +533,7 @@ export default defineComponent({
             getResultQustionColor,
             yourAnswerCorrect,
             centerDialogVisible,
+            currentRoomStatus,
         }
     }
 })
