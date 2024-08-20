@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useMainStore } from '~/store';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const store = useMainStore();
   const headers = {
     'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         authorize: (socketId, callback) => {
           axios
             .post(
-              config.public.BACKEND_URl  + "broadcasting/auth",
+              config.public.BACKEND_URL + "broadcasting/auth",
               {
                 socket_id: socketId,
                 channel_name: channel.name,
