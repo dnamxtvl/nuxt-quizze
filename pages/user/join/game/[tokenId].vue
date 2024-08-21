@@ -507,6 +507,9 @@ export default defineComponent({
                         }, 30000);
                     }
                 }).listen('AdminEndgameEvent', (e: any) => {
+                    if (currentRoomStatus.value == RoomStatus.PREPARE) {
+                        ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+                    }
                     centerDialogVisible.value = true;
                 });
         });

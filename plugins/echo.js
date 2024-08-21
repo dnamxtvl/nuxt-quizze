@@ -19,7 +19,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         authorize: (socketId, callback) => {
           axios
             .post(
-              config.public.BACKEND_URL + "broadcasting/auth",
+              "http://localhost/broadcasting/auth",
               {
                 socket_id: socketId,
                 channel_name: channel.name,
