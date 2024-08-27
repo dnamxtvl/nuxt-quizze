@@ -356,6 +356,7 @@ export default defineComponent({
         const currentScore = ref<number>(0);
         const currentQuestionIndex = ref<number>(0);
         const centerDialogVisible = ref<boolean>(false); 
+        const isRoomRunning = ref<boolean>(true);
 
         const yourAnswerCorrect = (gamerResult: any, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -503,13 +504,16 @@ export default defineComponent({
                     calculateTimeReply();
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(async () => {
-                            await getListQuestion();
+                            if (isRoomRunning.value) {
+                                await getListQuestion();
+                            }
                         }, 30000);
                     }
                 }).listen('AdminEndgameEvent', (e: any) => {
                     if (currentRoomStatus.value == RoomStatus.PREPARE) {
                         ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
                     }
+                    isRoomRunning.value = false;
                     centerDialogVisible.value = true;
                 });
         });

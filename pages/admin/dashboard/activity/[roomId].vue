@@ -27,7 +27,7 @@
                 </div>
                 <div class="row d-flex justify-content-center" v-for="(item, index) in listUserJoined" :key="index">
                     <span class="text-white text-center">
-                        <RiUser2Fill class="mb-2" :color="getRandomColor()" size="1.5em" /><span class="text-primary fs-4">{{ item.name
+                        <RiUser2Fill class="mb-2" :color="getRandomColor()" size="1.5em" /><span class="text-primary fs-4">{{ item.name ?? 'Sóc ẩn danh'
                             }}</span><span class="pb-2"> đã tham gia</span>
                     </span>
                 </div>
@@ -165,6 +165,7 @@ import { HttpStatusCode } from "axios";
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
 import { RoomStatus } from "~/constants/room";
+import API_CONST from "~/utils/apiConst";
 
 definePageMeta({
     layout: "admin-game",
@@ -289,7 +290,9 @@ export default defineComponent({
                         showQuestion.value = true;
                         calculateTimeReply();
                         setTimeout(async () => {
-                            await checkValidRoom();
+                            if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
+                                await checkValidRoom();   
+                            }
                             showButtonNext.value = true;
                             showResult.value = true;
                             showQuestion.value = false;
@@ -308,7 +311,9 @@ export default defineComponent({
             showQuestion.value = true;
             calculateTimeReply();
             setTimeout(async () => {
-                await checkValidRoom();
+                if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
+                    await checkValidRoom();   
+                }
                 showButtonNext.value = true;
                 showResult.value = true;
                 showQuestion.value = false;
