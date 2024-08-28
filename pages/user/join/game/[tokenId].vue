@@ -299,7 +299,7 @@ import api from "~/api/axios";
 import { useRoute } from "vue-router";
 import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";
-import { RoomStatus } from "~/constants/room";
+import { RoomSetting, RoomStatus } from "~/constants/room";
 import type { TabsPaneContext } from 'element-plus';
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 
@@ -328,6 +328,29 @@ interface ItemQuestion {
     created_at: string;
 }
 
+interface GamerResult {
+    id: string;
+    name: string;
+    gamer_answers: Array<GamerAnswer> | [];
+    gamer_answers_sum_score: number;
+    display_meme: boolean;
+    ip_address: string;  
+    created_at: string;
+    updated_at: string;
+}
+
+interface GamerAnswer {
+    id: number;
+    answer_id: number;
+    answer_in_time: number;
+    gamer_id: string;
+    question_id: string;
+    room_id: string;
+    score: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export default defineComponent({
     components: {
         RiUser2Fill,
@@ -341,7 +364,18 @@ export default defineComponent({
         const showPreviewEnding = ref<boolean>(false);
         const activeName = ref<string>('first')
         const gamerInfo = ref<GamerInfo>();
-        const gamerResult = ref<any>([]);
+        const gamerResult = ref<GamerResult>(
+            {
+                id: '',
+                name: '',
+                gamer_answers: [],
+                gamer_answers_sum_score: 0,
+                display_meme: false,
+                ip_address: '',
+                created_at: '',
+                updated_at: ''
+            }
+        );
         const currentQuestion = ref<ItemQuestion>({
             id: '',
             title: '',
@@ -358,9 +392,9 @@ export default defineComponent({
         const centerDialogVisible = ref<boolean>(false); 
         const isRoomRunning = ref<boolean>(true);
 
-        const yourAnswerCorrect = (gamerResult: any, answerId: number) => {
+        const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
-                let answer =  gamerResult.gamer_answers.find((item: any) => item.answer_id == answerId);
+                let answer =  gamerResult.gamer_answers.find((item: GamerAnswer) => item.answer_id == answerId);
                 if (answer) {
                     return 'text-primary';
                 }
@@ -382,7 +416,6 @@ export default defineComponent({
                     gamerResult.value = res.gamer;
                     roomId.value = res.room.id;
                     roomCode.value = res.room.code;
-                    console.log(res);
                     currentRoomStatus.value = res.room.status;
                     if (res.room.status == RoomStatus.HAPPING) {
                         timeReply.value = res.time_remaining;
@@ -449,11 +482,11 @@ export default defineComponent({
             console.log(tab, event)
         }
 
-        const countQuestionTrue = (item: any) => {
-            return item.gamer_answers.filter((answer: any) => answer.score > 0).length;
+        const countQuestionTrue = (item: GamerResult) => {
+            return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: any, questionId: string) => {
+        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
             if (gamerAnswers.length == 0) {
                 return {
                     score: 0,
@@ -461,7 +494,7 @@ export default defineComponent({
                 };
             }
 
-            let answer = gamerAnswers.filter((answer: any) => answer.question_id == questionId);
+            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
 
             if (answer.length > 0) {
                 if (answer[0].score > 0) {
@@ -493,21 +526,21 @@ export default defineComponent({
             $echo.channel('admin.start-game.' + roomId.value)
                 .listen('StartGameEvent', (e: any) => {
                     currentRoomStatus.value = RoomStatus.HAPPING;
-                    timeReply.value = 30;
+                    timeReply.value = RoomSetting.TIME_REPLY;
                     calculateTimeReply();
                     ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
                 })
                 .listen('NextQuestionEvent', (e: any) => {
                     currentQuestionIndex.value = currentQuestionIndex.value + 1;
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-                    timeReply.value = 30;
+                    timeReply.value = RoomSetting.TIME_REPLY;
                     calculateTimeReply();
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(async () => {
                             if (isRoomRunning.value) {
                                 await getListQuestion();
                             }
-                        }, 30000);
+                        }, RoomSetting.TIME_REPLY * 1000);
                     }
                 }).listen('AdminEndgameEvent', (e: any) => {
                     if (currentRoomStatus.value == RoomStatus.PREPARE) {

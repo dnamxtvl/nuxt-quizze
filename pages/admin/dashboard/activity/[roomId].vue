@@ -142,7 +142,7 @@ interface Answer {
     is_correct: number;
 }
 
-interface gamerInfo {
+interface GamerInfo {
     id: string;
     name: string;
     created_at: string
@@ -156,6 +156,29 @@ interface ItemQuestion {
     created_at: string;
 }
 
+interface GamerResult {
+    id: string;
+    name: string;
+    gamer_answers: Array<GamerAnswer> | [];
+    gamer_answers_sum_score: number;
+    display_meme: boolean;
+    ip_address: string;  
+    created_at: string;
+    updated_at: string;
+}
+
+interface GamerAnswer {
+    id: number;
+    answer_id: number;
+    answer_in_time: number;
+    gamer_id: string;
+    question_id: string;
+    room_id: string;
+    score: number;
+    created_at: string;
+    updated_at: string;
+}
+
 import { defineComponent, ref, onBeforeUnmount } from "vue";
 import type { TabsPaneContext } from 'element-plus';
 import { useRoute } from "vue-router";
@@ -164,7 +187,7 @@ import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
-import { RoomStatus } from "~/constants/room";
+import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 
 definePageMeta({
@@ -182,7 +205,7 @@ export default defineComponent({
         const showPrepare = ref<boolean>(true);
         const showQuestion = ref<boolean>(false);
         const showResult = ref<boolean>(false);
-        const listUserJoined = ref<Array<gamerInfo>>([]);
+        const listUserJoined = ref<Array<GamerInfo>>([]);
         const currentQuestion = ref<ItemQuestion>({
             id: '',
             title: '',
@@ -195,7 +218,18 @@ export default defineComponent({
         const activeName = ref<string>('first')
         const showButtonNext = ref<boolean>(false);
         const roomStatus = ref<number>(0);
-        const listGamerResult = ref<Array<any>>([]);
+        const listGamerResult = ref<Array<GamerResult>>([
+            {
+                id: '',
+                name: '',
+                gamer_answers: [],
+                gamer_answers_sum_score: 0,
+                display_meme: false,
+                ip_address: '',
+                created_at: '',
+                updated_at: ''
+            }
+        ]);
         const remainingTime = ref<number>(0);
         const remainingTimeReload = ref<number>(0);
         let intervalId: any;
@@ -248,13 +282,13 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
-                    remainingTime.value = 30;
+                    remainingTime.value = RoomSetting.TIME_REPLY;
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
-                    setShowResult(30000);
+                    setShowResult(RoomSetting.TIME_REPLY * 1000);
                     setTimeout(() => {
                         showButtonNext.value = true;
-                    }, 30000);
+                    }, RoomSetting.TIME_REPLY * 1000);
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Warning", message: err.error.shift(), type: "warning"});
@@ -284,7 +318,7 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     if (nextQuestionIndex < listQuestion.value.length) {
-                        remainingTime.value = 30;
+                        remainingTime.value = RoomSetting.TIME_REPLY;
                         currentQuestion.value = listQuestion.value[nextQuestionIndex];
                         showResult.value = false;
                         showQuestion.value = true;
@@ -296,7 +330,7 @@ export default defineComponent({
                             showButtonNext.value = true;
                             showResult.value = true;
                             showQuestion.value = false;
-                        }, 30000);
+                        }, RoomSetting.TIME_REPLY * 1000);
                     }
                 },
                 (err: ErrorResponse) => {
@@ -341,11 +375,11 @@ export default defineComponent({
             }
         }
 
-        const countQuestionTrue = (item: any) => {
-            return item.gamer_answers.filter((answer: any) => answer.score > 0).length;
+        const countQuestionTrue = (item: GamerResult) => {
+            return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: any, questionId: string) => {
+        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
             if (gamerAnswers.length == 0) {
                 return {
                     score: 0,
@@ -353,7 +387,7 @@ export default defineComponent({
                 };
             }
 
-            let answer = gamerAnswers.filter((answer: any) => answer.question_id == questionId);
+            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
 
             if (answer.length > 0) {
                 if (answer[0].score > 0) {
@@ -382,7 +416,7 @@ export default defineComponent({
                     } else {
                         clearInterval(intervalId);
                     }
-                }, 1000
+                }, 1000 // 1 second
             );
         }
 

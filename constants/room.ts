@@ -6,3 +6,7 @@ export enum RoomStatus {
     PENDING = 4,
     PREPARE_FINISH = 5,
 }
+
+export enum RoomSetting {
+    TIME_REPLY = 30,
+}
