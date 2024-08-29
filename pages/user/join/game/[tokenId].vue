@@ -445,7 +445,7 @@ export default defineComponent({
 
         const submitAnswer = async (id: number) => {
             if (timeReply.value == 0) {
-                return ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: 5000});
+                return ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
             }
             await api.gamer.submitAnswer(
                 {
@@ -461,7 +461,7 @@ export default defineComponent({
                     }
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: 5000});
+                    ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 }
             )
         }

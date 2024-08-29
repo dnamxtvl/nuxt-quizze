@@ -233,10 +233,6 @@ export default defineComponent({
         const remainingTime = ref<number>(0);
         const remainingTimeReload = ref<number>(0);
         let intervalId: any;
-
-        const converBool = (value: number) => {
-            return value == 1
-        }
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
         }
@@ -244,7 +240,7 @@ export default defineComponent({
         let countReload = ref<number>(0);
 
         const checkValidRoom = async () => {
-            let roomId: string = route.params.roomId;
+            let roomId: string = route.params.roomId.toString();
             await api.room.checkValidRoom(
                 roomId,
                 (res: any) => {
@@ -448,7 +444,6 @@ export default defineComponent({
             listUserJoined,
             getRandomColor,
             listQuestion,
-            converBool,
             currentQuestion,
             showButtonNext,
             nextQuestion,
