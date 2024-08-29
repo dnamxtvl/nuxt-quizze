@@ -41,7 +41,9 @@ export const RULES_VALIDATION = {
 
 }
 
-export const EXPIRES_COOKIE_DAY = 90
+export const EXPIRES_COOKIE_DAY = 90;
+
+export const CALL_AXIOS_TIMEOUT = 300000;
 
 export const BACKEND_URL_DEFAULT = 'http://laravel_new.local/api/';
 

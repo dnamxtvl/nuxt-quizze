@@ -1,7 +1,7 @@
 import helperApp from "~/utils/helper";
 import { useMainStore } from "~/store";
 import axios from 'axios';
-import { BACKEND_URL_DEFAULT, CODE } from "~/constants/application";
+import { CALL_AXIOS_TIMEOUT, CODE } from "~/constants/application";
 
 interface ResponseData {
     data: any;
@@ -20,7 +20,7 @@ export default class BaseService {
         this.prefix = prefix;
     }
 
-    private processResponse(response: ResponseData): any {
+    private processResponse(response: ResponseData) {
         let data = response.data;
         if (data.hasOwnProperty('data')) {
             return data.data;
@@ -65,7 +65,7 @@ export default class BaseService {
         });
     }
 
-    async get(endpoint: string, params: Object, success: (json: any) => void, error: (error: ErrorResponse) => void) {
+    async get(endpoint: string, params: Object, success: (json: ResponseData) => void, error: (error: ErrorResponse) => void) {
         try {
             const response = await this.getInstanceAxios().get(this.prefix + endpoint, { params });
             const json = this.processResponse(response);
@@ -78,7 +78,7 @@ export default class BaseService {
     async post(
         endpoint: string,
         params: Record<string, any> = {},
-        success: (json: any) => void,
+        success: (json: ResponseData) => void,
         error: (error: ErrorResponse) => void
     ) {
         try {
@@ -93,7 +93,7 @@ export default class BaseService {
     async put(
         endpoint: string,
         params: Record<string, any> = {},
-        success: (json: any) => void,
+        success: (json: ResponseData) => void,
         error: (error: ErrorResponse) => void
     ) {
         try {
@@ -118,7 +118,7 @@ export default class BaseService {
     async patch(
         endpoint: string,
         params: Record<string, any> = {},
-        success: (json: any) => void,
+        success: (json: ResponseData) => void,
         error: (error: ErrorResponse) => void
     ) {
         try {
@@ -149,7 +149,7 @@ export default class BaseService {
         const config = useRuntimeConfig()
         const instance = axios.create({
             baseURL: config.public.BACKEND_URL + 'api',
-            timeout: 300000,
+            timeout: CALL_AXIOS_TIMEOUT,
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
