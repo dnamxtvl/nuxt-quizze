@@ -445,13 +445,13 @@ export default defineComponent({
         }
 
         const submitAnswer = async (id: number) => {
-            if (isSubmited.value) {
-                ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
+            if (timeReply.value == 0) {
+                ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 return ;
             }
 
-            if (timeReply.value == 0) {
-                ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+            if (isSubmited.value) {
+                ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
                 return ;
             }
 
