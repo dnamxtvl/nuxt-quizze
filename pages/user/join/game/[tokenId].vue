@@ -391,6 +391,7 @@ export default defineComponent({
         const currentQuestionIndex = ref<number>(0);
         const centerDialogVisible = ref<boolean>(false); 
         const isRoomRunning = ref<boolean>(true);
+        const isSubmited = ref<boolean>(false);
 
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -444,9 +445,16 @@ export default defineComponent({
         }
 
         const submitAnswer = async (id: number) => {
-            if (timeReply.value == 0) {
-                return ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+            if (isSubmited.value) {
+                ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
+                return ;
             }
+
+            if (timeReply.value == 0) {
+                ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                return ;
+            }
+
             await api.gamer.submitAnswer(
                 {
                     answer_id: id,
@@ -464,6 +472,7 @@ export default defineComponent({
                     ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 }
             )
+            isSubmited.value = true;
         }
 
         let intervalId: any;
@@ -527,6 +536,7 @@ export default defineComponent({
                 .listen('StartGameEvent', (e: any) => {
                     currentRoomStatus.value = RoomStatus.HAPPING;
                     timeReply.value = RoomSetting.TIME_REPLY;
+                    isSubmited.value = false;
                     calculateTimeReply();
                     ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
                 })
@@ -534,6 +544,7 @@ export default defineComponent({
                     currentQuestionIndex.value = currentQuestionIndex.value + 1;
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
                     timeReply.value = RoomSetting.TIME_REPLY;
+                    isSubmited.value = false;
                     calculateTimeReply();
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(async () => {
