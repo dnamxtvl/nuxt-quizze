@@ -29,7 +29,6 @@ export default defineNuxtPlugin((nuxtApp) => {
               callback(false, response.data);
             })
             .catch((error) => {
-              console.log(error);
               callback(true, error);
             });
         },
@@ -37,11 +36,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     wsHost: config.public.BACKEND_HOST,
     wsPort: 8080,
-    wssPort: 8080,
     forceTLS: false,
     enabledTransports: ["ws", "wss"],
   });
 
-  // Provide Echo instance to the rest of the application
   nuxtApp.provide('echo', echo);
 });

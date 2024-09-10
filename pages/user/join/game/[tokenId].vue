@@ -564,6 +564,7 @@ export default defineComponent({
 
         onBeforeUnmount(() => {
             clearInterval(intervalId);
+            ElLoading.service({ fullscreen: true }).close();
         });
 
         return {

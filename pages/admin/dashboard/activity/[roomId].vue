@@ -189,6 +189,7 @@ import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
+import type Echo from "laravel-echo";
 
 definePageMeta({
     layout: "admin-game",
@@ -419,11 +420,12 @@ export default defineComponent({
         onMounted(async () => {
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true });
-            const { $echo }: any = useNuxtApp();
+            // @ts-ignore
+            const { $echo }: Echo = useNuxtApp();
             await checkValidRoom();
             setRoomStatus();
-            $echo.private('user.join-room.' + route.params.roomId.toString())
-                .listen('UserJoinRoomEvent', (e: any) => {
+            $echo.channel('user.join-room.' + route.params.roomId.toString())
+                .listen('UserJoinRoomEvent', (e: {gamers: GamerInfo[]}) => {
                     listUserJoined.value = e.gamers;
                 });
         });
