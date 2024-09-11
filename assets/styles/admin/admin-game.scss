@@ -19,8 +19,17 @@
 }
 
 .body-admin-game {
+    height: 92vh;
     top: 80px;
-    --bs-gutter-x: 0;
+    --bs-gutter-x: 0 !important;
+}
+
+.row {
+    margin-right: 0 !important;
+}
+
+.prepare-join {
+    height: fit-content;
 }
 
 .join-code {

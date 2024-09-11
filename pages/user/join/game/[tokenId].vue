@@ -10,7 +10,7 @@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
-                        class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
+                        :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
                             1}}</span>
                         <p class="text-white fs-2 text-center">{{ item.answer }}</p>
@@ -220,7 +220,7 @@
         </div>
         <div class="table-preview-result" v-if="showResult">
             <div class="row d-flex justify-content-center">
-                <div class="col-md-5">
+                <div class="col-md-10">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Tổng Quan" name="first">
                             <table class="table">
@@ -239,7 +239,7 @@
                                         <td class="text-white">{{ gamerResult?.name }}</td>
                                         <td class="text-white">{{ gamerResult?.gamer_answers_sum_score }}</td>
                                         <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
-                                        <td class="text-white detail-score">
+                                        <td class="text-white detail-score text-center">
                                             <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQustionColor(gamerResult?.gamer_answers, question.id).class"
                                                 v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
@@ -392,6 +392,7 @@ export default defineComponent({
         const centerDialogVisible = ref<boolean>(false); 
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
+        const selectedAnswerId = ref<number>(0);
 
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -431,6 +432,12 @@ export default defineComponent({
                         showQuestion.value = false;
                         showResult.value = true;
                     }
+                    if (res.gamer?.gamer_answers.length > 0) {
+                        let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
+                        if (currentQuestionSubmited) {
+                            selectedAnswerId.value = currentQuestionSubmited.answer_id;
+                        }
+                    }
                     ElLoading.service({ fullscreen: true }).close();
                 },
                 (err: ErrorResponse) => {
@@ -462,6 +469,7 @@ export default defineComponent({
                 },
                 (res: any) => {
                     currentScore.value = res.score;
+                    selectedAnswerId.value = id;
                     if (res.score > 0) {
                         ElNotification({title: "Chúc mừng!", message: "+" + res.score, type: "success"});
                     } else {
@@ -523,6 +531,12 @@ export default defineComponent({
                 score: 0,
                 class: "bg-warning"
             };
+        }
+
+        const isSelectedAnswer = (answerId: number) => {
+            if (answerId == selectedAnswerId.value) {
+                return 'selected-answer'
+            }
         }
 
         onMounted(async () => {
@@ -587,6 +601,8 @@ export default defineComponent({
             yourAnswerCorrect,
             centerDialogVisible,
             currentRoomStatus,
+            isSelectedAnswer,
+            selectedAnswerId,
         }
     }
 })

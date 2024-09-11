@@ -1,5 +1,5 @@
 <template>
-    <div class="row position-absolute body-admin-game w-full">
+    <div class="row position-absolute body-admin-game w-full g-0">
         <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center"
             v-if="showPrepare">
             <div
@@ -10,7 +10,7 @@
                         <h1 class="text-white random-code">{{ code }}</h1>
                     </div>
                     <div class="col-xl-2 col-md-2 icon copy text-center mt-2">
-                        <i class="ti ti-copy fs-2 text-white"></i>
+                        <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
                     </div>
                 </div>
                 <div class="row d-flex p-4 justify-center rounded-b-2xl">
@@ -51,7 +51,7 @@
         </div>
         <div class="table-preview-result" v-if="showResult">
             <div class="row d-flex justify-content-center">
-                <div class="col-md-5">
+                <div class="col-md-10 g-0">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Tổng Quan" name="first">
                             <table class="table">
@@ -70,8 +70,8 @@
                                         <td class="text-white">{{ item.name }}</td>
                                         <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(item) }}</td>
-                                        <td class="text-white">
-                                            <span :class="'badge rounded-pill ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
+                                        <td class="text-white text-center">
+                                            <span :class="'badge rounded-pill width-2 ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
                                                 <p>{{ getResultQustionColor(item.gamer_answers, question.id).score }}</p>
                                             </span>
@@ -106,7 +106,7 @@
                 </div>
             </div>
         </div>
-        <div class="control-center position-absolute top-725" v-show="showQuestion || showResult">
+        <div class="control-center position-absolute bottom-0" v-show="showQuestion || showResult">
             <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                 <div class="ring d-flex">
                     <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
@@ -417,6 +417,15 @@ export default defineComponent({
             );
         }
 
+        const copyCode = () => {
+            const textArea = document.createElement("textarea");
+            textArea.value = code.value.toString();
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        };
+
         onMounted(async () => {
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true });
@@ -424,7 +433,7 @@ export default defineComponent({
             const { $echo }: Echo = useNuxtApp();
             await checkValidRoom();
             setRoomStatus();
-            $echo.channel('user.join-room.' + route.params.roomId.toString())
+            $echo.private('user.join-room.' + route.params.roomId.toString())
                 .listen('UserJoinRoomEvent', (e: {gamers: GamerInfo[]}) => {
                     listUserJoined.value = e.gamers;
                 });
@@ -453,6 +462,7 @@ export default defineComponent({
             countQuestionTrue,
             getResultQustionColor,
             remainingTime,
+            copyCode,
         }
     }
 })

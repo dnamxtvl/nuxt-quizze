@@ -411,3 +411,15 @@
 .question-result-review {
     width: 45px;
 }
+
+.selected-answer {
+    background-color: rgb(222 222 222 / 35%) !important;
+}
+
+.btn-dark {
+    background-color: rgba(19, 24, 52, 1);
+}
+
+.btn:not([class*=btn-label-]):not([class*=btn-outline-]) {
+    box-shadow: none;
+}
