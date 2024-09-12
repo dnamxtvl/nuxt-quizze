@@ -237,7 +237,7 @@
                                     <tr>
                                         <th scope="row" class="text-white">1</th>
                                         <td class="text-white">{{ gamerResult?.name }}</td>
-                                        <td class="text-white">{{ gamerResult?.gamer_answers_sum_score }}</td>
+                                        <td class="text-white">{{ gamerResult?.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
                                         <td class="text-white detail-score text-center">
                                             <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQustionColor(gamerResult?.gamer_answers, question.id).class"
@@ -406,7 +406,6 @@ export default defineComponent({
         }
 
         const getListQuestion = async () => {
-            ElLoading.service({ fullscreen: true });
             await api.room.listQuestionOfRoom(
                 route.params.tokenId.toString(),
                 (res: any) => {
@@ -438,11 +437,9 @@ export default defineComponent({
                             selectedAnswerId.value = currentQuestionSubmited.answer_id;
                         }
                     }
-                    ElLoading.service({ fullscreen: true }).close();
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Error", message: err.error.shift(), type: "error"});
-                    ElLoading.service({ fullscreen: true }).close();
                     if (err.code === HttpStatusCode.NotFound) {
                         currentRoomStatus.value = -1;
                         return navigateTo("/not-found");
@@ -552,6 +549,13 @@ export default defineComponent({
                     timeReply.value = RoomSetting.TIME_REPLY;
                     isSubmited.value = false;
                     calculateTimeReply();
+                    if (listQuestion.value.length == 1) {
+                        setTimeout(async () => {
+                            if (isRoomRunning.value) {
+                                await getListQuestion();
+                            }
+                        }, RoomSetting.TIME_REPLY * 1000);
+                    }
                     ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
                 })
                 .listen('NextQuestionEvent', (e: any) => {
