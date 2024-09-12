@@ -37,8 +37,13 @@ export const RULES_VALIDATION = {
     },
     CODE: {
         LENGTH: 6,
+    },
+    QUESTION: {
+        TITLE: {
+            MIN_LENGTH: 6,
+            MAX_LENGTH: 255
+        }
     }
-
 }
 
 export const EXPIRES_COOKIE_DAY = 90;

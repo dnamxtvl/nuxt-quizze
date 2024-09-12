@@ -257,7 +257,7 @@
                                     <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
                                         <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
-                                            {{ (index + 1) + "." + item.title }}
+                                            {{ (index + 1) + ". " + item.title }}
                                         </p>
                                         <hr>
                                         </hr>

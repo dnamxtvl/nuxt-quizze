@@ -113,6 +113,17 @@
   border-radius: 0.375rem;
 }
 
+.menu-item > .active {
+  background: linear-gradient(
+    72.47deg,
+    #7367f0 22.16%,
+    rgba(115, 103, 240, 0.7) 76.47%
+  );
+  box-shadow: 0px 2px 6px 0px rgba(115, 103, 240, 0.48);
+  color: #fff !important;
+  border-radius: 0.375rem;
+}
+
 .el-menu-item.is-active {
   color: #6f6b7d;
 }

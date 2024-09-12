@@ -26,7 +26,9 @@
         </div>
 
         <div class="menu-inner-shadow"></div>
-
+        <div class="row menu-item d-flex justify-content-center mb-3 mt-2 ms-2 me-2">
+            <nuxt-link to="/admin/create/quizz" class="btn btn-primary text-white col-md-12" exact-active-class="active"><RiAddCircleFill size="18" class-name="me-1" />Tạo mới</nuxt-link>
+        </div>
         <ul class="menu-inner py-1">
             <!-- Dashboards -->
             <li class="menu-item active open">
@@ -36,15 +38,15 @@
                     <div class="badge bg-label-primary rounded-pill ms-auto">4</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item active">
+                    <li class="menu-item">
                         <a href="index.html" class="menu-link">
                             <div data-i18n="Analytics">Khám phá</div>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="dashboards-crm.html" class="menu-link">
+                        <nuxt-link to="/admin/dashboard/my-library" class="menu-link" exact-active-class="active">
                             <div data-i18n="CRM">Thư viện của tôi</div>
-                        </a>
+                        </nuxt-link>
                     </li>
                     <li class="menu-item">
                         <a href="dashboards-crm.html" class="menu-link">
@@ -62,8 +64,13 @@
     </aside>
 </template>
 <script lang="ts">
+import { RiAddCircleFill } from '@remixicon/vue';
+
 export default defineComponent({
   name: 'AdminDashboardSidebar',
+  components: {
+    RiAddCircleFill
+  }
 });
 </script>
 <style scoped>
