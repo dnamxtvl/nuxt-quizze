@@ -1,0 +1,570 @@
+<template>
+    <div class="container mt-4">
+        <el-dialog v-model="showModalSubmitExam" title="Warning" width="400" align-center>
+            <span>Open the dialog from the center from the screen</span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showModalSubmitExam = false">Cancel</el-button>
+                    <el-button type="primary" @click="">
+                        Confirm
+                    </el-button>
+                </div>
+            </template>
+        </el-dialog>
+        <div class="row">
+            <!-- Left Panel: Question List -->
+            <div class="col-lg-4 col-md-5 mb-4">
+                <div class="quiz-card">
+                    <div class="d-flex justify-content-center align-items-center mb-2">
+                        <div class="time-box fs-3 text-center">00:00:39</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="material-symbols-outlined bg-warning me-1"></span>
+                            <label for="markQuestion">Đánh dấu</label>
+                        </div>
+                        <div>
+                            <span class="material-symbols-outlined bg-primary me-1"></span>
+                            <label for="markQuestion">Đã trả lời</label>
+                        </div>
+                        <div>
+                            <span
+                                class="material-symbols-outlined border border-dark border-black bg-white me-1"></span>
+                            <label for="markQuestion">Chưa trả lời</label>
+                        </div>
+                    </div>
+                    <h5>Danh sách câu hỏi</h5>
+                    <div class="question-list">
+                        <!-- Question List -->
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary">3</button>
+                        <button class="btn unanswered border border-secondary">1</button>
+                        <button class="btn unanswered border border-secondary">2</button>
+                        <!-- More buttons for each question -->
+                        <button class="btn bg-primary text-white">25</button>
+                    </div>
+                    <button class="btn btn-primary mt-3 w-100" @click="handleModalSubmitExam">Nộp bài</button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Question Details -->
+            <div class="col-lg-8 col-md-7">
+                <div class="quiz-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Câu 25</h5>
+                        <div class="mb-auto">
+                            <span class="material-symbols-outlined bg-warning cursor-pointer me-1"></span>
+                            <label for="markQuestion">Đánh dấu</label>
+                        </div>
+                    </div>
+                    <p class="fs-5">Xe kéo mô tô ba bánh như hình này có đúng quy tắc giao thông?</p>
+                    <!-- Answer Options -->
+                    <form>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answer" id="option1">
+                            <label class="form-check-label" for="option1">
+                                Đúng
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answer" id="option2">
+                            <label class="form-check-label" for="option2">
+                                Không đúng
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answer" id="option2">
+                            <label class="form-check-label" for="option2">
+                                Không đúng
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answer" id="option2">
+                            <label class="form-check-label" for="option2">
+                                Không đúng
+                            </label>
+                        </div>
+                    </form>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <button class="btn btn-link btn-nav me-2 text-dark text-center whitespace-nowrap">
+                            <RiArrowLeftSLine />
+                            <span class="mt-1">Câu trước</span>
+                        </button>
+                        <button class="btn btn-primary btn-nav ms-2 whitespace-nowrap text-center">
+                            <span class="ms-2">Câu sau</span>
+                            <RiArrowRightSLine size="14"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div> -->
+
+    <!-- <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0"> -->
+    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1">
+                <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
+                </p>
+                <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3>
+            </div> -->
+    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center mt-4" style="flex:1">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
+                    v-for="(item, index) in currentQuestion?.answers" :key="index">
+                    <div @click="submitAnswer(item.id)"
+                        :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative '">
+                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
+                            1}}</span>
+                        <p class="text-white fs-2 text-center">{{ item.answer }}</p>
+                    </div>
+                </div>
+            </div> -->
+    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="control-center">
+                <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
+                    <div class="ring d-flex">
+                        <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
+                            <div class="coccoc-alo-ph-circle"></div>
+                            <div class="coccoc-alo-ph-circle-fill"></div>
+                            <div class="coccoc-alo-ph-img-circle"></div>
+                        </div>
+                        <span class="fs-4 text-white text-center user-name-text me-3 text-primary">
+                            {{ gamerInfo?.name }}
+                            <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ roomCode }}</div>
+                        </span>
+                        <div class="divider hidden sm:block"></div>
+                        <div>
+                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{
+                                currentQuestionIndex + 1 }}/{{ listQuestion.length }}</button>
+                        </div>
+                    </div>
+                    <div class="control-center-actions"></div>
+                </div>
+            </div> -->
+    <!-- </div> -->
+    <!-- <div class="table-preview-result" v-if="showResult">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-10">
+                    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+                        <el-tab-pane label="Tổng Quan" name="first">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-white">#</th>
+                                        <th scope="col" class="fs-6 text-white">Tên</th>
+                                        <th scope="col" class="fs-6 text-white">Điểm</th>
+                                        <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th>
+                                        <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="text-white">1</th>
+                                        <td class="text-white">{{ gamerResult?.name }}</td>
+                                        <td class="text-white">{{ gamerResult?.gamer_answers_sum_score ?? 0 }}</td>
+                                        <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
+                                        <td class="text-white detail-score text-center">
+                                            <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQustionColor(gamerResult?.gamer_answers, question.id).class"
+                                                v-for="(question, key) in listQuestion" :key="key">
+                                                <p>{{ 'Q' + (key + 1) }}</p>
+                                                <p>{{ getResultQustionColor(gamerResult?.gamer_answers,
+                                                    question.id).score }}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </el-tab-pane>
+                        <el-tab-pane label="Câu hỏi" name="second">
+                            <div class="row pt-4 rounded rounded-5 body-answer-review">
+                                <div class="col-lg-12 px-4 mb-2">
+                                    <div v-for="(item, index) in listQuestion"
+                                        class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
+                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
+                                            {{ (index + 1) + ". " + item.title }}
+                                        </p>
+                                        <hr>
+                                        </hr>
+                                        <div class="question-answer-review px-4 pt-2 mb-2">
+                                            <div class="form-check" v-for="(answer, index) in item.answers">
+                                                <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
+                                                <label :class="['form-check-label text-white ms-2']" for="flexCheckDefault">
+                                                    {{ answer.answer }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+            </div>
+        </div> -->
+    <!-- <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
+            <span class="text-center align-center">Admin đã kết thúc màn chơi này!</span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <nuxt-link to="/user/join" class="btn btn-primary">
+                        Thoát
+                    </nuxt-link>
+                </div>
+            </template>
+        </el-dialog> -->
+    <!-- <div class="show-meme d-flex justify-content-center align-items-center">
+        <img src="../../../../public/meme/sad/Screenshot from 2024-07-24 19-03-02.png" alt="meme" with="400" height="400" />
+        </div> -->
+    <!-- </div> -->
+</template>
+<script lang="ts">
+import { defineComponent, ref, onBeforeUnmount } from "vue";
+import { ElLoading } from "element-plus";
+import api from "~/api/axios";
+import { useRoute } from "vue-router";
+import type { ErrorResponse } from "~/constants/type";
+import { HttpStatusCode } from "axios";
+import { RoomSetting, RoomStatus } from "~/constants/room";
+import type { TabsPaneContext } from 'element-plus';
+import { RiUser2Fill, RiCheckFill, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/vue";
+
+definePageMeta({
+  layout: 'homework'
+})
+
+interface Answer {
+    id: number;
+    answer: string;
+    is_correct: boolean;
+    created_at: string;
+}
+
+interface GamerInfo {
+    id: string;
+    name: string;
+    created_at: string
+}
+
+interface ItemQuestion {
+    id: string;
+    title: string;
+    quizze_id: string;
+    answers: Array<Answer>;
+    created_at: string;
+}
+
+interface GamerResult {
+    id: string;
+    name: string;
+    gamer_answers: Array<GamerAnswer> | [];
+    gamer_answers_sum_score: number;
+    display_meme: boolean;
+    ip_address: string;  
+    created_at: string;
+    updated_at: string;
+}
+
+interface GamerAnswer {
+    id: number;
+    answer_id: number;
+    answer_in_time: number;
+    gamer_id: string;
+    question_id: string;
+    room_id: string;
+    score: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export default defineComponent({
+    components: {
+        RiUser2Fill,
+        RiCheckFill,
+        RiArrowLeftSLine,
+        RiArrowRightSLine,
+    },
+    setup() {
+        const route = useRoute();
+        const timeReply = ref<number>(0);
+        const listQuestion = ref<Array<ItemQuestion>>([]);
+        const showQuestion = ref<boolean>(true);
+        const showPreviewEnding = ref<boolean>(false);
+        const activeName = ref<string>('first')
+        const gamerInfo = ref<GamerInfo>();
+        const gamerResult = ref<GamerResult>(
+            {
+                id: '',
+                name: '',
+                gamer_answers: [],
+                gamer_answers_sum_score: 0,
+                display_meme: false,
+                ip_address: '',
+                created_at: '',
+                updated_at: ''
+            }
+        );
+        const currentQuestion = ref<ItemQuestion>({
+            id: '',
+            title: '',
+            quizze_id: '',
+            answers: [],
+            created_at: ''
+        });
+        const showResult = ref<boolean>(false);
+        const roomId = ref<string>('');
+        const roomCode = ref<string>('');
+        const currentRoomStatus = ref<number>(0);
+        const currentScore = ref<number>(0);
+        const currentQuestionIndex = ref<number>(0);
+        const centerDialogVisible = ref<boolean>(false); 
+        const isRoomRunning = ref<boolean>(true);
+        const isSubmited = ref<boolean>(false);
+        const selectedAnswerId = ref<number>(0);
+
+        const showModalSubmitExam = ref<boolean>(false);
+
+        // const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
+        //     if (gamerResult?.gamer_answers.length > 0) {
+        //         let answer =  gamerResult.gamer_answers.find((item: GamerAnswer) => item.answer_id == answerId);
+        //         if (answer) {
+        //             return 'text-primary';
+        //         }
+        //     }
+
+        //     return '';
+        // }
+
+        // const getListQuestion = async () => {
+        //     await api.room.listQuestionOfRoom(
+        //         route.params.tokenId.toString(),
+        //         (res: any) => {
+        //             listQuestion.value = res.questions;
+        //             currentQuestionIndex.value = res.room.status != RoomStatus.PREPARE ?
+        //                 listQuestion.value.findIndex((item: ItemQuestion) => item.id == res.room.current_question_id) : 0;
+        //             currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+        //             gamerInfo.value = res.gamer;
+        //             gamerResult.value = res.gamer;
+        //             roomId.value = res.room.id;
+        //             roomCode.value = res.room.code;
+        //             currentRoomStatus.value = res.room.status;
+        //             if (res.room.status == RoomStatus.HAPPING) {
+        //                 timeReply.value = res.time_remaining;
+        //                 calculateTimeReply();
+        //                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+        //                     setTimeout(async () => {
+        //                         await getListQuestion();
+        //                     }, res.time_remaining * 1000);
+        //                 }
+        //             }
+        //             if (res.room.status == RoomStatus.PREPARE_FINISH) {
+        //                 showQuestion.value = false;
+        //                 showResult.value = true;
+        //             }
+        //             if (res.gamer?.gamer_answers.length > 0) {
+        //                 let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
+        //                 if (currentQuestionSubmited) {
+        //                     selectedAnswerId.value = currentQuestionSubmited.answer_id;
+        //                 }
+        //             }
+        //         },
+        //         (err: ErrorResponse) => {
+        //             ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+        //             if (err.code === HttpStatusCode.NotFound) {
+        //                 currentRoomStatus.value = -1;
+        //                 return navigateTo("/not-found");
+        //             }
+        //         }
+        //     )
+        // }
+
+        // const submitAnswer = async (id: number) => {
+        //     if (timeReply.value == 0) {
+        //         ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+        //         return ;
+        //     }
+
+        //     if (isSubmited.value) {
+        //         ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
+        //         return ;
+        //     }
+
+        //     await api.gamer.submitAnswer(
+        //         {
+        //             answer_id: id,
+        //             token: route.params.tokenId.toString()
+        //         },
+        //         (res: any) => {
+        //             currentScore.value = res.score;
+        //             selectedAnswerId.value = id;
+        //             if (res.score > 0) {
+        //                 ElNotification({title: "Chúc mừng!", message: "+" + res.score, type: "success"});
+        //             } else {
+        //                 ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
+        //             }
+        //         },
+        //         (err: ErrorResponse) => {
+        //             ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
+        //         }
+        //     )
+        //     isSubmited.value = true;
+        // }
+
+        // let intervalId: any;
+
+        // const calculateTimeReply = () => {
+        //     intervalId = setInterval(() => {
+        //         if (timeReply.value > 0) {
+        //             timeReply.value = timeReply.value - 1;
+        //         } else {
+        //             clearInterval(intervalId);
+        //         }
+        //     }, 1000);
+        // }
+
+        // const handleClick = (tab: TabsPaneContext, event: Event) => {
+        //     console.log(tab, event)
+        // }
+
+        const countQuestionTrue = (item: GamerResult) => {
+            return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
+        }
+
+        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
+            if (gamerAnswers.length == 0) {
+                return {
+                    score: 0,
+                    class: "bg-warning"
+                };
+            }
+
+            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
+
+            if (answer.length > 0) {
+                if (answer[0].score > 0) {
+                    return {
+                        score: answer[0].score,
+                        class: "bg-success"
+                    };
+                }
+
+                return {
+                    score: 0,
+                    class: "bg-danger"
+                }
+            }
+            
+            return {
+                score: 0,
+                class: "bg-warning"
+            };
+        }
+
+        // const isSelectedAnswer = (answerId: number) => {
+        //     if (answerId == selectedAnswerId.value) {
+        //         return 'selected-answer'
+        //     }
+        // }
+
+        const handleModalSubmitExam = () => {
+            showModalSubmitExam.value = true;
+        }
+
+        onMounted(async () => {
+            // clearInterval(intervalId);
+            // const { $echo }: any = useNuxtApp();
+            // await getListQuestion();
+            // if (currentRoomStatus.value == 0) {
+            //     ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' });
+            // }
+            // $echo.channel('admin.start-game.' + roomId.value)
+            //     .listen('StartGameEvent', (e: any) => {
+            //         currentRoomStatus.value = RoomStatus.HAPPING;
+            //         timeReply.value = RoomSetting.TIME_REPLY;
+            //         isSubmited.value = false;
+            //         calculateTimeReply();
+            //         if (listQuestion.value.length == 1) {
+            //             setTimeout(async () => {
+            //                 if (isRoomRunning.value) {
+            //                     await getListQuestion();
+            //                 }
+            //             }, RoomSetting.TIME_REPLY * 1000);
+            //         }
+            //         ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+            //     })
+            //     .listen('NextQuestionEvent', (e: any) => {
+            //         currentQuestionIndex.value = currentQuestionIndex.value + 1;
+            //         currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+            //         timeReply.value = RoomSetting.TIME_REPLY;
+            //         isSubmited.value = false;
+            //         calculateTimeReply();
+            //         if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+            //             setTimeout(async () => {
+            //                 if (isRoomRunning.value) {
+            //                     await getListQuestion();
+            //                 }
+            //             }, RoomSetting.TIME_REPLY * 1000);
+            //         }
+            //     }).listen('AdminEndgameEvent', (e: any) => {
+            //         if (currentRoomStatus.value == RoomStatus.PREPARE) {
+            //             ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+            //         }
+            //         isRoomRunning.value = false;
+            //         centerDialogVisible.value = true;
+            //     });
+        });
+
+        onBeforeUnmount(() => {
+            // clearInterval(intervalId);
+            ElLoading.service({ fullscreen: true }).close();
+        });
+
+        return {
+            showQuestion,
+            showPreviewEnding,
+            currentQuestion,
+            currentQuestionIndex,
+            listQuestion,
+            gamerInfo,
+            // submitAnswer,
+            currentScore,
+            timeReply,
+            roomCode,
+            showResult,
+            activeName,
+            // handleClick,
+            gamerResult,
+            countQuestionTrue,
+            getResultQustionColor,
+            // yourAnswerCorrect,
+            centerDialogVisible,
+            currentRoomStatus,
+            // isSelectedAnswer,
+            selectedAnswerId,
+            handleModalSubmitExam,
+            showModalSubmitExam,
+        }
+    }
+})
+</script>
+<style scoped>
+@import '~/assets/styles/user/homework.scss';
+</style>
