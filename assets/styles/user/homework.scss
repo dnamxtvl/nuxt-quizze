@@ -1,0 +1,57 @@
+.question-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+.question-list button {
+    padding: 10px 0;
+}
+.selected-question {
+    background-color: #007bff;
+    color: #fff;
+}
+.time-box {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: green;
+}
+.quiz-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.question-image {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+}
+.form-check-label {
+    font-size: 1.1rem;
+}
+.btn-nav {
+    width: 120px;
+}
+.answered {
+    background-color: #0d6efd;
+    color: white;
+}
+.unanswered {
+    background-color: white;
+    color: black;
+}
+
+.layout-user-game {
+    background-image: none !important;
+}
+
+.material-symbols-outlined {
+    width: 10px;
+    height: 10px;
+    display: inline-flex
+}
+
+.whitespace-nowrap {
+    white-space: nowrap;
+}

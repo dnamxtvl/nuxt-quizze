@@ -43,6 +43,10 @@ export const RULES_VALIDATION = {
             MIN_LENGTH: 6,
             MAX_LENGTH: 255
         }
+    },
+    ROOM: {
+        MIN_RANGLE_TIME: 1,
+        MAX_RANGLE_TIME: 180,
     }
 }
 
