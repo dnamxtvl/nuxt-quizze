@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div class="w-full" v-show="showQuestion && currentRoomStatus > 0">
-            <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
+        <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0">
+            <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1">
                 <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
                 </p>
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
-            <div class="row list-answer justify-content-center align-items-center mt-4">
+            <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center mt-4" style="flex:1">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
@@ -17,7 +17,7 @@
                     </div>
                 </div>
             </div>
-            <div class="control-center">
+            <div v-if="showQuestion && currentRoomStatus > 0" class="control-center">
                 <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                     <div class="ring d-flex">
                         <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">

@@ -33,13 +33,13 @@
                 </div>
             </div>
         </div>
-        <div class="w-full" v-if="showQuestion">
-            <div class="row question-title d-flex flex-wrap justify-content-center align-items-center">
+        <div class="w-full h-80-percent d-flex flex-column" v-if="showQuestion">
+            <div class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1;">
                 <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}. {{ currentQuestion.title }}</p>
                 <h3 class="text-warning text-center fs-1">{{remainingTime }}</h3>
             </div>
-            <div class="row list-answer justify-content-center align-items-center mt-4">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer" v-for="(item, index) in currentQuestion.answers"
+            <div class="row list-answer justify-content-center align-items-center mt-1" style="flex:1;">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0" v-for="(item, index) in currentQuestion.answers"
                     :key="index">
                     <div class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +

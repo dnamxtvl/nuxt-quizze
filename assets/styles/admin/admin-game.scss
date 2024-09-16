@@ -51,12 +51,12 @@
 }
 
 .question-title {
-    min-height: 350px;
     background-color: #00000080;
 }
 .list-answer-item {
-    min-height: 340px;
+    min-height: 160px;
     background-color: #00000080;
+    max-height: 300px;
 }
 .user-name-text {
     padding-top: 50px;

@@ -1,7 +1,7 @@
 <template>
     <div class="row ms-4 me-4">
-        <div class="app-email card">
-            <div class="row g-0">
+        <div class="app-email card h-100-vh">
+            <div class="row g-0 h-100-vh">
                 <!-- Create Quizz -->
                 <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                     <el-tab-pane label="Dán câu hỏi" name="first">
@@ -22,7 +22,7 @@
                             </div>
                             <span class="fw-500 fs-5 ms-3 mb-0">Sao chép và dán văn bản câu hỏi để tạo bài kiểm tra từ đó <span class="text-danger">*</span></span>
                             <form class="p-3" @submit="createQuizz">
-                                <textarea v-model="listQuizzText" :placeholder="'' + defaultPlaceholder" class="form-control" name="" id="" cols="30" rows="23"></textarea>
+                                <textarea v-model="listQuizzText" :placeholder="'' + defaultPlaceholder" class="form-control list-question-textarea" name="" id="" cols="30" rows="22"></textarea>
                                 <button type="submit" class="btn btn-primary mt-3 float-end"><RiAddCircleFill size="18" /> Tạo quizz</button>
                             </form>
                         </div>

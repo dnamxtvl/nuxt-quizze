@@ -258,3 +258,22 @@ html, body {
 .width-2 {
   width: 45px;
 }
+
+.h-100-vh {
+  height: 100vh !important;
+}
+
+
+@media (max-width: 1920px) {
+  .list-question-textarea {
+    height: 300px;
+  }
+}
+
+.h-70-percent {
+  height: 70%;
+}
+
+.h-80-percent {
+  height: 80%;
+}

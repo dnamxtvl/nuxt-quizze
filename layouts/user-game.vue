@@ -1,5 +1,5 @@
 <template>
-    <div class="layout-user-game w-full h-full">
+    <div class="layout-user-game w-full">
         <UserGameHeader />
         <slot />
     </div>
@@ -16,8 +16,8 @@ export default {
 
 <style scoped>
 .layout-user-game {
-    min-height: 970px;
-    background-image: url(https://cf.quizizz.com/themes/v2/football/bg_image_1080p.jpg)
+    background-image: url(https://cf.quizizz.com/themes/v2/football/bg_image_1080p.jpg);
+    height: calc(100vh + 80px) !important;
 }
 </style>
   

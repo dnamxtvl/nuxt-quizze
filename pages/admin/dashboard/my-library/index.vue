@@ -1,7 +1,7 @@
 <template>
     <div class="row ms-4 me-4">
-        <div class="app-email card">
-            <div class="row g-0">
+        <div class="app-email card h-100-vh">
+            <div class="row g-0 h-100-vh">
                 <el-dialog v-model="showModalDelete" title="Warning" width="500" align-center>
                     <span>Bạn có chắc chắn muốn xóa bộ câu hỏi này?</span>
                     <template #footer>
@@ -94,7 +94,7 @@
                                                     </div>
                                                     <div
                                                         class="title-content-list-answer ms-3 d-flex justify-content-between col-md-7 mt-2">
-                                                        <p class="text-start fs-6">{{ item.questions_count }} câu hỏi
+                                                        <p class="text-start fs-6">{{ item.questions_count }} câu
                                                         </p>
                                                         <p class="text-start fs-6">{{ item.category?.name }}</p>
                                                         <p class="text-start fs-6">{{ item.rooms_count }} lượt chơi</p>
