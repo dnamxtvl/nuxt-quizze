@@ -16,6 +16,7 @@ const API_CONST = {
         START: 'admin/room/start',
         NEXT_QUESTION: 'admin/room/next-question',
         ADMIN_END_GAME: 'admin/room/end-game',
+        GET_DETAIL_ROOM: 'admin/room/detail',
     },
     GAMER: {
         CREATE_SETTING: 'user/gamer/create-setting',

@@ -148,7 +148,7 @@
                                         </div>
                                     </div>
                                     <div class="row pagination">
-                                        <el-pagination class="d-flex justify-content-center" :page-size="6"
+                                        <el-pagination class="d-flex justify-content-center" :page-size="7"
                                             @current-change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
@@ -194,8 +194,8 @@ export default defineComponent({
         const formLabelWidth = '140px';
         const timeRoom = ref<Array<Date>>(
             [
-                new Date(),
-                new Date()
+                new Date(moment().add(1, "hours").format("YYYY-MM-DD HH:mm:ss")),
+                new Date(moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")),
             ]
         );
         const defaultTime = new Date();
@@ -226,13 +226,24 @@ export default defineComponent({
                 return ;
             }
             
+            const params = typeRoom.value == RoomType.HOMEWORK ? {
+                start_time: moment(timeRoom.value[0]).format("YYYY-MM-DD HH:mm:ss"),
+                end_time: moment(timeRoom.value[1]).format("YYYY-MM-DD HH:mm:ss"),
+                type: typeRoom.value
+            } : { type: typeRoom.value }
+
             await api.room.create(
                 currentQuizzId.value,
+                params,
                 (res: any) => {
+                    if (res.type == RoomType.HOMEWORK) {
+                        return navigateTo("/admin/dashboard/reports/" + res.id);
+                    }
+                    
                     return navigateTo("/admin/dashboard/activity/" + res.id);
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Error",message: err.error.shift(),type: "error"});
+                    errorMessageValidate.value = err.error;
                 }
             )
         }
@@ -260,8 +271,13 @@ export default defineComponent({
                     isPassValidate = false;
                 }
 
-                const rangeTimeSeconds = moment(timeRoom.value[1]).diff(moment(timeRoom.value[0]), 'seconds');
-                if (rangeTimeSeconds < RULES_VALIDATION.ROOM.MIN_RANGLE_TIME * 60 || rangeTimeSeconds > RULES_VALIDATION.ROOM.MAX_RANGLE_TIME * 60) {
+                if (moment(timeRoom.value[0]) < moment(defaultTime) || moment(timeRoom.value[1]) < moment(defaultTime)) {
+                    errrorMessage.push("Thời gian bắt đầu và kết thúc phải lớn hơn thời gian hiện tại");
+                    isPassValidate = false;
+                }
+
+                const rangeTimeSeconds = moment(timeRoom.value[1]).diff(moment(timeRoom.value[0]), 'minutes');
+                if (rangeTimeSeconds < RULES_VALIDATION.ROOM.MIN_RANGLE_TIME || rangeTimeSeconds > RULES_VALIDATION.ROOM.MAX_RANGLE_TIME) {
                     errrorMessage.push('Thời gian diễn ra phải từ 1 đến 180 phút!');
                     isPassValidate = false;
                 }   
@@ -299,6 +315,10 @@ export default defineComponent({
             currentQuizzId.value = quizzeId;
             typeRoom.value = "";
             errorMessageValidate.value = [];
+            timeRoom.value = [
+                new Date(moment().add(1, "hours").format("YYYY-MM-DD HH:mm:ss")),
+                new Date(moment().add(2, "hours").format("YYYY-MM-DD HH:mm:ss")),
+            ];
         }
 
         const changeTypeRoom = () => {

@@ -1,5 +1,15 @@
 <template>
     <div class="container mt-4">
+        <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
+            <span class="text-center align-center">Admin đã kết thúc bài kiểm tra này!</span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <nuxt-link to="/user/join" class="btn btn-primary">
+                        Thoát
+                    </nuxt-link>
+                </div>
+            </template>
+        </el-dialog>
         <el-dialog v-model="showModalSubmitExam" title="Warning" width="400" align-center>
             <span>Open the dialog from the center from the screen</span>
             <template #footer>
@@ -15,8 +25,8 @@
             <!-- Left Panel: Question List -->
             <div class="col-lg-4 col-md-5 mb-4">
                 <div class="quiz-card">
-                    <div class="d-flex justify-content-center align-items-center mb-2">
-                        <div class="time-box fs-3 text-center">00:00:39</div>
+                    <div class="d-flex justify-content-center align-items-center mb-2" v-if="currentRoomStatus != statusPrepare">
+                        <div class="time-box fs-3 text-center">{{ converSecond(timeReply) }}</div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
@@ -36,84 +46,43 @@
                     <h5>Danh sách câu hỏi</h5>
                     <div class="question-list">
                         <!-- Question List -->
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
+                        <button class="btn unanswered border border-secondary" v-for="(item, index) in listQuestion" :key="index" @click="handleSelectQuestion(index)">{{ index + 1 }}</button>
                         <!-- More buttons for each question -->
-                        <button class="btn bg-primary text-white">25</button>
+                        <!-- <button class="btn bg-primary text-white">25</button> -->
                     </div>
                     <button class="btn btn-primary mt-3 w-100" @click="handleModalSubmitExam">Nộp bài</button>
                 </div>
             </div>
 
             <!-- Right Panel: Question Details -->
-            <div class="col-lg-8 col-md-7">
+            <div class="col-lg-8 col-md-7" v-show="currentRoomStatus != statusPrepare">
                 <div class="quiz-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5>Câu 25</h5>
+                        <h5>Câu {{ currentQuestionIndex + 1 }}</h5>
                         <div class="mb-auto">
                             <span class="material-symbols-outlined bg-warning cursor-pointer me-1"></span>
                             <label for="markQuestion">Đánh dấu</label>
                         </div>
                     </div>
-                    <p class="fs-5">Xe kéo mô tô ba bánh như hình này có đúng quy tắc giao thông?</p>
+                    <p class="fs-5">{{ currentQuestion?.title }}</p>
                     <!-- Answer Options -->
                     <form>
-                        <div class="form-check">
+                        <div class="form-check" v-for="(item, index) in currentQuestion?.answers" :key="index">
                             <input class="form-check-input" type="radio" name="answer" id="option1">
                             <label class="form-check-label" for="option1">
-                                Đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
+                                {{ item?.answer }}
                             </label>
                         </div>
                     </form>
 
                     <!-- Navigation Buttons -->
                     <div class="d-flex justify-content-center mt-4">
-                        <button class="btn btn-link btn-nav me-2 text-dark text-center whitespace-nowrap">
+                        <button class="btn btn-link btn-nav me-2 text-dark text-center whitespace-nowrap" v-if="currentQuestionIndex != 0">
                             <RiArrowLeftSLine />
-                            <span class="mt-1">Câu trước</span>
+                            <span class="mt-1" @click="handlePreviousQuestion">Câu trước</span>
                         </button>
-                        <button class="btn btn-primary btn-nav ms-2 whitespace-nowrap text-center">
-                            <span class="ms-2">Câu sau</span>
+                        <button class="btn btn-primary btn-nav ms-2 whitespace-nowrap text-center" v-if="currentQuestionIndex != listQuestion.length - 1">
+                            <span class="ms-2" @click="handleNextQuestion">Câu sau</span>
                             <RiArrowRightSLine size="14"/>
                         </button>
                     </div>
@@ -221,16 +190,6 @@
                 </div>
             </div>
         </div> -->
-    <!-- <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
-            <span class="text-center align-center">Admin đã kết thúc màn chơi này!</span>
-            <template #footer>
-                <div class="dialog-footer">
-                    <nuxt-link to="/user/join" class="btn btn-primary">
-                        Thoát
-                    </nuxt-link>
-                </div>
-            </template>
-        </el-dialog> -->
     <!-- <div class="show-meme d-flex justify-content-center align-items-center">
         <img src="../../../../public/meme/sad/Screenshot from 2024-07-24 19-03-02.png" alt="meme" with="400" height="400" />
         </div> -->
@@ -246,6 +205,8 @@ import { HttpStatusCode } from "axios";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import type { TabsPaneContext } from 'element-plus';
 import { RiUser2Fill, RiCheckFill, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/vue";
+import helperApp from "~/utils/helper";
+import moment from "moment";
 
 definePageMeta({
   layout: 'homework'
@@ -305,6 +266,7 @@ export default defineComponent({
     setup() {
         const route = useRoute();
         const timeReply = ref<number>(0);
+        const statusPrepare = RoomStatus.PREPARE;
         const listQuestion = ref<Array<ItemQuestion>>([]);
         const showQuestion = ref<boolean>(true);
         const showPreviewEnding = ref<boolean>(false);
@@ -339,7 +301,7 @@ export default defineComponent({
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
         const selectedAnswerId = ref<number>(0);
-
+        const currentRoomEndAt = ref<string>("");
         const showModalSubmitExam = ref<boolean>(false);
 
         // const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
@@ -353,48 +315,46 @@ export default defineComponent({
         //     return '';
         // }
 
-        // const getListQuestion = async () => {
-        //     await api.room.listQuestionOfRoom(
-        //         route.params.tokenId.toString(),
-        //         (res: any) => {
-        //             listQuestion.value = res.questions;
-        //             currentQuestionIndex.value = res.room.status != RoomStatus.PREPARE ?
-        //                 listQuestion.value.findIndex((item: ItemQuestion) => item.id == res.room.current_question_id) : 0;
-        //             currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-        //             gamerInfo.value = res.gamer;
-        //             gamerResult.value = res.gamer;
-        //             roomId.value = res.room.id;
-        //             roomCode.value = res.room.code;
-        //             currentRoomStatus.value = res.room.status;
-        //             if (res.room.status == RoomStatus.HAPPING) {
-        //                 timeReply.value = res.time_remaining;
-        //                 calculateTimeReply();
-        //                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-        //                     setTimeout(async () => {
-        //                         await getListQuestion();
-        //                     }, res.time_remaining * 1000);
-        //                 }
-        //             }
-        //             if (res.room.status == RoomStatus.PREPARE_FINISH) {
-        //                 showQuestion.value = false;
-        //                 showResult.value = true;
-        //             }
-        //             if (res.gamer?.gamer_answers.length > 0) {
-        //                 let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
-        //                 if (currentQuestionSubmited) {
-        //                     selectedAnswerId.value = currentQuestionSubmited.answer_id;
-        //                 }
-        //             }
-        //         },
-        //         (err: ErrorResponse) => {
-        //             ElNotification({title: "Error", message: err.error.shift(), type: "error"});
-        //             if (err.code === HttpStatusCode.NotFound) {
-        //                 currentRoomStatus.value = -1;
-        //                 return navigateTo("/not-found");
-        //             }
-        //         }
-        //     )
-        // }
+        const getListQuestion = async () => {
+            ElLoading.service({ fullscreen: true });
+            await api.room.listQuestionOfRoom(
+                route.params.tokenId.toString(),
+                (res: any) => {
+                    listQuestion.value = res.questions;
+                    currentQuestionIndex.value = 0;
+                    currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+                    gamerInfo.value = res.gamer;
+                    gamerResult.value = res.gamer;
+                    roomId.value = res.room.id;
+                    roomCode.value = res.room.code;
+                    currentRoomEndAt.value = res.room.ended_at;
+                    currentRoomStatus.value = res.room.status;
+                    if (res.room.status == RoomStatus.HAPPING) {
+                        timeReply.value = res.time_remaining;
+                        calculateTimeReply();
+                    }
+                    if (res.room.status == RoomStatus.PREPARE_FINISH) {
+                        showQuestion.value = false;
+                        showResult.value = true;
+                    }
+                    if (res.gamer?.gamer_answers.length > 0) {
+                        let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
+                        if (currentQuestionSubmited) {
+                            selectedAnswerId.value = currentQuestionSubmited.answer_id;
+                        }
+                    }
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    if (err.code === HttpStatusCode.NotFound) {
+                        currentRoomStatus.value = -1;
+                        return navigateTo("/not-found");
+                    }
+                }
+            )
+
+            ElLoading.service({ fullscreen: true }).close();
+        }
 
         // const submitAnswer = async (id: number) => {
         //     if (timeReply.value == 0) {
@@ -428,17 +388,17 @@ export default defineComponent({
         //     isSubmited.value = true;
         // }
 
-        // let intervalId: any;
+        let intervalId: any;
 
-        // const calculateTimeReply = () => {
-        //     intervalId = setInterval(() => {
-        //         if (timeReply.value > 0) {
-        //             timeReply.value = timeReply.value - 1;
-        //         } else {
-        //             clearInterval(intervalId);
-        //         }
-        //     }, 1000);
-        // }
+        const calculateTimeReply = () => {
+            intervalId = setInterval(() => {
+                if (timeReply.value > 0) {
+                    timeReply.value = timeReply.value - 1;
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 1000);
+        }
 
         // const handleClick = (tab: TabsPaneContext, event: Event) => {
         //     console.log(tab, event)
@@ -488,57 +448,61 @@ export default defineComponent({
             showModalSubmitExam.value = true;
         }
 
+        const handleSelectQuestion = (id: number) => {
+            currentQuestionIndex.value = id;
+            currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+        }
+
+        const handlePreviousQuestion = () => {
+            if (currentQuestionIndex.value > 0) {
+                currentQuestionIndex.value = currentQuestionIndex.value - 1;
+                currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+            }
+        }
+
+        const handleNextQuestion = () => {
+            if (currentQuestionIndex.value < listQuestion.value.length - 1) {
+                currentQuestionIndex.value = currentQuestionIndex.value + 1;
+                currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+            }
+        }
+
+        const converSecond = (second: number) => {
+            return helperApp.convertSecondsToTime(second);
+        }
+
         onMounted(async () => {
-            // clearInterval(intervalId);
-            // const { $echo }: any = useNuxtApp();
-            // await getListQuestion();
-            // if (currentRoomStatus.value == 0) {
-            //     ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' });
-            // }
-            // $echo.channel('admin.start-game.' + roomId.value)
-            //     .listen('StartGameEvent', (e: any) => {
-            //         currentRoomStatus.value = RoomStatus.HAPPING;
-            //         timeReply.value = RoomSetting.TIME_REPLY;
-            //         isSubmited.value = false;
-            //         calculateTimeReply();
-            //         if (listQuestion.value.length == 1) {
-            //             setTimeout(async () => {
-            //                 if (isRoomRunning.value) {
-            //                     await getListQuestion();
-            //                 }
-            //             }, RoomSetting.TIME_REPLY * 1000);
-            //         }
-            //         ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
-            //     })
-            //     .listen('NextQuestionEvent', (e: any) => {
-            //         currentQuestionIndex.value = currentQuestionIndex.value + 1;
-            //         currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-            //         timeReply.value = RoomSetting.TIME_REPLY;
-            //         isSubmited.value = false;
-            //         calculateTimeReply();
-            //         if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-            //             setTimeout(async () => {
-            //                 if (isRoomRunning.value) {
-            //                     await getListQuestion();
-            //                 }
-            //             }, RoomSetting.TIME_REPLY * 1000);
-            //         }
-            //     }).listen('AdminEndgameEvent', (e: any) => {
-            //         if (currentRoomStatus.value == RoomStatus.PREPARE) {
-            //             ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
-            //         }
-            //         isRoomRunning.value = false;
-            //         centerDialogVisible.value = true;
-            //     });
+            clearInterval(intervalId);
+            const { $echo }: any = useNuxtApp();
+            await getListQuestion();
+            if (currentRoomStatus.value == 0) {
+                ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' });
+            }
+            $echo.channel('admin.start-game.' + roomId.value)
+                .listen('StartGameEvent', (e: any) => {
+                    currentRoomStatus.value = RoomStatus.HAPPING;
+                    timeReply.value = moment(currentRoomEndAt.value).diff(moment(), 'seconds');
+                    isSubmited.value = false;
+                    calculateTimeReply();
+                    ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' }).close();
+                })
+                .listen('AdminEndgameEvent', (e: any) => {
+                    if (currentRoomStatus.value == RoomStatus.PREPARE) {
+                        ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' }).close();
+                    }
+                    isRoomRunning.value = false;
+                    centerDialogVisible.value = true;
+                });
         });
 
         onBeforeUnmount(() => {
-            // clearInterval(intervalId);
+            clearInterval(intervalId);
             ElLoading.service({ fullscreen: true }).close();
         });
 
         return {
             showQuestion,
+            statusPrepare,
             showPreviewEnding,
             currentQuestion,
             currentQuestionIndex,
@@ -561,6 +525,10 @@ export default defineComponent({
             selectedAnswerId,
             handleModalSubmitExam,
             showModalSubmitExam,
+            handleSelectQuestion,
+            handlePreviousQuestion,
+            handleNextQuestion,
+            converSecond,
         }
     }
 })
