@@ -20,7 +20,7 @@
                         976349
                     </li> -->
                     <li class="nav-item ms-2">
-                        <button @click="outGame()" class="nav-link btn btn-danger">Thoát</button>
+                        <button @click="outGame" class="nav-link btn btn-danger">Thoát</button>
                     </li>
                 </ul>
             </div>
@@ -38,7 +38,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const outGame = async () => {
-        if (route.path.includes(API_CONST.FRONT_END.USER_GAME)) {
+        if (route.path.includes(API_CONST.FRONT_END.USER_GAME) || route.path.includes(API_CONST.FRONT_END.HOMEWORK)) {
             await api.gamer.outGame(
                 route.params.tokenId.toString(),
                 (res: any) => {

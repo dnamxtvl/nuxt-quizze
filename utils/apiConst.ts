@@ -27,6 +27,7 @@ const API_CONST = {
     FRONT_END: {
         USER_GAME: '/user/join/game',
         ADMIN_GAME: '/admin/dashboard/activity',
+        HOMEWORK: '/user/join/homework'
     }
 };
 
