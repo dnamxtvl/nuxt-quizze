@@ -33,9 +33,17 @@
                         <div class="time-box fs-6 text-danger text-center">Đã kết thúc lúc {{ submitedExamAt }}</div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div>
+                        <div v-if="!(!isRoomRunning && currentRoomStatus != statusPrepare)">
                             <span class="material-symbols-outlined bg-warning me-1"></span>
                             <label for="markQuestion">Đánh dấu</label>
+                        </div>
+                        <div v-if="(!isRoomRunning && currentRoomStatus != statusPrepare)">
+                            <span class="material-symbols-outlined bg-danger me-1"></span>
+                            <label for="markQuestion">Trả lời sai</label>
+                        </div>
+                        <div v-if="(!isRoomRunning && currentRoomStatus != statusPrepare)">
+                            <span class="material-symbols-outlined bg-success me-1"></span>
+                            <label for="markQuestion">Trả lời đúng</label>
                         </div>
                         <div>
                             <span class="material-symbols-outlined bg-primary me-1"></span>
@@ -331,7 +339,19 @@ export default defineComponent({
         }, 1000);
 
         const getStatusQuestion = (questionId: string) => {
-            if (selectedAnswer.value[questionId]) return 'bg-primary text-white';
+            let selectedAnswerIdReview = selectedAnswer.value[questionId];
+            if (selectedAnswerIdReview) {
+                if (!isRoomRunning.value && currentRoomStatus.value != statusPrepare) {
+                    let answersOfQuestion = listQuestion.value.find((item: ItemQuestion) => item.id == questionId)?.answers;
+                    if (answersOfQuestion) {
+                        return answersOfQuestion.find((item: Answer) => item.id == selectedAnswerIdReview)?.is_correct ? 'bg-success text-white' : 'bg-danger text-white';
+                    }
+                }
+
+                return 'bg-primary text-white';
+            }
+
+            return '';
         }
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
