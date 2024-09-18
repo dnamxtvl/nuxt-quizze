@@ -16,11 +16,13 @@ const API_CONST = {
         START: 'admin/room/start',
         NEXT_QUESTION: 'admin/room/next-question',
         ADMIN_END_GAME: 'admin/room/end-game',
+        GET_DETAIL_ROOM: 'admin/room/detail',
     },
     GAMER: {
         CREATE_SETTING: 'user/gamer/create-setting',
         SUBMIT_ANSWER: 'user/gamer/submit-answer',
         OUT_GAME: 'user/gamer/out-game',
+        SUBMIT_HOMEWORK: 'user/gamer/submit-homework',
     },
     FRONT_END: {
         USER_GAME: '/user/join/game',

@@ -13,7 +13,7 @@
                         <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
                     </div>
                 </div>
-                <div class="row d-flex p-4 justify-center rounded-b-2xl">
+                <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
                     <div class="col-md-6">
                         <button class="btn btn-light w-full fs-5">
                             Preview as a Student
@@ -25,11 +25,15 @@
                         </button>
                     </div>
                 </div>
-                <div class="row d-flex justify-content-center" v-for="(item, index) in listUserJoined" :key="index">
-                    <span class="text-white text-center">
-                        <RiUser2Fill class="mb-2" :color="getRandomColor()" size="1.5em" /><span class="text-primary fs-4">{{ item.name ?? 'Sóc ẩn danh'
-                            }}</span><span class="pb-2"> đã tham gia</span>
-                    </span>
+                <div class="row d-flex justify-content-between p-4 pt-0">
+                    <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
+                        <button class="btn btn-outline-secondary text-white w-full text-center">
+                            <RiUser2Fill class="" :color="getRandomColor()" size="1.2em" />
+                            <span class="text-primary fs-5">
+                                {{ item.name ?? 'Sóc ẩn danh'}}
+                            </span><span class="ms-2"> đã join</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -424,6 +428,7 @@ export default defineComponent({
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
+            ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
         };
 
         onMounted(async () => {

@@ -2,8 +2,8 @@ import BaseService from './BaseService';
 import API_CONST from '~/utils/apiConst';
 
 export default class RoomService extends BaseService {
-    create = async (id: string, success: any, error: any) => {
-        await this.post(API_CONST.ROOM.CREATE + '/' + id, {}, success, error);
+    create = async (id: string, params: Object ,success: any, error: any) => {
+        await this.post(API_CONST.ROOM.CREATE + '/' + id, params, success, error);
     };
     checkValidRoom = async (id: string, success: any, error: any) => {
         await this.get(API_CONST.ROOM.CHECK_VALID + '/' + id, {}, success, error);
@@ -22,5 +22,8 @@ export default class RoomService extends BaseService {
     };
     adminEndGame = async (roomId: string, success: any, error: any) => {
         await this.post(API_CONST.ROOM.ADMIN_END_GAME + '/' + roomId, {}, success, error);
+    };
+    getDetailRoom = async (roomId: string, success: any, error: any) => {
+        await this.get(API_CONST.ROOM.GET_DETAIL_ROOM + '/' + roomId, {}, success, error);
     };
 }

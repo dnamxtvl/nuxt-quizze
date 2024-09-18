@@ -53,6 +53,7 @@ import api from "~/api/axios";
 import { useRoute } from "vue-router";
 import { useMainStore } from "~/store";
 import type { ErrorResponse } from "~/constants/type";
+import { RoomType } from "~/constants/room";
 
 export default defineComponent({
   setup() {
@@ -76,6 +77,10 @@ export default defineComponent({
             {name: username.value, display_meme: valueEnableMeme.value, token: route.params.tokenId, gamer_id: store.$state.gamerId},
             (res: any) => {
                 ElLoading.service({ fullscreen: true }).close();
+                if (res.type == RoomType.HOMEWORK) {
+                    return navigateTo("/user/join/homework/" + route.params.tokenId);
+                }
+
                 return navigateTo("/user/join/game/" + route.params.tokenId);
             },
             (err: ErrorResponse) => {

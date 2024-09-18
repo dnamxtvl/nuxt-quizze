@@ -1,12 +1,22 @@
 <template>
     <div class="container mt-4">
-        <el-dialog v-model="showModalSubmitExam" title="Warning" width="400" align-center>
-            <span>Open the dialog from the center from the screen</span>
+        <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
+            <span class="text-center align-center">Admin đã kết thúc bài kiểm tra này!</span>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="showModalSubmitExam = false">Cancel</el-button>
-                    <el-button type="primary" @click="">
-                        Confirm
+                    <button class="btn btn-primary" @click="getListQuestion">
+                        Xem kết quả
+                    </button>
+                </div>
+            </template>
+        </el-dialog>
+        <el-dialog v-model="showModalSubmitExam" title="Warning" width="400" align-center>
+            <span>Bạn có chắc chắn muốn nộp bài?</span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showModalSubmitExam = false">Hủy</el-button>
+                    <el-button type="primary" @click="submitExam">
+                        Xác nhận
                     </el-button>
                 </div>
             </template>
@@ -15,8 +25,12 @@
             <!-- Left Panel: Question List -->
             <div class="col-lg-4 col-md-5 mb-4">
                 <div class="quiz-card">
-                    <div class="d-flex justify-content-center align-items-center mb-2">
-                        <div class="time-box fs-3 text-center">00:00:39</div>
+                    <div class="d-flex justify-content-center align-items-center mb-2" v-if="currentRoomStatus != statusPrepare && isRoomRunning">
+                        <div class="time-box fs-3 text-center">{{ converSecond(timeReply) }}</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2" v-if="!isRoomRunning && currentRoomStatus != statusPrepare">
+                        <div class="time-box fs-3 text-center">{{ countQuestionTrue(gamerResult) + "/" + listQuestion.length }}</div>
+                        <div class="time-box fs-6 text-danger text-center">Đã kết thúc lúc {{ submitedExamAt }}</div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
@@ -36,84 +50,42 @@
                     <h5>Danh sách câu hỏi</h5>
                     <div class="question-list">
                         <!-- Question List -->
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
-                        <button class="btn unanswered border border-secondary">3</button>
-                        <button class="btn unanswered border border-secondary">1</button>
-                        <button class="btn unanswered border border-secondary">2</button>
+                        <button :class='"btn unanswered border border-secondary " + getStatusQuestion(item.id)' v-for="(item, index) in listQuestion" :key="index" @click="handleSelectQuestion(index)">{{ index + 1 }}</button>
                         <!-- More buttons for each question -->
-                        <button class="btn bg-primary text-white">25</button>
                     </div>
-                    <button class="btn btn-primary mt-3 w-100" @click="handleModalSubmitExam">Nộp bài</button>
+                    <button v-if="currentRoomStatus != statusPrepare && isRoomRunning" class="btn btn-primary mt-3 w-100" @click="handleModalSubmitExam">Nộp bài</button>
                 </div>
             </div>
 
             <!-- Right Panel: Question Details -->
-            <div class="col-lg-8 col-md-7">
+            <div class="col-lg-8 col-md-7" v-show="currentRoomStatus != statusPrepare">
                 <div class="quiz-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5>Câu 25</h5>
+                        <h5>Câu {{ currentQuestionIndex + 1 }}</h5>
                         <div class="mb-auto">
                             <span class="material-symbols-outlined bg-warning cursor-pointer me-1"></span>
                             <label for="markQuestion">Đánh dấu</label>
                         </div>
                     </div>
-                    <p class="fs-5">Xe kéo mô tô ba bánh như hình này có đúng quy tắc giao thông?</p>
+                    <p class="fs-5">{{ currentQuestion?.title }}</p>
                     <!-- Answer Options -->
                     <form>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option1">
-                            <label class="form-check-label" for="option1">
-                                Đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="answer" id="option2">
-                            <label class="form-check-label" for="option2">
-                                Không đúng
+                        <div class="form-check" v-for="(item, index) in currentQuestion?.answers" :key="index">
+                            <input class="form-check-input" :value="item.id" :disabled="!isRoomRunning"
+                            v-model="selectedAnswer[currentQuestion?.id]"  type="radio" :name='"answer_" + currentQuestion?.id' @change="handleSelectAnswer(item?.id)">
+                            <label :class='"form-check-label " + checkAnswerCorrect(item?.id)' for="option1">
+                                {{ defaultStringSort[index] }}. {{ item.answer }}
                             </label>
                         </div>
                     </form>
-
                     <!-- Navigation Buttons -->
                     <div class="d-flex justify-content-center mt-4">
-                        <button class="btn btn-link btn-nav me-2 text-dark text-center whitespace-nowrap">
+                        <button class="btn btn-link btn-nav me-2 text-dark text-center whitespace-nowrap" v-if="currentQuestionIndex != 0">
                             <RiArrowLeftSLine />
-                            <span class="mt-1">Câu trước</span>
+                            <span class="mt-1" @click="handlePreviousQuestion">Câu trước</span>
                         </button>
-                        <button class="btn btn-primary btn-nav ms-2 whitespace-nowrap text-center">
-                            <span class="ms-2">Câu sau</span>
+                        <button class="btn btn-primary btn-nav ms-2 whitespace-nowrap text-center" v-if="currentQuestionIndex != listQuestion.length - 1">
+                            <span class="ms-2" @click="handleNextQuestion">Câu sau</span>
                             <RiArrowRightSLine size="14"/>
                         </button>
                     </div>
@@ -121,131 +93,19 @@
             </div>
         </div>
     </div>
-    <!-- <div> -->
-
-    <!-- <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0"> -->
-    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1">
-                <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
-                </p>
-                <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3>
-            </div> -->
-    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center mt-4" style="flex:1">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
-                    v-for="(item, index) in currentQuestion?.answers" :key="index">
-                    <div @click="submitAnswer(item.id)"
-                        :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative '">
-                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
-                            1}}</span>
-                        <p class="text-white fs-2 text-center">{{ item.answer }}</p>
-                    </div>
-                </div>
-            </div> -->
-    <!-- <div v-if="showQuestion && currentRoomStatus > 0" class="control-center">
-                <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
-                    <div class="ring d-flex">
-                        <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
-                            <div class="coccoc-alo-ph-circle"></div>
-                            <div class="coccoc-alo-ph-circle-fill"></div>
-                            <div class="coccoc-alo-ph-img-circle"></div>
-                        </div>
-                        <span class="fs-4 text-white text-center user-name-text me-3 text-primary">
-                            {{ gamerInfo?.name }}
-                            <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ roomCode }}</div>
-                        </span>
-                        <div class="divider hidden sm:block"></div>
-                        <div>
-                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{
-                                currentQuestionIndex + 1 }}/{{ listQuestion.length }}</button>
-                        </div>
-                    </div>
-                    <div class="control-center-actions"></div>
-                </div>
-            </div> -->
-    <!-- </div> -->
-    <!-- <div class="table-preview-result" v-if="showResult">
-            <div class="row d-flex justify-content-center">
-                <div class="col-md-10">
-                    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-                        <el-tab-pane label="Tổng Quan" name="first">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="text-white">#</th>
-                                        <th scope="col" class="fs-6 text-white">Tên</th>
-                                        <th scope="col" class="fs-6 text-white">Điểm</th>
-                                        <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row" class="text-white">1</th>
-                                        <td class="text-white">{{ gamerResult?.name }}</td>
-                                        <td class="text-white">{{ gamerResult?.gamer_answers_sum_score ?? 0 }}</td>
-                                        <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
-                                        <td class="text-white detail-score text-center">
-                                            <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQustionColor(gamerResult?.gamer_answers, question.id).class"
-                                                v-for="(question, key) in listQuestion" :key="key">
-                                                <p>{{ 'Q' + (key + 1) }}</p>
-                                                <p>{{ getResultQustionColor(gamerResult?.gamer_answers,
-                                                    question.id).score }}</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </el-tab-pane>
-                        <el-tab-pane label="Câu hỏi" name="second">
-                            <div class="row pt-4 rounded rounded-5 body-answer-review">
-                                <div class="col-lg-12 px-4 mb-2">
-                                    <div v-for="(item, index) in listQuestion"
-                                        class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
-                                            {{ (index + 1) + ". " + item.title }}
-                                        </p>
-                                        <hr>
-                                        </hr>
-                                        <div class="question-answer-review px-4 pt-2 mb-2">
-                                            <div class="form-check" v-for="(answer, index) in item.answers">
-                                                <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
-                                                <label :class="['form-check-label text-white ms-2']" for="flexCheckDefault">
-                                                    {{ answer.answer }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </el-tab-pane>
-                    </el-tabs>
-                </div>
-            </div>
-        </div> -->
-    <!-- <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
-            <span class="text-center align-center">Admin đã kết thúc màn chơi này!</span>
-            <template #footer>
-                <div class="dialog-footer">
-                    <nuxt-link to="/user/join" class="btn btn-primary">
-                        Thoát
-                    </nuxt-link>
-                </div>
-            </template>
-        </el-dialog> -->
-    <!-- <div class="show-meme d-flex justify-content-center align-items-center">
-        <img src="../../../../public/meme/sad/Screenshot from 2024-07-24 19-03-02.png" alt="meme" with="400" height="400" />
-        </div> -->
-    <!-- </div> -->
 </template>
 <script lang="ts">
-import { defineComponent, ref, onBeforeUnmount } from "vue";
+import { defineComponent, ref, onBeforeUnmount, watch } from "vue";
 import { ElLoading } from "element-plus";
 import api from "~/api/axios";
 import { useRoute } from "vue-router";
 import type { ErrorResponse } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RoomSetting, RoomStatus } from "~/constants/room";
-import type { TabsPaneContext } from 'element-plus';
 import { RiUser2Fill, RiCheckFill, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/vue";
+import helperApp from "~/utils/helper";
+import moment from "moment";
+import { useDebounceFn } from "@vueuse/core";
 
 definePageMeta({
   layout: 'homework'
@@ -304,11 +164,11 @@ export default defineComponent({
     },
     setup() {
         const route = useRoute();
+        const defaultStringSort = ref<string>('ABCDEFGH');
         const timeReply = ref<number>(0);
+        const statusPrepare = RoomStatus.PREPARE;
         const listQuestion = ref<Array<ItemQuestion>>([]);
         const showQuestion = ref<boolean>(true);
-        const showPreviewEnding = ref<boolean>(false);
-        const activeName = ref<string>('first')
         const gamerInfo = ref<GamerInfo>();
         const gamerResult = ref<GamerResult>(
             {
@@ -333,234 +193,247 @@ export default defineComponent({
         const roomId = ref<string>('');
         const roomCode = ref<string>('');
         const currentRoomStatus = ref<number>(0);
-        const currentScore = ref<number>(0);
         const currentQuestionIndex = ref<number>(0);
         const centerDialogVisible = ref<boolean>(false); 
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
-        const selectedAnswerId = ref<number>(0);
-
+        const currentRoomEndAt = ref<string>("");
+        const currentRoomStartAt = ref<string>("");
         const showModalSubmitExam = ref<boolean>(false);
+        const selectedAnswer = ref({});
+        const submitedExamAt = ref<string>("");
+        const autoSubmit = ref<boolean>(false);
 
-        // const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
-        //     if (gamerResult?.gamer_answers.length > 0) {
-        //         let answer =  gamerResult.gamer_answers.find((item: GamerAnswer) => item.answer_id == answerId);
-        //         if (answer) {
-        //             return 'text-primary';
-        //         }
-        //     }
+        const checkAnswerCorrect = (answerId: number) => {
+            if (isRoomRunning.value) {
+                return '';
+            }
 
-        //     return '';
-        // }
+            if (currentQuestion.value?.answers.length > 0) {
+                let answer =  currentQuestion.value?.answers.find((item: Answer) => item.id == answerId);
+                if (answer) {
+                    return answer.is_correct ? 'text-success' : '';
+                }
+            }
 
-        // const getListQuestion = async () => {
-        //     await api.room.listQuestionOfRoom(
-        //         route.params.tokenId.toString(),
-        //         (res: any) => {
-        //             listQuestion.value = res.questions;
-        //             currentQuestionIndex.value = res.room.status != RoomStatus.PREPARE ?
-        //                 listQuestion.value.findIndex((item: ItemQuestion) => item.id == res.room.current_question_id) : 0;
-        //             currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-        //             gamerInfo.value = res.gamer;
-        //             gamerResult.value = res.gamer;
-        //             roomId.value = res.room.id;
-        //             roomCode.value = res.room.code;
-        //             currentRoomStatus.value = res.room.status;
-        //             if (res.room.status == RoomStatus.HAPPING) {
-        //                 timeReply.value = res.time_remaining;
-        //                 calculateTimeReply();
-        //                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-        //                     setTimeout(async () => {
-        //                         await getListQuestion();
-        //                     }, res.time_remaining * 1000);
-        //                 }
-        //             }
-        //             if (res.room.status == RoomStatus.PREPARE_FINISH) {
-        //                 showQuestion.value = false;
-        //                 showResult.value = true;
-        //             }
-        //             if (res.gamer?.gamer_answers.length > 0) {
-        //                 let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
-        //                 if (currentQuestionSubmited) {
-        //                     selectedAnswerId.value = currentQuestionSubmited.answer_id;
-        //                 }
-        //             }
-        //         },
-        //         (err: ErrorResponse) => {
-        //             ElNotification({title: "Error", message: err.error.shift(), type: "error"});
-        //             if (err.code === HttpStatusCode.NotFound) {
-        //                 currentRoomStatus.value = -1;
-        //                 return navigateTo("/not-found");
-        //             }
-        //         }
-        //     )
-        // }
+            return '';
+        }
 
-        // const submitAnswer = async (id: number) => {
-        //     if (timeReply.value == 0) {
-        //         ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
-        //         return ;
-        //     }
+        const getListQuestion = async () => {
+            ElLoading.service({ fullscreen: true });
+            await api.room.listQuestionOfRoom(
+                route.params.tokenId.toString(),
+                (res: any) => {
+                    listQuestion.value = res.questions;
+                    currentQuestionIndex.value = 0;
+                    currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+                    gamerInfo.value = res.gamer;
+                    gamerResult.value = res.gamer;
+                    roomId.value = res.room.id;
+                    roomCode.value = res.room.code;
+                    currentRoomEndAt.value = res.room.ended_at;
+                    currentRoomStartAt.value = res.room.started_at;
+                    currentRoomStatus.value = res.room.status;
+                    if (currentRoomStartAt.value > currentRoomEndAt.value) {
+                        ElNotification({title: "Warning!", message: 'Admin đã kết thúc bài thi trước khi nó bắt đầu!', type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                        return navigateTo("/user/join");
+                    }
+                    isRoomRunning.value = !(res.gamer_token.submit_at || res.room.status == RoomStatus.FINISHED);
+                    submitedExamAt.value = res.gamer_token.submit_at ?
+                        moment(res.gamer_token.submit_at).format("DD/MM/YYYY HH:mm:ss") :
+                        (res.room.status == RoomStatus.FINISHED ? moment(res.room.ended_at).format("DD/MM/YYYY HH:mm:ss") : "");
+                    if (res.room.status == RoomStatus.HAPPING && !isSubmited.value) {
+                        timeReply.value = res.time_remaining;
+                        calculateTimeReply();
+                    }
+                    if (res.room.status == RoomStatus.PREPARE_FINISH) {
+                        showQuestion.value = false;
+                        showResult.value = true;
+                    }
+                    if (res.gamer?.gamer_answers.length > 0) {
+                        res.gamer?.gamer_answers.forEach((item: GamerAnswer) => {
+                            selectedAnswer.value[item.question_id] = item.answer_id;
+                        })
+                    }
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    if (err.code === HttpStatusCode.NotFound) {
+                        currentRoomStatus.value = -1;
+                        return navigateTo("/not-found");
+                    }
+                }
+            )
 
-        //     if (isSubmited.value) {
-        //         ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
-        //         return ;
-        //     }
+            ElLoading.service({ fullscreen: true }).close();
+            centerDialogVisible.value = false;
+        }
 
-        //     await api.gamer.submitAnswer(
-        //         {
-        //             answer_id: id,
-        //             token: route.params.tokenId.toString()
-        //         },
-        //         (res: any) => {
-        //             currentScore.value = res.score;
-        //             selectedAnswerId.value = id;
-        //             if (res.score > 0) {
-        //                 ElNotification({title: "Chúc mừng!", message: "+" + res.score, type: "success"});
-        //             } else {
-        //                 ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
-        //             }
-        //         },
-        //         (err: ErrorResponse) => {
-        //             ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
-        //         }
-        //     )
-        //     isSubmited.value = true;
-        // }
+        const submitAnswer = async (id: number) => {
+            await api.gamer.submitAnswer(
+                {
+                    answer_id: id,
+                    token: route.params.tokenId.toString()
+                },
+                (res: any) => {
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                }
+            )
+        }
 
-        // let intervalId: any;
+        let intervalId: any;
 
-        // const calculateTimeReply = () => {
-        //     intervalId = setInterval(() => {
-        //         if (timeReply.value > 0) {
-        //             timeReply.value = timeReply.value - 1;
-        //         } else {
-        //             clearInterval(intervalId);
-        //         }
-        //     }, 1000);
-        // }
-
-        // const handleClick = (tab: TabsPaneContext, event: Event) => {
-        //     console.log(tab, event)
-        // }
+        const calculateTimeReply = () => {
+            intervalId = setInterval(() => {
+                if (timeReply.value > 0) {
+                    timeReply.value = timeReply.value - 1;
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 1000);
+        }
 
         const countQuestionTrue = (item: GamerResult) => {
             return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
-            if (gamerAnswers.length == 0) {
-                return {
-                    score: 0,
-                    class: "bg-warning"
-                };
-            }
-
-            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
-
-            if (answer.length > 0) {
-                if (answer[0].score > 0) {
-                    return {
-                        score: answer[0].score,
-                        class: "bg-success"
-                    };
-                }
-
-                return {
-                    score: 0,
-                    class: "bg-danger"
-                }
-            }
-            
-            return {
-                score: 0,
-                class: "bg-warning"
-            };
-        }
-
-        // const isSelectedAnswer = (answerId: number) => {
-        //     if (answerId == selectedAnswerId.value) {
-        //         return 'selected-answer'
-        //     }
-        // }
-
         const handleModalSubmitExam = () => {
             showModalSubmitExam.value = true;
         }
 
+        const handleSelectQuestion = (id: number) => {
+            currentQuestionIndex.value = id;
+            currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+        }
+
+        const handlePreviousQuestion = () => {
+            if (currentQuestionIndex.value > 0) {
+                currentQuestionIndex.value = currentQuestionIndex.value - 1;
+                currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+            }
+        }
+
+        const handleNextQuestion = () => {
+            if (currentQuestionIndex.value < listQuestion.value.length - 1) {
+                currentQuestionIndex.value = currentQuestionIndex.value + 1;
+                currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
+            }
+        }
+
+        const converSecond = (second: number) => {
+            return helperApp.convertSecondsToTime(second);
+        }
+
+        const handleSelectAnswer = useDebounceFn((answerId: number) => {
+            submitAnswer(answerId);
+        }, 1000);
+
+        const getStatusQuestion = (questionId: string) => {
+            if (selectedAnswer.value[questionId]) return 'bg-primary text-white';
+        }
+
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = '';
+        }
+
+        const submitExam = async () => {
+            await api.gamer.submitHomework(
+                route.params.tokenId.toString(),
+                { results: selectedAnswer.value, auto_submit: autoSubmit.value },
+                (res: any) => {
+                    ElNotification({title: "Success!", message: 'Nộp bài thành công!', type: "success", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                    clearInterval(intervalId);
+                    getListQuestion();
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                }
+            )
+            showModalSubmitExam.value = false;
+            isSubmited.value = true;
+            isRoomRunning.value = false;
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        }
+
+        watch(timeReply, (newValue, oldValue) => {
+            if (oldValue == newValue + 1 && newValue == 0 && currentRoomStatus.value == RoomStatus.HAPPING && !isSubmited.value) {
+                autoSubmit.value = true;
+                submitExam();
+            }
+        });
+
         onMounted(async () => {
-            // clearInterval(intervalId);
-            // const { $echo }: any = useNuxtApp();
-            // await getListQuestion();
-            // if (currentRoomStatus.value == 0) {
-            //     ElLoading.service({ fullscreen: true, text: 'Chưa đến giờ kiểm tra!' });
-            // }
-            // $echo.channel('admin.start-game.' + roomId.value)
-            //     .listen('StartGameEvent', (e: any) => {
-            //         currentRoomStatus.value = RoomStatus.HAPPING;
-            //         timeReply.value = RoomSetting.TIME_REPLY;
-            //         isSubmited.value = false;
-            //         calculateTimeReply();
-            //         if (listQuestion.value.length == 1) {
-            //             setTimeout(async () => {
-            //                 if (isRoomRunning.value) {
-            //                     await getListQuestion();
-            //                 }
-            //             }, RoomSetting.TIME_REPLY * 1000);
-            //         }
-            //         ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
-            //     })
-            //     .listen('NextQuestionEvent', (e: any) => {
-            //         currentQuestionIndex.value = currentQuestionIndex.value + 1;
-            //         currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-            //         timeReply.value = RoomSetting.TIME_REPLY;
-            //         isSubmited.value = false;
-            //         calculateTimeReply();
-            //         if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-            //             setTimeout(async () => {
-            //                 if (isRoomRunning.value) {
-            //                     await getListQuestion();
-            //                 }
-            //             }, RoomSetting.TIME_REPLY * 1000);
-            //         }
-            //     }).listen('AdminEndgameEvent', (e: any) => {
-            //         if (currentRoomStatus.value == RoomStatus.PREPARE) {
-            //             ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
-            //         }
-            //         isRoomRunning.value = false;
-            //         centerDialogVisible.value = true;
-            //     });
+            clearInterval(intervalId);
+            const { $echo }: any = useNuxtApp();
+            await getListQuestion();
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            if (currentRoomStatus.value == 0) {
+                ElLoading.service({ fullscreen: true, text: 'Bài thi sẽ diễn ra vào lúc ' + moment(currentRoomStartAt.value).format('HH:mm:ss') });
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+            }
+            $echo.channel('admin.start-game.' + roomId.value)
+                .listen('StartGameEvent', (e: any) => {
+                    currentRoomStatus.value = RoomStatus.HAPPING;
+                    isRoomRunning.value = true;
+                    timeReply.value = moment(currentRoomEndAt.value).diff(moment(), 'seconds');
+                    isSubmited.value = false;
+                    calculateTimeReply();
+                    ElLoading.service({ fullscreen: true, text: 'Bài thi sẽ diễn ra vào lúc ' + moment(currentRoomStartAt.value).format('HH:mm:ss') }).close();
+                    window.addEventListener('beforeunload', handleBeforeUnload);
+                })
+                .listen('AdminEndgameEvent', (e: any) => {
+                    if (currentRoomStatus.value == RoomStatus.PREPARE) {
+                        ElLoading.service({ fullscreen: true, text: 'Bài thi sẽ diễn ra vào lúc ' + moment(currentRoomStartAt.value).format('HH:mm:ss') }).close();
+                        ElNotification({title: "Warning!", message: 'Admin đã kết thúc bài thi!', type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                        return navigateTo("/user/join");
+                    }
+                    if (isRoomRunning.value) {
+                        isRoomRunning.value = false;
+                        centerDialogVisible.value = true;
+                    }
+                    window.removeEventListener('beforeunload', handleBeforeUnload);
+                });
         });
 
         onBeforeUnmount(() => {
-            // clearInterval(intervalId);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            clearInterval(intervalId);
             ElLoading.service({ fullscreen: true }).close();
         });
 
         return {
             showQuestion,
-            showPreviewEnding,
+            statusPrepare,
             currentQuestion,
             currentQuestionIndex,
             listQuestion,
             gamerInfo,
-            // submitAnswer,
-            currentScore,
+            submitAnswer,
             timeReply,
             roomCode,
             showResult,
-            activeName,
-            // handleClick,
             gamerResult,
             countQuestionTrue,
-            getResultQustionColor,
-            // yourAnswerCorrect,
+            checkAnswerCorrect,
             centerDialogVisible,
             currentRoomStatus,
-            // isSelectedAnswer,
-            selectedAnswerId,
             handleModalSubmitExam,
             showModalSubmitExam,
+            handleSelectQuestion,
+            handlePreviousQuestion,
+            handleNextQuestion,
+            converSecond,
+            handleSelectAnswer,
+            getStatusQuestion,
+            selectedAnswer,
+            submitExam,
+            isRoomRunning,
+            submitedExamAt,
+            defaultStringSort,
+            getListQuestion,
         }
     }
 })

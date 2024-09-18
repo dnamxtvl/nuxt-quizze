@@ -1,0 +1,100 @@
+.main-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .btn {
+    margin-right: 10px;
+}
+
+.question-info {
+    color: green;
+    font-weight: bold;
+}
+
+.progress-card {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.progress-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.progress-item .icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.purple-card {
+    background-color: #6f42c1;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.purple-card h5,
+.purple-card p {
+    margin: 0;
+}
+
+.action-btn {
+    width: 100px;
+    height: 40px;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.icon-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+}
+
+.players-card {
+    margin-top: 20px;
+}
+
+.players-card .nav-link {
+    color: #6f42c1;
+}
+
+.empty-section {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.icon-answer-correct {
+    background-color: rgba(0, 207, 232, .12);
+    color: #00cfe8;
+}
+
+.icon-num-submit {
+    background-color: rgba(255, 159, 67, .12);
+    color: #ff9f43;
+}
+
+.icon-num-user {
+    background-color: rgba(115, 103, 240, .12);
+    color: #7367f0;
+}
+
+.icon-question {
+    background-color: rgba(40, 199, 111, .12);
+    color: #28c76f;
+}
