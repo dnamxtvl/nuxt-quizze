@@ -18,6 +18,7 @@ export default {
 .layout-user-game {
     background-image: url(https://cf.quizizz.com/themes/v2/football/bg_image_1080p.jpg);
     height: calc(100vh + 80px) !important;
+    overflow-y: auto;
 }
 </style>
   

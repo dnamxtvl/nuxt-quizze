@@ -52,7 +52,7 @@
                     <div class="d-flex justify-content-start">
                         <h5 class="text-white">Mời người tham gia</h5>
                         <span class="fw-bold fs-4 ms-3 text-success">{{ roomCode }}</span>
-                        <RiFileCopyLine class="ms-3 cursor-pointer" />
+                        <span @click="copyCode"><RiFileCopyLine class="ms-3 cursor-pointer"/></span>
                     </div>
                     <span class="fs-6"><RiTimeLine size="15" /> Hạn chót: <span class="text-success fw-bold">{{ roomEndAt }}</span></span>
                 </div>
@@ -154,14 +154,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { ErrorResponse, ItemQuizze } from "~/constants/type";
+import type { ErrorResponse } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import helperApp from "~/utils/helper";
 import { RiMore2Fill, RiDeleteBin7Fill, RiRegisteredLine, RiCheckboxCircleLine, RiUser2Line, RiQuestionLine, RiTimeLine, RiRefreshLine, RiFileCopyLine } from "@remixicon/vue";
-import { RoomType } from "~/constants/room";
 import moment from "moment";
-import { RULES_VALIDATION } from "~/constants/application";
 import { useRoute } from "vue-router";
 
 definePageMeta({
@@ -286,6 +283,16 @@ export default defineComponent({
             await getRoomDetail();
         });
 
+        const copyCode = () => {
+            const textArea = document.createElement("textarea");
+            textArea.value = roomCode.value.toString();
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
+        };
+
         return {
             roomCode,
             roomStartAt,
@@ -295,6 +302,7 @@ export default defineComponent({
             handleStartGame,
             endGame,
             showModelEndGame,
+            copyCode,
         }
     }
 })

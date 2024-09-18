@@ -22,6 +22,7 @@ const API_CONST = {
         CREATE_SETTING: 'user/gamer/create-setting',
         SUBMIT_ANSWER: 'user/gamer/submit-answer',
         OUT_GAME: 'user/gamer/out-game',
+        SUBMIT_HOMEWORK: 'user/gamer/submit-homework',
     },
     FRONT_END: {
         USER_GAME: '/user/join/game',

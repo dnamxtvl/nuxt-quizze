@@ -271,6 +271,9 @@ export default defineComponent({
                     isPassValidate = false;
                 }
 
+                console.log(moment(timeRoom.value[0]).format("YYYY-MM-DD HH:mm:ss"));
+                console.log(moment(timeRoom.value[1]).format("YYYY-MM-DD HH:mm:ss"));
+                console.log(moment(defaultTime).format("YYYY-MM-DD HH:mm:ss"));
                 if (moment(timeRoom.value[0]) < moment(defaultTime) || moment(timeRoom.value[1]) < moment(defaultTime)) {
                     errrorMessage.push("Thời gian bắt đầu và kết thúc phải lớn hơn thời gian hiện tại");
                     isPassValidate = false;
