@@ -367,14 +367,14 @@ export default defineComponent({
                     ElNotification({title: "Success!", message: 'Nộp bài thành công!', type: "success", duration: RoomSetting.TIME_DISPLAY_TOAST});
                     clearInterval(intervalId);
                     getListQuestion();
+                    isSubmited.value = true;
+                    isRoomRunning.value = false;
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Error!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 }
             )
             showModalSubmitExam.value = false;
-            isSubmited.value = true;
-            isRoomRunning.value = false;
             window.removeEventListener('beforeunload', handleBeforeUnload);
         }
 
