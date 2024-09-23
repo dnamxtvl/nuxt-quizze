@@ -28,7 +28,6 @@
                 <div class="row d-flex justify-content-between p-4 pt-0">
                     <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
                         <button class="btn btn-outline-secondary text-white w-full text-center">
-                            <RiUser2Fill class="" :color="getRandomColor()" size="1.2em" />
                             <span class="text-primary fs-5">
                                 {{ item.name ?? 'Sóc ẩn danh'}}
                             </span><span class="ms-2"> đã join</span>
