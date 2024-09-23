@@ -42,11 +42,17 @@ export const RULES_VALIDATION = {
         TITLE: {
             MIN_LENGTH: 6,
             MAX_LENGTH: 255
-        }
+        },
+        MIN_ANSWER: 2,
+        MAX_ANSWER: 4
     },
     ROOM: {
         MIN_RANGLE_TIME: 1,
         MAX_RANGLE_TIME: 180,
+    },
+    FILE: {
+        MAX_SIZE_UPLOAD: 5242880,
+        MAX_QUESTION: 100,
     }
 }
 
