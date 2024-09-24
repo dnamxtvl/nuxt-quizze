@@ -214,7 +214,7 @@
                                 <td>{{ formatDate(item.gamer_token?.created_at) }}</td>
                                 <td class="text-dark text-center">
                                     <span :class="'badge width-2 ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestionRooms" :key="key">
-                                        <p class="mb-1 mt-1">{{ 'Q' + (key + 1) }}</p>
+                                        <p class="mb-1 mt-1">{{ 'Q' + (key + 1) + (getResultQustionColor(item.gamer_answers, question.id).index > -1 ? ':' + defaultStringSort[getResultQustionColor(item.gamer_answers, question.id).index] : '') }}</p>
                                         <p class="mb-1 mt-1" v-if="roomDetail.type != homeworkType">{{ getResultQustionColor(item.gamer_answers, question.id).score }}</p>
                                     </span>
                                 </td>
@@ -401,6 +401,7 @@ export default defineComponent({
         const showModelEndGame = ref<boolean>(false);
         const listQuestionRooms = ref<ItemQuestion[]>([]);
         const listGamers = ref<Array<GamerInfo>>([]);
+        const defaultStringSort = ref<string>('ABCDEFGH');
         const roomDetail = ref<RoomDetail>({
             id: '',
             code: '',
@@ -618,14 +619,17 @@ export default defineComponent({
             let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
 
             if (answer.length > 0) {
+                let answersOfQuestion = listQuestionRooms.value.find((item: ItemQuestion) => item.id == questionId)?.answers;
                 if (answer[0].score > 0) {
                     return {
+                        index: answersOfQuestion?.findIndex((item: Answer) => item.id == answer[0].answer_id),
                         score: answer[0].score,
                         class: "bg-success"
                     };
                 }
 
                 return {
+                    index: answersOfQuestion?.findIndex((item: Answer) => item.id == answer[0].answer_id),
                     score: 0,
                     class: "bg-danger"
                 }
@@ -691,6 +695,7 @@ export default defineComponent({
             finishedStatus,
             pendingStatus,
             cancelStatus,
+            defaultStringSort,
         }
     }
 })
