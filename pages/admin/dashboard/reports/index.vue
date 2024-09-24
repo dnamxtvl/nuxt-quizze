@@ -1,0 +1,292 @@
+<template>
+    <div class="row ms-4 me-4">
+        <div class="">
+            <div class="row g-0 h-100-vh">
+                <el-dialog v-model="showModalDelete" :show-close="false" title="Warning" width="500" align-center>
+                    <span>Bạn có chắc chắn muốn xóa room này?</span>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="showModalDelete = false">Hủy</el-button>
+                            <el-button type="primary" @click="">
+                                Xác nhận
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+                <!-- Email Sidebar -->
+
+                <!--/ Quiz Sidebar -->
+                <!-- Room List -->
+                <div class="col overflow-scroll app-emails-list">
+                    <div class="shadow-none border-0">
+                        <hr class="container-m-nx m-0" />
+                        <!-- Email List: Items -->
+                        <div class="row g-3 align-items-center mt-0 ms-2 mb-2 filter-report">
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
+                                <label for="inputPassword6" class="col-form-label">Loại</label>
+                                <select class="form-control" v-model="filterParams.type">
+                                    <option value="">Chọn loại</option>
+                                    <option v-for="(value, key) in roomTypesArray" :key="value" :value="key">
+                                        {{ roomType[key] }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
+                                <label for="inputPassword6" class="col-form-label">Mã code</label>
+                                <input type="text" v-model="filterParams.code" placeholder="Nhập mã code"
+                                    class="form-control" aria-describedby="passwordHelpInline">
+                            </div>
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
+                                <label for="inputPassword6" class="col-form-label">Trạng thái</label>
+                                <select class="form-control" v-model="filterParams.status">
+                                    <option value="">Chọn trạng thái</option>
+                                    <option v-for="(value, key) in roomStatusArray" :key="value" :value="key">
+                                        {{ getStatusText(key)?.text }}
+                                    </option>
+                                </select>
+                            </div>
+                            <el-form-item class="col-xxl-4 col-xl-6 col-lg-6 col-md-6 mt-2 pt-2 align-items-center">
+                                <label for="inputPassword6" class="col-form-label">Thời gian</label>
+                                <el-date-picker style="height: 38px;" class="w-full" v-model="filterParams.time_report"
+                                    type="datetimerange" start-placeholder="Start Date" end-placeholder="End Date"
+                                    :default-time="defaultTime" />
+                            </el-form-item>
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6 mt-4 pt-1">
+                                <button type="button" @click="getListRoomReport" class="btn btn-primary mt-4">Tìm kiếm</button>
+                                <span @click="resetFilter" class="ms-1 mt-4 pt-4"><RiRefreshLine size="20" class="text-danger cursor-pointer mt-4" /></span>
+                            </div>
+                        </div>
+                        <table class="table" v-if="listRoom.length > 0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-dark">#</th>
+                                    <th scope="col" class="fs-6 text-dark text-start">Loại</th>
+                                    <th scope="col" class="fs-6 text-dark">Tên Quizz</th>
+                                    <th scope="col" class="fs-6 text-dark text-center">Số người tham gia</th>
+                                    <th scope="col" class="fs-6 text-dark">Câu đúng</th>
+                                    <th scope="col" class="fs-6 text-dark text-center">Mã code</th>
+                                    <th scope="col" class="fs-6 text-dark text-center">Trạng thái</th>
+                                    <th scope="col" class="fs-6 text-dark text-center">Ngày tạo</th>
+                                    <th scope="col" class="fs-6 text-dark text-end">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="cursor-pointer" @click="navigateTo(`/admin/dashboard/reports/${item.id}`)"
+                                    v-for="(item, index) in listRoom" :key="index">
+                                    <th scope="row" class="text-dark">{{ index + 1 }}</th>
+                                    <td class="text-dark text-start">
+                                        <span
+                                            :class='"badge text-white " + (item.type == roomType.KAHOOT ? "bg-primary" : "bg-success")'>
+                                            {{ item.type == roomType.KAHOOT ? 'KAHOOT' : 'HOMEWORK' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-dark">{{ item.quizze?.title }}</td>
+                                    <td class="text-dark text-center">{{ item.gamers_count }}</td>
+                                    <td>
+                                        <div class="badge text-dark">
+                                            <span><el-progress stroke-width="4" width="30" type="circle"
+                                                    :percentage="item.gamer_answers_count > 0 ? Math.round(item.total_correct * 100 / item.gamer_answers_count) : 0"
+                                                    status="success" /></span>
+                                            <span class="ms-1">{{ item.gamer_answers_count > 0 ?
+                                                Math.round(item.total_correct * 100 /
+                                                item.gamer_answers_count) : 0 }}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">{{ item.code }}</td>
+                                    <td class="text-white text-center">
+                                        <span :class='"text-start badge " + getStatusText(item.status).className'>
+                                            {{ getStatusText(item.status).text }}
+                                        </span>
+                                    </td>
+                                    <td class="text-dark text-center">
+                                        {{ formatDate(item.created_at) }}
+                                    </td>
+                                    <td class="text-center">
+                                        <el-dropdown class="float-end">
+                                            <span class="el-dropdown-link">
+                                                <RiMore2Fill class="more-icon" />
+                                            </span>
+                                            <template #dropdown>
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item @click="showModalDeleteRoomReport(item.id)">
+                                                        <RiDeleteBin7Fill size="15" /><span class="mt-1"> Xóa</span>
+                                                    </el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="empty-section mt-2" v-if="listRoom.length == 0">
+                        <p class="text-center">Không tìm thấy room nào!</p>
+                    </div>
+                    <div class="row pagination mt-1" v-if="listRoom.length > 0">
+                        <el-pagination class="d-flex justify-content-center" :page-size="12"
+                            @current-change="handleCurrentChangeReport" background layout="prev, pager, next"
+                            :total="totalRoomReport" />
+                    </div>
+                </div>
+                <!-- /Quizzes List -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "vue";
+import type { ErrorResponse } from "~/constants/type";
+import { ElLoading, ElNotification } from "element-plus";
+import api from "~/api/axios";
+import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine } from "@remixicon/vue";
+import { RoomStatus, RoomType } from "~/constants/room";
+import { ROOM_STATUS_TEXT } from "~/constants/room";
+import moment from "moment";
+import { formatDate } from "@vueuse/core";
+
+definePageMeta({
+    layout: "admin-dashboard",
+})
+
+interface Room {
+    id: string;
+    code: string;
+    started_at: string;
+    ended_at: string;
+    status: RoomStatus;
+    type: RoomType;
+    gamers_count: number;
+    gamer_answers_count: number;
+    total_correct: number;
+    quizze?: {
+        id: string;
+        title: string;
+    };
+    created_at: string;
+    updated_at: string;
+}
+
+export default defineComponent({
+    components: {
+        RiMore2Fill,
+        RiDeleteBin7Fill,
+        RiRefreshLine,
+    },
+    setup() {
+        const currentPage = ref<number>(1);
+        const totalRoomReport = ref<number>(0);
+        const showModalDelete = ref<boolean>(false);
+        const listRoom = ref<Room[]>([]);
+        const roomType = RoomType;
+        const roomStatus = RoomStatus;
+        const currentRoomReportId = ref<string>("");
+        const defaultTime = new Date();
+        const filterParams = ref({
+            type: '',
+            code: '',
+            status: '',
+            time_report: []
+        })
+        
+        // const deleteQuizz = async () => {
+        //     await api.quizze.deleteQuizze(
+        //         currentQuizzId.value,
+        //         (res: any) => {
+        //             showModalDelete.value = false;
+        //             ElNotification({title: "Success", message: 'Xóa bộ câu hỏi thành công!', type: "success"});
+        //             getListQuizzes();
+        //         },
+        //         (err: ErrorResponse) => {
+        //             ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+        //         }
+        //     )
+        // }
+        const getListRoomReport = async () => {
+            let paramsFilter = {
+                page: currentPage.value,
+                type: filterParams.value.type,
+                code: filterParams.value.code,
+                status: filterParams.value.status,
+                start_time: filterParams.value.time_report[0] ? moment(filterParams.value.time_report[0]).format("YYYY-MM-DD HH:mm:ss") : '',
+                end_time: filterParams.value.time_report[1] ? moment(filterParams.value.time_report[1]).format("YYYY-MM-DD HH:mm:ss") : '',
+            };
+
+            console.log(paramsFilter);
+
+            await api.room.getListRoomReport(
+                paramsFilter,
+                (res: any) => {
+                    ElLoading.service({ fullscreen: true }).close();
+                    listRoom.value = res.data;
+                    totalRoomReport.value = res.total;
+                },
+                (err: ErrorResponse) => {
+                    ElLoading.service({ fullscreen: true }).close();
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                }
+            )
+        }
+
+        const formatDate = (date: string) => {
+            return moment(date).format("DD/MM/YYYY HH:mm:ss");
+        }
+
+        const getStatusText = (status: number) => {
+            return ROOM_STATUS_TEXT[status];
+        }
+
+        const showModalDeleteRoomReport = (id: string) => {
+            currentRoomReportId.value = id;
+            showModalDelete.value = true;
+        }
+
+        const resetFilter = async () => {
+            filterParams.value = {
+                type: '',
+                code: '',
+                status: '',
+                time_report: []
+            }
+
+            await getListRoomReport();
+        }
+
+        const handleCurrentChangeReport = async (page: number) => {
+            currentPage.value = page;
+            await getListRoomReport();
+        }
+
+        const roomTypesArray = Object.entries(RoomType).filter(([key, value]) => typeof value === 'number');
+        const roomStatusArray = Object.entries(RoomStatus).filter(([key, value]) => typeof value === 'number');
+
+        onMounted(async () => {
+            ElLoading.service({ fullscreen: true });
+            await getListRoomReport();
+        });
+
+        return {
+            showModalDelete,
+            listRoom,
+            roomType,
+            getStatusText,
+            showModalDeleteRoomReport,
+            handleCurrentChangeReport,
+            totalRoomReport,
+            defaultTime,
+            roomTypesArray,
+            filterParams,
+            roomStatus,
+            roomStatusArray,
+            getListRoomReport,
+            formatDate,
+            resetFilter,
+        }
+    }
+})
+</script>
+<style scoped>
+.el-date-editor.el-input, .el-date-editor.el-input__wrapper {
+    height: 38px;
+}
+</style>

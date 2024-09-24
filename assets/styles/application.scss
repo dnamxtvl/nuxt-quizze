@@ -281,3 +281,7 @@ html, body {
 .el-date-editor.el-input, .el-date-editor.el-input__wrapper {
   width: 100% !important;
 }
+
+html:not(.layout-menu-collapsed) .bg-menu-theme .menu-inner .menu-item:not(.active) .menu-link:hover, .layout-menu-hover.layout-menu-collapsed .bg-menu-theme .menu-inner .menu-item:not(.active) .menu-link:hover {
+  background: #0e009b;
+}

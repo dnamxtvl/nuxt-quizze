@@ -17,6 +17,7 @@ const API_CONST = {
         NEXT_QUESTION: 'admin/room/next-question',
         ADMIN_END_GAME: 'admin/room/end-game',
         GET_DETAIL_ROOM: 'admin/room/detail',
+        GET_LIST_ROOM_REPORT: 'admin/room/list-report',
     },
     GAMER: {
         CREATE_SETTING: 'user/gamer/create-setting',
@@ -27,7 +28,8 @@ const API_CONST = {
     FRONT_END: {
         USER_GAME: '/user/join/game',
         ADMIN_GAME: '/admin/dashboard/activity',
-        HOMEWORK: '/user/join/homework'
+        HOMEWORK: '/user/join/homework',
+        REPORT_DETAIL: '/admin/dashboard/reports',
     }
 };
 
