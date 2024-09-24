@@ -49,9 +49,9 @@
                         </nuxt-link>
                     </li>
                     <li class="menu-item">
-                        <a href="dashboards-crm.html" class="menu-link">
+                        <nuxt-link to="/admin/dashboard/reports" :class="'menu-link ' + (useRoute().path.includes(detailReportRoutePath) ? 'active' : '')" exact-active-class="active">
                             <div data-i18n="CRM">Báo cáo</div>
-                        </a>
+                        </nuxt-link>
                     </li>
                     <li class="menu-item">
                         <a href="dashboards-crm.html" class="menu-link">
@@ -65,11 +65,24 @@
 </template>
 <script lang="ts">
 import { RiAddCircleFill } from '@remixicon/vue';
+import { useRoute } from "vue-router";
+import API_CONST from '~/utils/apiConst';
 
 export default defineComponent({
   name: 'AdminDashboardSidebar',
   components: {
     RiAddCircleFill
+  },
+  setup() {
+    const detailReportRoutePath = API_CONST.FRONT_END.REPORT_DETAIL;
+
+    onMounted(() => {
+        
+    })
+
+    return {
+        detailReportRoutePath,
+    }
   }
 });
 </script>

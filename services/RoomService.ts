@@ -26,4 +26,7 @@ export default class RoomService extends BaseService {
     getDetailRoom = async (roomId: string, success: any, error: any) => {
         await this.get(API_CONST.ROOM.GET_DETAIL_ROOM + '/' + roomId, {}, success, error);
     };
+    getListRoomReport = async (params: Object, success: any, error: any) => {
+        await this.get(API_CONST.ROOM.GET_LIST_ROOM_REPORT, params, success, error);
+    };
 }
