@@ -7,6 +7,7 @@ const API_CONST = {
         LIST: 'admin/quizzes/list',
         CREATE_QUIZZE: 'admin/quizzes/create',
         DELETE_QUIZZE: 'admin/quizzes/delete',
+        LIST_QUESTION: 'admin/quizzes/list-question',
     },
     ROOM: {
         CREATE: 'admin/room/create',
@@ -31,6 +32,7 @@ const API_CONST = {
         ADMIN_GAME: '/admin/dashboard/activity',
         HOMEWORK: '/user/join/homework',
         REPORT_DETAIL: '/admin/dashboard/reports',
+        DETAIL_QUIZ: '/admin/dashboard/my-library',
     }
 };
 

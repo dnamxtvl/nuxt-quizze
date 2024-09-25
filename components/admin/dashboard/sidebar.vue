@@ -35,16 +35,16 @@
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-smart-home"></i>
                     <div data-i18n="Dashboards">Dashboards</div>
-                    <div class="badge bg-label-primary rounded-pill ms-auto">4</div>
+                    <div class="badge bg-label-primary rounded-pill ms-auto">3</div>
                 </a>
                 <ul class="menu-sub">
-                    <li class="menu-item">
+                    <!-- <li class="menu-item">
                         <a href="index.html" class="menu-link">
                             <div data-i18n="Analytics">Khám phá</div>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="menu-item">
-                        <nuxt-link to="/admin/dashboard/my-library" class="menu-link" exact-active-class="active">
+                        <nuxt-link to="/admin/dashboard/my-library" :class="'menu-link ' + (useRoute().path.includes(detailQuizzRoutePath) ? 'active' : '')" exact-active-class="active">
                             <div data-i18n="CRM">Thư viện của tôi</div>
                         </nuxt-link>
                     </li>
@@ -75,6 +75,7 @@ export default defineComponent({
   },
   setup() {
     const detailReportRoutePath = API_CONST.FRONT_END.REPORT_DETAIL;
+    const detailQuizzRoutePath = API_CONST.FRONT_END.DETAIL_QUIZ;
 
     onMounted(() => {
         
@@ -82,6 +83,7 @@ export default defineComponent({
 
     return {
         detailReportRoutePath,
+        detailQuizzRoutePath,
     }
   }
 });

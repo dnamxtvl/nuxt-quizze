@@ -61,7 +61,7 @@ export default class BaseService {
         error({
             code: codeError,
             error: errors,
-            responseCode: e.response?.data?.code ?? 0,
+            responseCode: typeof e.response?.data?.errors?.code == 'number' ? e.response.data.errors.code : 0,
         });
     }
 
