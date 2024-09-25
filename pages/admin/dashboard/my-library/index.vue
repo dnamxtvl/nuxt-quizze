@@ -85,7 +85,7 @@
                                     data-target="#app-email-view">
                                     <div v-if="listQuizzes.length > 0" class="d-flex align-items-center"
                                         v-for="(item, index) in listQuizzes" :key="index">
-                                        <div class="flex flex-col items-center bg-primary">
+                                        <div :class='"flex flex-col items-center " + (index % 2 == 0 ? "bg-primary" : "bg-success")'>
                                             <div class="h-18 w-18 relative rounded-sm overflow-hidden bg-lilac">
                                                 <div class="v-image"><img
                                                         class="lazy-img rounded-inherit object-contain" alt="Quiz image"

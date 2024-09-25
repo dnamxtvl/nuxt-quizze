@@ -7,7 +7,7 @@
                     <template #footer>
                         <div class="dialog-footer">
                             <el-button @click="showModalDelete = false">Hủy</el-button>
-                            <el-button type="primary" @click="">
+                            <el-button type="primary" @click="deleteRoom">
                                 Xác nhận
                             </el-button>
                         </div>
@@ -109,7 +109,10 @@
                                             <template #dropdown>
                                                 <el-dropdown-menu>
                                                     <el-dropdown-item @click="showModalDeleteRoomReport(item.id)">
-                                                        <RiDeleteBin7Fill size="15" /><span class="mt-1"> Xóa</span>
+                                                        <RiDeleteBin7Fill size="15" class="me-1" /><span class="mt-1"> Xóa</span>
+                                                    </el-dropdown-item>
+                                                    <el-dropdown-item>
+                                                        <RiEyeCloseFill size="15" class="me-1" /><span class="mt-1"> Xem câu hỏi</span>
                                                     </el-dropdown-item>
                                                 </el-dropdown-menu>
                                             </template>
@@ -119,8 +122,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="empty-section mt-2" v-if="listRoom.length == 0">
-                        <p class="text-center">Không tìm thấy room nào!</p>
+                    <div class="empty-section mt-4" v-if="listRoom.length == 0">
+                        <h4 class="text-center">Không tìm thấy room nào!</h4>
                     </div>
                     <div class="row pagination mt-1" v-if="listRoom.length > 0">
                         <el-pagination class="d-flex justify-content-center" :page-size="12"
@@ -139,11 +142,10 @@ import { defineComponent, ref } from "vue";
 import type { ErrorResponse } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine, RiEyeCloseFill } from "@remixicon/vue";
 import { RoomStatus, RoomType } from "~/constants/room";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
 import moment from "moment";
-import { formatDate } from "@vueuse/core";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -172,6 +174,7 @@ export default defineComponent({
         RiMore2Fill,
         RiDeleteBin7Fill,
         RiRefreshLine,
+        RiEyeCloseFill,
     },
     setup() {
         const currentPage = ref<number>(1);
@@ -188,20 +191,7 @@ export default defineComponent({
             status: '',
             time_report: []
         })
-        
-        // const deleteQuizz = async () => {
-        //     await api.quizze.deleteQuizze(
-        //         currentQuizzId.value,
-        //         (res: any) => {
-        //             showModalDelete.value = false;
-        //             ElNotification({title: "Success", message: 'Xóa bộ câu hỏi thành công!', type: "success"});
-        //             getListQuizzes();
-        //         },
-        //         (err: ErrorResponse) => {
-        //             ElNotification({title: "Error", message: err.error.shift(), type: "error"});
-        //         }
-        //     )
-        // }
+
         const getListRoomReport = async () => {
             let paramsFilter = {
                 page: currentPage.value,
@@ -240,6 +230,22 @@ export default defineComponent({
             currentRoomReportId.value = id;
             showModalDelete.value = true;
         }
+
+        const deleteRoom = async () => {
+            await api.room.deleteRoomReport(
+                currentRoomReportId.value,
+                (res: any) => {
+                    showModalDelete.value = false;
+                    ElNotification({title: "Success", message: 'Xóa báo cáo room thành công!', type: "success"});
+                    getListRoomReport();
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                }
+                
+            )
+        }
+        
 
         const resetFilter = async () => {
             filterParams.value = {
@@ -281,6 +287,7 @@ export default defineComponent({
             getListRoomReport,
             formatDate,
             resetFilter,
+            deleteRoom,
         }
     }
 })
