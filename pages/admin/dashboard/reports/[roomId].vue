@@ -202,7 +202,7 @@
                         <tbody>
                             <tr v-for="(item, index) in listGamers" :key="index">
                                 <th scope="row" class="text-dark">{{ index + 1 }}</th>
-                                <td class="text-dark">{{ item.name }}</td>
+                                <td class="text-dark">{{ item.name ?? 'Sóc ẩn danh' }}</td>
                                 <td class="text-dark">{{ roomDetail.type == homeworkType ? ((item.gamer_answers_sum_score ?? 0) + '/' + listQuestionRooms.length) : (item.gamer_answers_sum_score ?? 0) }}</td>
                                 <td class="text-dark">{{ countQuestionTrue(item) }}</td>
                                 <td v-if="roomDetail.type == homeworkType">

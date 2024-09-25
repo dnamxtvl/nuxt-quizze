@@ -18,6 +18,7 @@ const API_CONST = {
         ADMIN_END_GAME: 'admin/room/end-game',
         GET_DETAIL_ROOM: 'admin/room/detail',
         GET_LIST_ROOM_REPORT: 'admin/room/list-report',
+        DELETE_ROOM_REPORT: 'admin/room/delete-report',
     },
     GAMER: {
         CREATE_SETTING: 'user/gamer/create-setting',

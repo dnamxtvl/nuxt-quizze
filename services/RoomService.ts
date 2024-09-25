@@ -29,4 +29,7 @@ export default class RoomService extends BaseService {
     getListRoomReport = async (params: Object, success: any, error: any) => {
         await this.get(API_CONST.ROOM.GET_LIST_ROOM_REPORT, params, success, error);
     };
+    deleteRoomReport = async (roomId: string, success: any, error: any) => {
+        await this.post(API_CONST.ROOM.DELETE_ROOM_REPORT + '/' + roomId, {}, success, error);
+    };
 }
