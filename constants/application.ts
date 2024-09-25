@@ -71,6 +71,9 @@ export const CODE = {
     SERVER_NOT_WORKING: 'ERR_NETWORK',
     VALIDATE_FAIL: 422,
     AUTHTHENTICATE_FAIL: 401,
+    ERROR_THROW: {
+        ROOM_IS_RUNNING: 1001887,
+    }
 }
 
 export const GROUP_ROUTE = {
