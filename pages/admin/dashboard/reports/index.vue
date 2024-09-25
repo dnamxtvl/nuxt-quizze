@@ -111,9 +111,11 @@
                                                     <el-dropdown-item @click="showModalDeleteRoomReport(item.id)">
                                                         <RiDeleteBin7Fill size="15" class="me-1" /><span class="mt-1"> Xóa</span>
                                                     </el-dropdown-item>
-                                                    <el-dropdown-item>
-                                                        <RiEyeCloseFill size="15" class="me-1" /><span class="mt-1"> Xem câu hỏi</span>
-                                                    </el-dropdown-item>
+                                                    <nuxt-link :to='"/admin/dashboard/my-library/" + item.quizze?.id'>
+                                                        <el-dropdown-item>
+                                                            <RiEyeCloseFill size="15" class="me-1" /><span class="mt-1"> Xem câu hỏi</span>
+                                                        </el-dropdown-item>
+                                                    </nuxt-link>
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
@@ -125,8 +127,8 @@
                     <div class="empty-section mt-4" v-if="listRoom.length == 0">
                         <h4 class="text-center">Không tìm thấy room nào!</h4>
                     </div>
-                    <div class="row pagination mt-1" v-if="listRoom.length > 0">
-                        <el-pagination class="d-flex justify-content-center" :page-size="12"
+                    <div class="row pagination mt-1" v-if="listRoom.length >= defalutPerpage">
+                        <el-pagination class="d-flex justify-content-center" :page-size="defalutPerpage"
                             @current-change="handleCurrentChangeReport" background layout="prev, pager, next"
                             :total="totalRoomReport" />
                     </div>
@@ -143,7 +145,7 @@ import type { ErrorResponse } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
 import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine, RiEyeCloseFill } from "@remixicon/vue";
-import { RoomStatus, RoomType } from "~/constants/room";
+import { RoomSetting, RoomStatus, RoomType } from "~/constants/room";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
 import moment from "moment";
 
@@ -178,6 +180,7 @@ export default defineComponent({
     },
     setup() {
         const currentPage = ref<number>(1);
+        const defalutPerpage = ref<number>(RoomSetting.PER_PAGE);
         const totalRoomReport = ref<number>(0);
         const showModalDelete = ref<boolean>(false);
         const listRoom = ref<Room[]>([]);
@@ -288,6 +291,7 @@ export default defineComponent({
             formatDate,
             resetFilter,
             deleteRoom,
+            defalutPerpage,
         }
     }
 })

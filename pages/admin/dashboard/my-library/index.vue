@@ -38,6 +38,16 @@
                     </template>
                 </el-dialog>
                 <!-- End Modal Create Room -->
+                <!-- show modal warning room is running -->
+                <el-dialog v-model="showModalWarningRoomRunning" :show-close="false" title="Warning" width="500" align-center>
+                    <span>{{ messageWarningRoomRunning }}</span>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button type="danger" @click="showModalWarningRoomRunning = false">Đóng</el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+                 <!-- end show modal warning room is running  -->
                 <!-- Email Sidebar -->
                 <div class="col-lg-3 app-email-sidebar border-end flex-grow-0">
                     <div class="btn-compost-wrapper d-grid">
@@ -83,8 +93,9 @@
                             <ul class="list-unstyled m-0">
                                 <div class="email-list-item" data-starred="true" data-bs-toggle="sidebar"
                                     data-target="#app-email-view">
-                                    <div v-if="listQuizzes.length > 0" class="d-flex align-items-center"
-                                        v-for="(item, index) in listQuizzes" :key="index">
+                                    <div v-if="listQuizzes.length > 0" class="d-flex align-items-center cursor-pointer"
+                                        v-for="(item, index) in listQuizzes" :key="index"
+                                        @click="navigateTo('/admin/dashboard/my-library/' + item.id)" >
                                         <div :class='"flex flex-col items-center " + (index % 2 == 0 ? "bg-primary" : "bg-success")'>
                                             <div class="h-18 w-18 relative rounded-sm overflow-hidden bg-lilac">
                                                 <div class="v-image"><img
@@ -172,7 +183,7 @@ import helperApp from "~/utils/helper";
 import { RiMore2Fill, RiDeleteBin7Fill } from "@remixicon/vue";
 import { RoomType } from "~/constants/room";
 import moment from "moment";
-import { RULES_VALIDATION } from "~/constants/application";
+import { CODE, RULES_VALIDATION } from "~/constants/application";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -192,6 +203,8 @@ export default defineComponent({
         const showModalCreateRoom = ref<boolean>(false);
         const typeRoom = ref<number | "">();
         const formLabelWidth = '140px';
+        const showModalWarningRoomRunning = ref<boolean>(false);
+        const messageWarningRoomRunning = ref<string>("");
         const timeRoom = ref<Array<Date>>(
             [
                 new Date(moment().add(1, "hours").format("YYYY-MM-DD HH:mm:ss")),
@@ -308,9 +321,16 @@ export default defineComponent({
                     getListQuizzes();
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    console.log(err);
+                    if (err.responseCode == CODE.ERROR_THROW.ROOM_IS_RUNNING) {
+                        showModalWarningRoomRunning.value = true;
+                        messageWarningRoomRunning.value = err.error.shift();
+                    } else {
+                        ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    }
                 }
             )
+            showModalDelete.value = false;
         }
 
         const handleModalCreateRoom = (quizzeId: string) => {
@@ -351,6 +371,8 @@ export default defineComponent({
             RoomType,
             changeTypeRoom,
             errorMessageValidate,
+            showModalWarningRoomRunning,
+            messageWarningRoomRunning,
         }
     }
 })

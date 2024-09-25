@@ -27,5 +27,5 @@ export interface ItemQuizze {
 export interface ErrorResponse {
     code: number;
     error: string[];
-    responseCode: string;
+    responseCode: number;
 }
