@@ -280,7 +280,12 @@ export default defineComponent({
         }
 
         const addAnswerOfQuestion = () => {
-
+            currentQuestionUpdate.value.answers.push({
+                id: currentQuestionUpdate.value.answers[currentQuestionUpdate.value.answers.length - 1].id + 1,
+                answer: '',
+                is_correct: false,
+                created_at: '',
+            });
         }
         
         onMounted(async () => {
@@ -289,7 +294,14 @@ export default defineComponent({
         });
 
         const validateQuestionUpdate = (question: ItemQuestion) => {
+            let isPassvalidate = true;
+            if (currentQuestionUpdate.value.answers.length < minAnswerOFQuestion || currentQuestionUpdate.value.answers.length > maxAnswerOFQuestion) {
+                isPassvalidate = false;
+            }
 
+            
+
+            return isPassvalidate;
         }
 
         return {

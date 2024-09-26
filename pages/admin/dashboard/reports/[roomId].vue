@@ -174,7 +174,7 @@
                     <RiQuestionLine size="19" />
                     Bảng điều kiển
                 </button>
-                <button class="btn btn-outline-secondary me-2 text-dark">
+                <button @click="navigateTo('/admin/dashboard/my-library/' + roomDetail.quizze?.id)" class="btn btn-outline-secondary me-2 text-dark">
                     <RiQuestionLine size="19" />
                     Xem Quizz
                 </button>
