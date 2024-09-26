@@ -1,5 +1,5 @@
 <template>
-    <div class="row position-absolute body-admin-game w-full g-0">
+    <div class="row position-relative body-admin-game w-full g-0">
         <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center"
             v-if="showPrepare">
             <div
@@ -41,19 +41,19 @@
                 <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}. {{ currentQuestion.title }}</p>
                 <h3 class="text-warning text-center fs-1">{{remainingTime }}</h3>
             </div>
-            <div class="row list-answer justify-content-center align-items-center mt-1" style="flex:1;">
+            <div class="row list-answer justify-content-center align-items-center mt-2" style="flex:1;">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0" v-for="(item, index) in currentQuestion.answers"
                     :key="index">
-                    <div class="list-answer-item w-full ms-1 me-1 d-flex align-items-center justify-content-center position-relative">
+                    <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
                             1}}</span>
-                        <p class="text-white fs-2 text-center">{{ item.answer }}</p>
+                        <p class="text-white lh-base fs-2 pt-4 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="table-preview-result" v-if="showResult">
-            <div class="row d-flex justify-content-center">
+            <div class="d-flex justify-content-center">
                 <div class="col-md-10 g-0">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Tổng Quan" name="first">
@@ -84,7 +84,7 @@
                             </table>
                         </el-tab-pane>
                         <el-tab-pane label="Câu hỏi" name="second">
-                            <div class="row pt-4 rounded rounded-5 body-answer-review">
+                            <div class="row pt-4 rounded rounded-5 body-answer-review ps-2">
                                 <div class="col-lg-12 px-4 mb-2">
                                     <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
@@ -109,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="control-center position-absolute bottom-0" v-show="showQuestion || showResult">
+        <div class="control-center mt-auto" v-show="showQuestion || showResult">
             <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                 <div class="ring d-flex">
                     <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">

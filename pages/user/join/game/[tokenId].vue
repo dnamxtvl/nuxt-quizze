@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0">
-            <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1">
-                <p class="text-white text-center fs-2 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
+            <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center g-0" style="flex:1">
+                <p class="text-white text-center fs-2 lh-base p-3 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
                 </p>
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
@@ -13,11 +13,11 @@
                         :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
                             1}}</span>
-                        <p class="text-white fs-2 text-center">{{ item.answer }}</p>
+                        <p class="text-white fs-2 lh-base p-3 mt-4 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
             </div>
-            <div v-if="showQuestion && currentRoomStatus > 0" class="control-center">
+            <div v-if="showQuestion && currentRoomStatus > 0" class="control-center mt-auto">
                 <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                     <div class="ring d-flex">
                         <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">

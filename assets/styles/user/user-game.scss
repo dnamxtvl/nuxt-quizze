@@ -4,12 +4,12 @@
     }
 }
 .question-title {
+    min-height: 320px;
     background-color: #00000080;
 }
 .list-answer-item {
-    min-height: 160px;
+    min-height: 320px;
     background-color: #00000080;
-    max-height: 300px;
 }
 .user-name-text {
     padding-top: 50px;
@@ -425,6 +425,6 @@
 }
 
 .show-question-body {
-    height: calc(100vh - 40px);
+    min-height: calc(100vh - 80px);
 }
 

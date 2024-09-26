@@ -1,6 +1,5 @@
 .table-preview-result .el-tab-pane {
     overflow-y: scroll;
-    max-height: 320px;
 }
 .table {
     background-color: #090909cc;
@@ -19,8 +18,8 @@
 }
 
 .body-admin-game {
-    height: 92vh;
-    top: 80px;
+    padding-top: 80px;
+    min-height: 100vh;
     --bs-gutter-x: 0 !important;
 }
 
@@ -51,12 +50,12 @@
 }
 
 .question-title {
+    min-height: 20rem;
     background-color: #00000080;
 }
 .list-answer-item {
-    min-height: 160px;
+    min-height: 320px;
     background-color: #00000080;
-    max-height: 300px;
 }
 .user-name-text {
     padding-top: 50px;
