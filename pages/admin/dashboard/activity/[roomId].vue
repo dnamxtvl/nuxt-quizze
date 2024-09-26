@@ -74,9 +74,9 @@
                                         <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(item) }}</td>
                                         <td class="text-white text-center">
-                                            <span :class="'badge rounded-pill width-2 ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
+                                            <span :class="'badge rounded-pill width-2 ms-1 ' + getResultQuestionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
-                                                <p>{{ getResultQustionColor(item.gamer_answers, question.id).score }}</p>
+                                                <p>{{ getResultQuestionColor(item.gamer_answers, question.id).score }}</p>
                                             </span>
                                         </td>
                                     </tr>
@@ -139,54 +139,17 @@
 </template>
 
 <script lang="ts">
-interface Answer {
-    id: number;
-    answer: string;
-    is_correct: number;
-}
-
 interface GamerInfo {
     id: string;
     name: string;
     created_at: string
 }
 
-interface ItemQuestion {
-    id: string;
-    title: string;
-    quizze_id: string;
-    answers: Array<Answer>;
-    created_at: string;
-}
-
-interface GamerResult {
-    id: string;
-    name: string;
-    gamer_answers: Array<GamerAnswer> | [];
-    gamer_answers_sum_score: number;
-    display_meme: boolean;
-    ip_address: string;  
-    created_at: string;
-    updated_at: string;
-}
-
-interface GamerAnswer {
-    id: number;
-    answer_id: number;
-    answer_in_time: number;
-    gamer_id: string;
-    question_id: string;
-    room_id: string;
-    score: number;
-    created_at: string;
-    updated_at: string;
-}
-
 import { defineComponent, ref, onBeforeUnmount } from "vue";
 import type { TabsPaneContext } from 'element-plus';
 import { useRoute } from "vue-router";
 import api from "~/api/axios";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, GamerAnswer, GamerResult, ItemQuestion } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
@@ -379,34 +342,8 @@ export default defineComponent({
             return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
-            if (gamerAnswers.length == 0) {
-                return {
-                    score: 0,
-                    class: "bg-warning"
-                };
-            }
-
-            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
-
-            if (answer.length > 0) {
-                if (answer[0].score > 0) {
-                    return {
-                        score: answer[0].score,
-                        class: "bg-success"
-                    };
-                }
-
-                return {
-                    score: 0,
-                    class: "bg-danger"
-                }
-            }
-            
-            return {
-                score: 0,
-                class: "bg-warning"
-            };
+        const getResultQuestionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
+            return helperApp.getColorOfQuestion(gamerAnswers, questionId);
         }
 
         const calculateTimeReply = () => {
@@ -464,7 +401,7 @@ export default defineComponent({
             nextQuestion,
             listGamerResult,
             countQuestionTrue,
-            getResultQustionColor,
+            getResultQuestionColor,
             remainingTime,
             copyCode,
         }

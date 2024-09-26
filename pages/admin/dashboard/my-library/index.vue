@@ -89,6 +89,9 @@
                     <div class="shadow-none border-0">
                         <hr class="container-m-nx m-0" />
                         <!-- Email List: Items -->
+                        <div v-if="listQuizzes.length == 0" class="d-flex justify-content-center mt-4">
+                            <h4 class="text-dark text-center">Chưa có bộ câu hỏi nào, hãy bấm tạo mới!</h4>
+                        </div>
                         <div class="email-list pt-0">
                             <ul class="list-unstyled m-0">
                                 <div class="email-list-item" data-starred="true" data-bs-toggle="sidebar"
@@ -157,8 +160,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row pagination">
-                                        <el-pagination class="d-flex justify-content-center" :page-size="7"
+                                    <div class="row pagination" v-if="listQuizzes.length > 0">
+                                        <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @current-change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
@@ -212,6 +215,7 @@ export default defineComponent({
         );
         const defaultTime = new Date();
         const errorMessageValidate = ref<Array<string> | []>([]);
+        const perpage = ref<number>(7);
 
         const getListQuizzes = async () => {
             await api.quizze.list(
@@ -283,9 +287,6 @@ export default defineComponent({
                     isPassValidate = false;
                 }
 
-                console.log(moment(timeRoom.value[0]).format("YYYY-MM-DD HH:mm:ss"));
-                console.log(moment(timeRoom.value[1]).format("YYYY-MM-DD HH:mm:ss"));
-                console.log(moment(defaultTime).format("YYYY-MM-DD HH:mm:ss"));
                 if (moment(timeRoom.value[0]) < moment(defaultTime) || moment(timeRoom.value[1]) < moment(defaultTime)) {
                     errrorMessage.push("Thời gian bắt đầu và kết thúc phải lớn hơn thời gian hiện tại");
                     isPassValidate = false;
@@ -320,7 +321,6 @@ export default defineComponent({
                     getListQuizzes();
                 },
                 (err: ErrorResponse) => {
-                    console.log(err);
                     if (err.responseCode == CODE.ERROR_THROW.ROOM_IS_RUNNING) {
                         showModalWarningRoomRunning.value = true;
                         messageWarningRoomRunning.value = err.error.shift();
@@ -372,6 +372,7 @@ export default defineComponent({
             errorMessageValidate,
             showModalWarningRoomRunning,
             messageWarningRoomRunning,
+            perpage,
         }
     }
 })

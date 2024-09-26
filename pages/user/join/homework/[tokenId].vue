@@ -107,7 +107,7 @@ import { defineComponent, ref, onBeforeUnmount, watch } from "vue";
 import { ElLoading } from "element-plus";
 import api from "~/api/axios";
 import { useRoute } from "vue-router";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, GamerAnswer, GamerResult, ItemQuestion } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import { RiUser2Fill, RiCheckFill, RiArrowLeftSLine, RiArrowRightSLine } from "@remixicon/vue";
@@ -119,48 +119,10 @@ definePageMeta({
   layout: 'homework'
 })
 
-interface Answer {
-    id: number;
-    answer: string;
-    is_correct: boolean;
-    created_at: string;
-}
-
 interface GamerInfo {
     id: string;
     name: string;
     created_at: string
-}
-
-interface ItemQuestion {
-    id: string;
-    title: string;
-    quizze_id: string;
-    answers: Array<Answer>;
-    created_at: string;
-}
-
-interface GamerResult {
-    id: string;
-    name: string;
-    gamer_answers: Array<GamerAnswer> | [];
-    gamer_answers_sum_score: number;
-    display_meme: boolean;
-    ip_address: string;  
-    created_at: string;
-    updated_at: string;
-}
-
-interface GamerAnswer {
-    id: number;
-    answer_id: number;
-    answer_in_time: number;
-    gamer_id: string;
-    question_id: string;
-    room_id: string;
-    score: number;
-    created_at: string;
-    updated_at: string;
 }
 
 export default defineComponent({

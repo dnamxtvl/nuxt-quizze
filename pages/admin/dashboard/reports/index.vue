@@ -127,7 +127,7 @@
                     <div class="empty-section mt-4" v-if="listRoom.length == 0">
                         <h4 class="text-center">Không tìm thấy room nào!</h4>
                     </div>
-                    <div class="row pagination mt-1" v-if="listRoom.length >= defalutPerpage">
+                    <div class="row pagination mt-1" v-if="listRoom.length > 0">
                         <el-pagination class="d-flex justify-content-center" :page-size="defalutPerpage"
                             @current-change="handleCurrentChangeReport" background layout="prev, pager, next"
                             :total="totalRoomReport" />
@@ -204,8 +204,6 @@ export default defineComponent({
                 start_time: filterParams.value.time_report[0] ? moment(filterParams.value.time_report[0]).format("YYYY-MM-DD HH:mm:ss") : '',
                 end_time: filterParams.value.time_report[1] ? moment(filterParams.value.time_report[1]).format("YYYY-MM-DD HH:mm:ss") : '',
             };
-
-            console.log(paramsFilter);
 
             await api.room.getListRoomReport(
                 paramsFilter,

@@ -38,6 +38,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useRoute as useNuxtRoute } from 'nuxt/app'
 import api from "~/api/axios";
 import API_CONST from "~/utils/apiConst";
 import type { ErrorResponse } from "~/constants/type";
@@ -58,7 +59,7 @@ export default defineComponent({
                 await api.room.adminEndGame(
                     route.params.roomId.toString(),
                     (res: any) => {
-                        navigateTo("/admin/dashboard/my-library");
+                        navigateTo("/admin/dashboard/reports/" + useNuxtRoute().params.roomId);
                     },
                     (err: ErrorResponse) => {
                         ElNotification({title: "Error", message: err.error.shift(), type: "error"});
