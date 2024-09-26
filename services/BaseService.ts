@@ -149,7 +149,7 @@ export default class BaseService {
         const config = useRuntimeConfig();
         console.log();
         const instance = axios.create({
-            baseURL: 'http://192.168.0.99/api',
+            baseURL: config.public.BACKEND_URL + 'api',
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
