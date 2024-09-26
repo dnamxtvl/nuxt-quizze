@@ -1,27 +1,30 @@
 <template>
     <div class="container">
-        <el-dialog v-model="showModalEditQuestion" close-icon="false" :close-on-click-modal="false" title="Cập nhật"
+        <el-dialog v-model="showModalCreateOrUpdateEditQuestion" close-icon="false" :close-on-click-modal="false" :title="isUpdate ? 'Cập nhật' : 'Tạo mới'"
             width="500" align-center>
+            <div v-for="(error, index) in errorMessageUpdateQuestions" :key="index" class="text-danger" v-show="errorMessageUpdateQuestions.length > 0" >
+                {{ error }}
+            </div>
             <label for="inputPassword6" class="col-form-label fw-bold">Câu hỏi</label>
-            <input type="text" class="form-control" v-model="currentQuestionUpdate.title"/>
+            <input type="text" class="form-control" v-model="currentQuestion.title"/>
             <div class="row mt-3">
                 <span class="text-primary">
                     <label for="inputPassword6" class="col-form-label fw-bold">Câu trả lời</label>
-                    <span v-if="currentQuestionUpdate.answers.length < maxAnswerOFQuestion" class="cursor-pointer" @click="addAnswerOfQuestion">
+                    <span v-if="currentQuestion.answers.length < maxAnswerOFQuestion" class="cursor-pointer" @click="addAnswerOfQuestion">
                         <RiAddCircleLine size="18" class="mb-1 ms-1" />
                     </span>
                 </span>
-                <div v-for="(checkbox, index) in currentQuestionUpdate.answers" :key="index" class="d-flex form-check mb-3 ms-2 pe-4">
+                <div v-for="(checkbox, index) in currentQuestion.answers" :key="index" class="d-flex form-check mb-3 ms-2 pe-4">
                     <input class="form-check-input mt-2" type="checkbox" :id="'checkbox-' + index" v-model="checkbox.is_correct">
                     <input class="form-control form-check-label ms-1" :for="'checkbox-' + index" v-model="checkbox.answer">
-                    <span v-if="currentQuestionUpdate.answers.length > minAnswerOFQuestion" class="text-danger cursor-pointer mt-2">
+                    <span v-if="currentQuestion.answers.length > minAnswerOFQuestion" class="text-danger cursor-pointer mt-2">
                         <RiCloseLine size="18" class="mb-1 ms-1" @click="removeAnswerOfQuestion(checkbox.id)" />
                     </span>
                   </div>
             </div>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="showModalEditQuestion = false">
+                    <el-button @click="showModalCreateOrUpdateEditQuestion = false">
                         <RiCloseLine size="18"/>
                         Hủy
                     </el-button>
@@ -32,19 +35,20 @@
                 </div>
             </template>
         </el-dialog>
-
-        <!-- <el-dialog v-model="showModelEndGame" close-icon="false" :close-on-click-modal="false" title="Warning"
+        <!-- Show modal delete question -->
+        <el-dialog v-model="showModalDeleteQuestion" close-icon="false" :close-on-click-modal="false" title="Warning"
             width="500" align-center>
-            <span class="text-center align-center">Bạn có muốn kết thúc bài kiểm tra ngay lập tức?</span>
+            <span class="text-center align-center">Bạn có muốn xóa câu hỏi này?</span>
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="showModelEndGame = false">Hủy</el-button>
-                    <el-button type="primary" @click="endGame">
+                    <el-button @click="showModalDeleteQuestion = false">Hủy</el-button>
+                    <el-button type="primary" @click="removeQuestion">
                         Xác nhận
                     </el-button>
                 </div>
             </template>
-        </el-dialog> -->
+        </el-dialog>
+        <!-- Show modal delete question -->
         <!-- Header Section -->
         <div class="header">
             <div class="d-flex justify-content-start">
@@ -57,7 +61,7 @@
                 <h5 class="text-primary mb-0 pt-3">{{ listQuestions.length }} câu hỏi</h5>
             </div>
             <div class="col-md-6 d-flex justify-content-end">
-                <button class="btn btn-primary text-white me-2 mt-2">
+                <button @click="handleAddQuestion" class="btn btn-primary text-white me-2 mt-2">
                     <RiAddLine size="18" class="mb-1" />
                     Thêm câu hỏi
                 </button>
@@ -75,14 +79,18 @@
                                 </span>
                             </div>
                             <div class="col-md-3 d-flex justify-content-end mt-2">
-                                <button @click="handleEditQuestion(item)" class="btn btn-primary text-white me-2 mt-2">
+                                <!-- <span class="text-success me-2 mt-2 cursor-pointer">
+                                    <RiArrowUpLine size="20" class="mb-1" />
+                                </span>
+                                <span class="text-dark me-2 mt-2 cursor-pointer">
+                                    <RiArrowDownLine size="20" class="mb-1" />
+                                </span> -->
+                                <span @click="handleEditQuestion(item)" class="text-primary text-white me-2 mt-2 cursor-pointer">
                                     <RiEditFill size="18" class="mb-1" />
-                                    Sửa câu hỏi
-                                </button>
-                                <button class="btn btn-danger text-white me-2 mt-2">
-                                    <RiDeleteBin2Fill size="17" class="mb-1" />
-                                    Xóa
-                                </button>
+                                </span>
+                                <span @click="handleRemoveQuestion(item.id)" class="text-danger me-2 mt-2 cursor-pointer">
+                                    <RiDeleteBin2Fill size="18" class="mb-1" />
+                                </span>
                             </div>
                         </div>
                         <hr>
@@ -106,25 +114,19 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, GamerAnswer, GamerToken, ItemQuestion, Quizz } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiDeleteBin2Fill, RiEditFill, RiCheckFill, RiCheckboxCircleLine, RiQuestionLine, RiAddLine, RiCloseLine, RiAddCircleLine } from "@remixicon/vue";
+import { RiDeleteBin2Fill, RiEditFill, RiCheckFill, RiCheckboxCircleLine, RiQuestionLine, RiAddLine, RiCloseLine, RiAddCircleLine, RiArrowDownLine, RiArrowUpLine } from "@remixicon/vue";
 import moment from "moment";
 import { useRoute } from "vue-router";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
 import { RULES_VALIDATION } from "~/constants/application";
+import { useValidator } from "#imports";
 
 definePageMeta({
     layout: "admin-dashboard",
 })
-
-interface Answer {
-    id: number;
-    answer: string;
-    is_correct: boolean;
-    created_at: string;
-}
 
 interface GamerInfo {
     id: string;
@@ -133,41 +135,6 @@ interface GamerInfo {
     gamer_answers: Array<GamerAnswer> | [];
     gamer_token: GamerToken;
     created_at: string
-}
-
-interface ItemQuestion {
-    id: string;
-    title: string;
-    quizze_id: string;
-    answers: Array<Answer>;
-    created_at: string;
-}
-
-interface GamerToken {
-    id: string;
-    token: string;
-    submit_at: string|null;
-    created_at: string
-}
-
-interface GamerAnswer {
-    id: number;
-    answer_id: number;
-    answer_in_time: number;
-    gamer_id: string;
-    question_id: string;
-    room_id: string;
-    score: number;
-    created_at: string;
-    updated_at: string;
-}
-
-interface Quizz {
-    id: string;
-    title: string;
-    category_id: number;
-    created_at: string
-    updated_at: string
 }
 
 export default defineComponent({
@@ -180,6 +147,8 @@ export default defineComponent({
         RiAddLine,
         RiCloseLine,
         RiAddCircleLine,
+        RiArrowDownLine,
+        RiArrowUpLine,
     },
     setup() {
         const route = useRoute();
@@ -193,8 +162,8 @@ export default defineComponent({
             created_at: '',
             updated_at: ''
         });
-        const showModalEditQuestion = ref<boolean>(false);
-        const currentQuestionUpdate = ref<ItemQuestion>({
+        const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
+        const currentQuestion = ref<ItemQuestion>({
             id: '',
             title: '',
             quizze_id: '',
@@ -203,6 +172,10 @@ export default defineComponent({
         });
         const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
         const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
+        const errorMessageUpdateQuestions = ref<string[]>([]);
+        const isUpdate = ref<boolean>(false);
+        const showModalDeleteQuestion = ref<boolean>(false);
+        const currentQuestionIdDelete = ref<string>('');
 
         const getListQuestion = async () => {
             await api.quizze.listQuestion(
@@ -223,48 +196,34 @@ export default defineComponent({
             return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
-            if (gamerAnswers.length == 0) {
-                return {
-                    score: 0,
-                    class: "bg-warning"
-                };
-            }
-
-            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
-
-            if (answer.length > 0) {
-                let answersOfQuestion = listQuestions.value.find((item: ItemQuestion) => item.id == questionId)?.answers;
-                if (answer[0].score > 0) {
-                    return {
-                        index: answersOfQuestion?.findIndex((item: Answer) => item.id == answer[0].answer_id),
-                        score: answer[0].score,
-                        class: "bg-success"
-                    };
-                }
-
-                return {
-                    index: answersOfQuestion?.findIndex((item: Answer) => item.id == answer[0].answer_id),
-                    score: 0,
-                    class: "bg-danger"
-                }
-            }
-            
-            return {
-                score: 0,
-                class: "bg-warning"
-            };
-        }
-
         const handleEditQuestion = (item: ItemQuestion) => {
-            showModalEditQuestion.value = true;
-            currentQuestionUpdate.value = {
+            showModalCreateOrUpdateEditQuestion.value = true;
+            isUpdate.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
                 ...item,
                 answers: item.answers.map(answer => ({
                     ...answer,
                     is_correct: !!answer.is_correct
                 }))
             };
+        }
+
+        const handleRemoveQuestion = (questionId: string) => {
+            currentQuestionIdDelete.value = questionId;
+            showModalDeleteQuestion.value = true;
+        }
+
+        const removeQuestion  = async () => {
+            await api.quizze.deleteQuestion(currentQuestionIdDelete.value, (res: any) => {
+                ElNotification({title: "Success",message: "Xóa câu hỏi thành công!",type: "success"});
+                getListQuestion();
+            }, (err: ErrorResponse) => {
+                ElLoading.service({ fullscreen: true }).close();
+                ElNotification({title: "Error", message: err.error.shift(),type: "error"});
+            })
+            
+            showModalDeleteQuestion.value = false;
         }
 
         const formatDate = (date: string) => {
@@ -276,33 +235,130 @@ export default defineComponent({
         }
 
         const removeAnswerOfQuestion = (answerId: number) => {
-            currentQuestionUpdate.value.answers = currentQuestionUpdate.value.answers.filter((answer: Answer) => answer.id != answerId);
+            currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
         }
 
         const addAnswerOfQuestion = () => {
-            currentQuestionUpdate.value.answers.push({
-                id: currentQuestionUpdate.value.answers[currentQuestionUpdate.value.answers.length - 1].id + 1,
+            currentQuestion.value.answers.push({
+                id: currentQuestion.value.answers.length > 0 ? currentQuestion.value.answers[currentQuestion.value.answers.length - 1].id + 1 : 1,
                 answer: '',
                 is_correct: false,
                 created_at: '',
             });
+        }
+
+        const updateQuestion = async () => {
+            const resultValidate = validateQuestionUpdateOrCreate();
+            if (!resultValidate) {
+                return;
+            }
+
+            if (isUpdate.value) {
+                await api.quizze.updateQuestion(
+                    currentQuestion.value.id,
+                    currentQuestion.value,
+                    (res: any) => {
+                        showModalCreateOrUpdateEditQuestion.value = false;
+                        ElNotification({title: "Success",message: "Cập nhật câu hỏi thành công!",type: "success"});
+                        getListQuestion();
+                    },
+                    (err: ErrorResponse) => {
+                        ElNotification({title: "Error",message: err.error.shift(),type: "error"});
+                    }
+                )
+            } else {
+                await api.quizze.createQuestion(
+                    route.params.quizzId as string,
+                    currentQuestion.value,
+                    (res: any) => {
+                        showModalCreateOrUpdateEditQuestion.value = false;
+                        ElNotification({title: "Success",message: "Thêm câu hỏi thành công!",type: "success"});
+                        getListQuestion();
+                    },
+                    (err: ErrorResponse) => {
+                        ElNotification({title: "Error",message: err.error.shift(),type: "error"});
+                    }
+                )
+            }
+        }
+
+        const handleAddQuestion = () => {
+            isUpdate.value = false;
+            showModalCreateOrUpdateEditQuestion.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
+                id: '',
+                title: '',
+                quizze_id: route.params.quizzId as string,
+                answers: [],
+                created_at: ''
+            }
+        }
+
+        const validateQuestionUpdateOrCreate = () => {
+            const validator = useValidator();
+            let isPassvalidate: boolean = true;
+            let errorMessagesValidate: string[] = [];
+            if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
+                errorMessagesValidate.push(`Cấu hỏi phải có 2 đến 4 câu trả lời!`);
+                isPassvalidate = false;
+            }
+
+            let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
+            if (counAnswerCorrect == 0) {
+                errorMessagesValidate.push(`Cấu hỏi phải có ít nhất 1 đáp án đúng!`);
+                isPassvalidate = false;
+            }
+
+            let requiredQuestionTitle = validator.required(currentQuestion.value.title.trim(), "Câu hỏi");
+            let isLengthTitleQuestion = validator.isLength(
+                currentQuestion.value.title,
+                "Câu hỏi",
+                RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH,
+                RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH,
+                true,
+            );
+
+            if (requiredQuestionTitle != true) {
+                errorMessagesValidate.push(requiredQuestionTitle);
+                isPassvalidate = false;
+            }
+            
+            if (isLengthTitleQuestion != true) {
+                errorMessagesValidate.push(isLengthTitleQuestion);
+                isPassvalidate = false;
+            }
+
+            let defaultStringAnwser = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            currentQuestion.value.answers.forEach((answer: Answer, index: number) => {
+                let requiredAnswer = validator.required(answer.answer.trim(), "Đáp án " + defaultStringAnwser[index]);
+                let isLengthAnswer = validator.isLength(
+                    answer.answer.trim(),
+                    "Đáp án " + defaultStringAnwser[index],
+                    RULES_VALIDATION.QUESTION.ANSWER.MIN_LENGTH,
+                    RULES_VALIDATION.QUESTION.ANSWER.MAX_LENGTH,
+                    true,
+                );
+                if (requiredAnswer != true) {
+                    errorMessagesValidate.push(requiredAnswer);
+                    isPassvalidate = false;
+                }
+                
+                if (isLengthAnswer != true) {
+                    errorMessagesValidate.push(isLengthAnswer);
+                    isPassvalidate = false;
+                }
+            })
+            
+            errorMessageUpdateQuestions.value = errorMessagesValidate;
+
+            return isPassvalidate;
         }
         
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
             await getListQuestion();
         });
-
-        const validateQuestionUpdate = (question: ItemQuestion) => {
-            let isPassvalidate = true;
-            if (currentQuestionUpdate.value.answers.length < minAnswerOFQuestion || currentQuestionUpdate.value.answers.length > maxAnswerOFQuestion) {
-                isPassvalidate = false;
-            }
-
-            
-
-            return isPassvalidate;
-        }
 
         return {
             showModelEndGame,
@@ -311,17 +367,23 @@ export default defineComponent({
             getStatusText,
             listQuestions,
             countQuestionTrue,
-            getResultQustionColor,
             defaultStringSort,
             quizDetail,
-            showModalEditQuestion,
+            showModalCreateOrUpdateEditQuestion,
             handleEditQuestion,
-            currentQuestionUpdate,
-            validateQuestionUpdate,
+            currentQuestion,
+            validateQuestionUpdateOrCreate,
             addAnswerOfQuestion,
             maxAnswerOFQuestion,
             minAnswerOFQuestion,
             removeAnswerOfQuestion,
+            errorMessageUpdateQuestions,
+            updateQuestion,
+            handleAddQuestion,
+            isUpdate,
+            showModalDeleteQuestion,
+            handleRemoveQuestion,
+            removeQuestion,
         }
     }
 })

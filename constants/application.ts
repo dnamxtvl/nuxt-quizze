@@ -43,6 +43,10 @@ export const RULES_VALIDATION = {
             MIN_LENGTH: 6,
             MAX_LENGTH: 255
         },
+        ANSWER: {
+            MIN_LENGTH: 1,
+            MAX_LENGTH: 255
+        },
         MIN_ANSWER: 2,
         MAX_ANSWER: 4
     },

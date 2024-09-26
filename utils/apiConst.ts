@@ -8,6 +8,9 @@ const API_CONST = {
         CREATE_QUIZZE: 'admin/quizzes/create',
         DELETE_QUIZZE: 'admin/quizzes/delete',
         LIST_QUESTION: 'admin/quizzes/list-question',
+        UPDATE_QUESTION: 'admin/quizzes/update-question',
+        CREATE_QUESTION: 'admin/quizzes/create-question',
+        DELETE_QUESTION: 'admin/quizzes/delete-question',
     },
     ROOM: {
         CREATE: 'admin/room/create',

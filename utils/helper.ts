@@ -2,6 +2,7 @@ import { GROUP_ROUTE } from "~/constants/application";
 import LocalStorageManager from "./localStorage";
 import { useMainStore } from "~/store";
 import moment from "moment";
+import type { GamerAnswer } from "~/constants/type";
 
 export default class helperApp {
   static getErrorMessage = (error: unknown): string => {
@@ -86,5 +87,35 @@ export default class helperApp {
     const remainingSeconds = seconds % 60;
 
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  static getColorOfQuestion = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
+    if (gamerAnswers.length == 0) {
+      return {
+          score: 0,
+          class: "bg-warning"
+      };
+    }
+
+    let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
+
+    if (answer.length > 0) {
+        if (answer[0].score > 0) {
+            return {
+                score: answer[0].score,
+                class: "bg-success"
+            };
+        }
+
+        return {
+          score: 0,
+          class: "bg-danger",
+        };
+    }
+    
+    return {
+        score: 0,
+        class: "bg-warning"
+    };
   }
 };

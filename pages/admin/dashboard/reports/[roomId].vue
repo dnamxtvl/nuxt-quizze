@@ -25,6 +25,19 @@
                 </div>
             </template>
         </el-dialog>
+        <!-- show current question -->
+        <el-dialog v-model="showModalViewQuestion" :title="(listQuestionRooms.findIndex(item => item.id == currentShowQuestion.id) + 1) + '. ' + currentShowQuestion.title"
+            width="500" align-center>
+            <div class="col-xl-9 col-lg-9 col-md-8 col-sm-6">
+                <div class="form-check" v-for="(answer, index) in currentShowQuestion.answers">
+                    <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
+                    <label class="form-check-label ms-2" for="flexCheckDefault">
+                        {{ answer.answer }}
+                    </label>
+                </div>
+            </div>
+        </el-dialog>
+         <!-- end show current question -->
         <!-- Header Section -->
         <div class="header">
             <div class="d-flex justify-content-start">
@@ -213,7 +226,7 @@
                                 </td>
                                 <td>{{ formatDate(item.gamer_token?.created_at) }}</td>
                                 <td class="text-dark text-center">
-                                    <span :class="'badge width-2 ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestionRooms" :key="key">
+                                    <span :class="'badge cursor-pointer width-2 ms-1 ' + getResultQustionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestionRooms" :key="key" @click="handleShowModalQuestion(question)">
                                         <p class="mb-1 mt-1">{{ 'Q' + (key + 1) + (getResultQustionColor(item.gamer_answers, question.id).index > -1 ? ':' + defaultStringSort[getResultQustionColor(item.gamer_answers, question.id).index] : '') }}</p>
                                         <p class="mb-1 mt-1" v-if="roomDetail.type != homeworkType">{{ getResultQustionColor(item.gamer_answers, question.id).score }}</p>
                                     </span>
@@ -228,19 +241,13 @@
                             <div v-for="(item, index) in listQuestionRooms"
                                 class="question-preview-content border rounded rounded-3 pl-2 mb-3">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div class="col-md-9 d-flex justify-content-start mt-2">
+                                    <div class="col-md-12 d-flex justify-content-start mt-2">
                                         <span class="text-black fw-normal fs-5 pt-2 px-4 text-start font-bold">
                                             {{ (index + 1) + ". " + item.title }}
                                             <span class="fw-bold">
                                                 {{ roomDetail.type == homeworkType ? "1 điểm" : '1000 điểm' }}
                                             </span>
                                         </span>
-                                    </div>
-                                    <div class="col-md-3 d-flex justify-content-end mt-2">
-                                        <button class="btn btn-primary text-white me-2 mt-2">
-                                            <RiEditFill size="18" class="mb-1" />
-                                            Sửa câu hỏi
-                                        </button>
                                     </div>
                                 </div>
                                 <hr>
@@ -300,7 +307,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, GamerAnswer, GamerToken, ItemQuestion, Quizz } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
 import { RiDeleteBin2Fill, RiCloseFill, RiUser2Fill, RiEditFill, RiCheckFill, RiMore2Fill, RiDeleteBin7Fill, RiRegisteredLine, RiCheckboxCircleLine, RiUser2Line, RiQuestionLine, RiTimeLine, RiRefreshLine, RiFileCopyLine } from "@remixicon/vue";
@@ -315,13 +322,6 @@ definePageMeta({
     layout: "admin-dashboard",
 })
 
-interface Answer {
-    id: number;
-    answer: string;
-    is_correct: boolean;
-    created_at: string;
-}
-
 interface GamerInfo {
     id: string;
     name: string;
@@ -329,41 +329,6 @@ interface GamerInfo {
     gamer_answers: Array<GamerAnswer> | [];
     gamer_token: GamerToken;
     created_at: string
-}
-
-interface ItemQuestion {
-    id: string;
-    title: string;
-    quizze_id: string;
-    answers: Array<Answer>;
-    created_at: string;
-}
-
-interface GamerToken {
-    id: string;
-    token: string;
-    submit_at: string|null;
-    created_at: string
-}
-
-interface GamerAnswer {
-    id: number;
-    answer_id: number;
-    answer_in_time: number;
-    gamer_id: string;
-    question_id: string;
-    room_id: string;
-    score: number;
-    created_at: string;
-    updated_at: string;
-}
-
-interface Quizz {
-    id: string;
-    title: string;
-    category_id: number;
-    created_at: string
-    updated_at: string
 }
 
 interface RoomDetail {
@@ -419,14 +384,21 @@ export default defineComponent({
             created_at: '',
             updated_at: ''
         });
-
+        const showModalViewQuestion = ref<boolean>(false);
+        const currentShowQuestion = ref<ItemQuestion>({
+            id: '',
+            title: '',
+            quizze_id: '',
+            answers: [],
+            created_at: '',
+        })
         const defaultStatus = ref<number>(RoomStatus.PREPARE);
         const runningStatus = ref<number>(RoomStatus.HAPPING);
         const finishedStatus = ref<number>(RoomStatus.FINISHED);
         const pendingStatus = ref<number>(RoomStatus.PENDING);
         const cancelStatus = ref<number>(RoomStatus.CANCEL);
         const homeworkType = ref<number>(RoomType.HOMEWORK);
-        const activeName = ref('first')
+        const activeName = ref('first');
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -640,6 +612,11 @@ export default defineComponent({
                 class: "bg-warning"
             };
         }
+
+        const handleShowModalQuestion = (question: ItemQuestion) => {
+            showModalViewQuestion.value = true;
+            currentShowQuestion.value = question;
+        }
         
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
@@ -696,6 +673,9 @@ export default defineComponent({
             pendingStatus,
             cancelStatus,
             defaultStringSort,
+            handleShowModalQuestion,
+            showModalViewQuestion,
+            currentShowQuestion,
         }
     }
 })

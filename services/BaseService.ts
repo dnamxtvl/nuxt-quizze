@@ -147,7 +147,6 @@ export default class BaseService {
     getInstanceAxios = () => {
         let store = useMainStore();
         const config = useRuntimeConfig();
-        console.log();
         const instance = axios.create({
             baseURL: config.public.BACKEND_URL + 'api',
             headers: { 'Authorization': `Bearer ${store.$state.token}` }

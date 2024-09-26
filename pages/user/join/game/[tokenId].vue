@@ -61,10 +61,10 @@
                                         <td class="text-white">{{ gamerResult?.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
                                         <td class="text-white detail-score text-center">
-                                            <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQustionColor(gamerResult?.gamer_answers, question.id).class"
+                                            <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQuestionColor(gamerResult?.gamer_answers, question.id).class"
                                                 v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
-                                                <p>{{ getResultQustionColor(gamerResult?.gamer_answers,
+                                                <p>{{ getResultQuestionColor(gamerResult?.gamer_answers,
                                                     question.id).score }}</p>
                                             </div>
                                         </td>
@@ -114,62 +114,26 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, onBeforeUnmount } from "vue";
+import { defineComponent, ref, onBeforeUnmount, watch } from "vue";
 import { ElLoading } from "element-plus";
 import api from "~/api/axios";
 import { useRoute } from "vue-router";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, GamerResult, ItemQuestion } from "~/constants/type";
 import { HttpStatusCode } from "axios";
 import { RoomSetting, RoomStatus, RoomType } from "~/constants/room";
 import type { TabsPaneContext } from 'element-plus';
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
+import type { GamerAnswer } from "~/constants/type";
+import helperApp from "~/utils/helper";
 
 definePageMeta({
   layout: 'user-game'
 })
 
-interface Answer {
-    id: number;
-    answer: string;
-    is_correct: boolean;
-    created_at: string;
-}
-
 interface GamerInfo {
     id: string;
     name: string;
     created_at: string
-}
-
-interface ItemQuestion {
-    id: string;
-    title: string;
-    quizze_id: string;
-    answers: Array<Answer>;
-    created_at: string;
-}
-
-interface GamerResult {
-    id: string;
-    name: string;
-    gamer_answers: Array<GamerAnswer> | [];
-    gamer_answers_sum_score: number;
-    display_meme: boolean;
-    ip_address: string;  
-    created_at: string;
-    updated_at: string;
-}
-
-interface GamerAnswer {
-    id: number;
-    answer_id: number;
-    answer_in_time: number;
-    gamer_id: string;
-    question_id: string;
-    room_id: string;
-    score: number;
-    created_at: string;
-    updated_at: string;
 }
 
 export default defineComponent({
@@ -214,6 +178,7 @@ export default defineComponent({
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
         const selectedAnswerId = ref<number>(0);
+        const currentScoreAnswer = ref<number|null>(null);
 
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -260,6 +225,7 @@ export default defineComponent({
                         let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
                         if (currentQuestionSubmited) {
                             selectedAnswerId.value = currentQuestionSubmited.answer_id;
+                            currentScoreAnswer.value = currentQuestionSubmited.score;
                         }
                     }
                 },
@@ -292,11 +258,7 @@ export default defineComponent({
                 (res: any) => {
                     currentScore.value = res.score;
                     selectedAnswerId.value = id;
-                    if (res.score > 0) {
-                        ElNotification({title: "Chúc mừng!", message: "+" + res.score, type: "success"});
-                    } else {
-                        ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
-                    }
+                    currentScoreAnswer.value = res.score;
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
@@ -325,34 +287,8 @@ export default defineComponent({
             return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
         }
 
-        const getResultQustionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
-            if (gamerAnswers.length == 0) {
-                return {
-                    score: 0,
-                    class: "bg-warning"
-                };
-            }
-
-            let answer = gamerAnswers.filter((answer: GamerAnswer) => answer.question_id == questionId);
-
-            if (answer.length > 0) {
-                if (answer[0].score > 0) {
-                    return {
-                        score: answer[0].score,
-                        class: "bg-success"
-                    };
-                }
-
-                return {
-                    score: 0,
-                    class: "bg-danger"
-                }
-            }
-            
-            return {
-                score: 0,
-                class: "bg-warning"
-            };
+        const getResultQuestionColor = (gamerAnswers: Array<GamerAnswer> | [], questionId: string) => {
+            return helperApp.getColorOfQuestion(gamerAnswers, questionId);
         }
 
         const isSelectedAnswer = (answerId: number) => {
@@ -360,6 +296,23 @@ export default defineComponent({
                 return 'selected-answer'
             }
         }
+        
+        watch(timeReply, (newValue, oldValue) => {
+            if (oldValue == newValue + 1 && newValue == 0 &&
+                (currentRoomStatus.value == RoomStatus.HAPPING || currentRoomStatus.value == RoomStatus.PENDING)) {
+                if (currentScoreAnswer.value != null) {
+                    if (currentScoreAnswer.value > 0) {
+                        ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
+                        return;
+                    }
+
+                    ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
+                    return;
+                }
+
+                ElNotification({title: "Oh no!", message: "Đã hết thời gian trả lời!", type: "warning"});
+            }
+        });
 
         onMounted(async () => {
             clearInterval(intervalId);
@@ -373,6 +326,7 @@ export default defineComponent({
                     currentRoomStatus.value = RoomStatus.HAPPING;
                     timeReply.value = RoomSetting.TIME_REPLY;
                     isSubmited.value = false;
+                    currentScoreAnswer.value = null;
                     calculateTimeReply();
                     if (listQuestion.value.length == 1) {
                         setTimeout(async () => {
@@ -388,6 +342,7 @@ export default defineComponent({
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
                     timeReply.value = RoomSetting.TIME_REPLY;
                     isSubmited.value = false;
+                    currentScoreAnswer.value = null;
                     calculateTimeReply();
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(async () => {
@@ -426,7 +381,7 @@ export default defineComponent({
             handleClick,
             gamerResult,
             countQuestionTrue,
-            getResultQustionColor,
+            getResultQuestionColor,
             yourAnswerCorrect,
             centerDialogVisible,
             currentRoomStatus,
