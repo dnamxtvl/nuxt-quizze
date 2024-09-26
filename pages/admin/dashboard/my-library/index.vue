@@ -94,8 +94,7 @@
                                 <div class="email-list-item" data-starred="true" data-bs-toggle="sidebar"
                                     data-target="#app-email-view">
                                     <div v-if="listQuizzes.length > 0" class="d-flex align-items-center cursor-pointer"
-                                        v-for="(item, index) in listQuizzes" :key="index"
-                                        @click="navigateTo('/admin/dashboard/my-library/' + item.id)" >
+                                        v-for="(item, index) in listQuizzes" :key="index">
                                         <div :class='"flex flex-col items-center " + (index % 2 == 0 ? "bg-primary" : "bg-success")'>
                                             <div class="h-18 w-18 relative rounded-sm overflow-hidden bg-lilac">
                                                 <div class="v-image"><img
@@ -108,7 +107,7 @@
                                         <div class="list-quizz-content w-full">
                                             <div class="row flex-col h-full">
                                                 <div class="row justify-content-between">
-                                                    <div class="col-md-9 title-content-list-answer ms-3 mb-0 mt-2">
+                                                    <div @click="navigateTo('/admin/dashboard/my-library/' + item.id)" class="col-md-9 title-content-list-answer ms-3 mb-0 mt-2 cursor-pointer">
                                                         <p class="text-start fs-5 fw-bold mb-0">{{ item.title }}</p>
                                                     </div>
                                                     <div class="col-md-2 title-content-list-answer ms-3 mb-0 mt-2">
