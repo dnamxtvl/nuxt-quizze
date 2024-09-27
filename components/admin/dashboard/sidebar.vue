@@ -35,7 +35,7 @@
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-smart-home"></i>
                     <div data-i18n="Dashboards">Dashboards</div>
-                    <div class="badge bg-label-primary rounded-pill ms-auto">3</div>
+                    <div class="badge bg-label-primary rounded-pill ms-auto">2</div>
                 </a>
                 <ul class="menu-sub">
                     <!-- <li class="menu-item">
@@ -53,11 +53,11 @@
                             <div data-i18n="CRM">Báo cáo</div>
                         </nuxt-link>
                     </li>
-                    <li class="menu-item">
+                    <!-- <li class="menu-item">
                         <a href="dashboards-crm.html" class="menu-link">
                             <div data-i18n="CRM">Cài đặt</div>
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </li>
         </ul>

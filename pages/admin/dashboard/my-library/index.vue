@@ -48,6 +48,25 @@
                     </template>
                 </el-dialog>
                  <!-- end show modal warning room is running  -->
+                <!-- Show modal share quizz-->
+                <el-dialog v-model="showModalShare" :show-close="false" title="Chia sẻ bộ câu hỏi" width="500" align-center>
+                    <span>{{ messageWarningRoomRunning }}</span>
+                    <div v-if="validateMessageEmailBeforeShare.length > 0">
+                        <div class="error-validate text-danger" v-for="(error, index) in validateMessageEmailBeforeShare" :key="index">{{ error }}</div>
+                    </div>
+                    <el-form-item label="Email">
+                        <el-input v-model="emailShare" />
+                    </el-form-item>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="showModalShare = false">Hủy</el-button>
+                            <el-button type="primary" @click="shareQuiz()">
+                                Xác nhận
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+                <!-- End show modal share-->
                 <!-- Email Sidebar -->
                 <div class="col-lg-3 app-email-sidebar border-end flex-grow-0">
                     <div class="btn-compost-wrapper d-grid">
@@ -147,7 +166,7 @@
                                                                 }}</p>
                                                         </div>
                                                         <div class="col-md-6 d-flex justify-content-end pe-4">
-                                                            <button class="btn btn-link">
+                                                            <button @click="handleShowModalShare(item.id)" class="btn btn-link">
                                                                 Chia sẻ
                                                             </button>
                                                             <button class="btn btn-primary ms-3"
@@ -182,9 +201,10 @@ import type { ErrorResponse, ItemQuizze } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
 import helperApp from "~/utils/helper";
-import { RiMore2Fill, RiDeleteBin7Fill } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine } from "@remixicon/vue";
 import { RoomType } from "~/constants/room";
 import moment from "moment";
+import { useMainStore } from '~/store';
 import { CODE, RULES_VALIDATION } from "~/constants/application";
 
 definePageMeta({
@@ -195,8 +215,10 @@ export default defineComponent({
     components: {
         RiMore2Fill,
         RiDeleteBin7Fill,
+        RiCloseCircleLine,
     },
     setup() {
+        const store = useMainStore();
         const listQuizzes = ref<Array<ItemQuizze>>([]);
         const totalPageQuizzes = ref<number>(0);
         const currentPage = ref<number>(1);
@@ -216,6 +238,10 @@ export default defineComponent({
         const defaultTime = new Date();
         const errorMessageValidate = ref<Array<string> | []>([]);
         const perpage = ref<number>(7);
+        const showModalShare = ref<boolean>(false);
+        const currentQuizIdShare = ref<string>("");
+        const emailShare = ref<string>("");
+        const validateMessageEmailBeforeShare = ref<string[]>([]);
 
         const getListQuizzes = async () => {
             await api.quizze.list(
@@ -347,6 +373,69 @@ export default defineComponent({
             errorMessageValidate.value = [];
         }
 
+        const handleShowModalShare = (id: string) => {
+            emailShare.value = '';
+            showModalShare.value = true;
+            currentQuizIdShare.value = id;
+        }
+
+        const shareQuiz = async () => {
+            if (!validateEmailShare()) {
+                return ;
+            }
+
+            await api.quizze.shareQuiz(
+                currentQuizIdShare.value,
+                { email: emailShare.value },
+                (res: any) => {
+                    showModalShare.value = false;
+                    ElNotification({title: "Success", message: 'Chia bạn bộ cảu hỏi thành công!', type: "success"});
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                }
+            )
+        }
+
+        const validateEmailShare = () => {
+            let isPassValidate: boolean = true;
+            let errorMessagesValidate: string[] = [];
+            const validator = useValidator();
+            let requiredEmail = validator.required(emailShare.value, "Email");
+            let isLengthEmail = validator.isLength(
+                emailShare.value,
+                "Email",
+                RULES_VALIDATION.EMAIL_LENGTH.MIN,
+                RULES_VALIDATION.EMAIL_LENGTH.MAX,
+                true
+            );
+            let isValidEmail = validator.isInvalidEmail(emailShare.value, false);
+        
+            if (requiredEmail != true) {
+                errorMessagesValidate.push(requiredEmail);
+                isPassValidate = false;
+            }
+
+            if (isLengthEmail != true) {
+                errorMessagesValidate.push(isLengthEmail);
+                isPassValidate = false;
+            }
+
+            if (isValidEmail != true) {
+                errorMessagesValidate.push('Email không hợp lệ!');
+                isPassValidate = false;
+            }
+
+            if (emailShare.value == store.$state.user?.email) {
+                errorMessagesValidate.push('Không thể chia sẻ cho chính mình!');
+                isPassValidate = false;
+            }
+
+            validateMessageEmailBeforeShare.value = errorMessagesValidate;
+
+            return isPassValidate
+        }
+
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
             await getListQuizzes();
@@ -373,6 +462,11 @@ export default defineComponent({
             showModalWarningRoomRunning,
             messageWarningRoomRunning,
             perpage,
+            handleShowModalShare,
+            showModalShare,
+            emailShare,
+            shareQuiz,
+            validateMessageEmailBeforeShare,
         }
     }
 })

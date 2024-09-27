@@ -82,7 +82,7 @@ export default defineComponent({
     }
 
     const setValueStoreLogin = async (data: any) => {
-        const userInfo = { email: data.user.email, name: data.user.name };
+        const userInfo = { id: data.user.id, email: data.user.email, name: data.user.name };
         await LocalStorageManager.setItemWithKey("isLoggedIn", true);
         await CookieManager.setCookie(JWT_KEY_ACEESS_TOKEN_NAME, data.token);
         await LocalStorageManager.setItemWithKey(
