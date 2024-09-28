@@ -179,7 +179,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row pagination" v-if="listQuizzes.length > 0">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @current-change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />

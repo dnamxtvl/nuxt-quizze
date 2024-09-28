@@ -135,7 +135,7 @@
                 <span
                   @click="getListNotify"
                   class="text-center text-primary cursor-pointer"
-                  v-if="defaultPerPage >= listNotify.length"
+                  v-if="defaultPerPage <= listNotify.length"
                   >Xem thêm</span
                 >
               </li>
@@ -145,7 +145,6 @@
               >
                 <span
                   v-if="!disabledLoadMore"
-                  defaultPerPage
                   @click="getListNotify"
                   class="text-center text-primary cursor-pointer"
                   >Xem thêm</span
@@ -216,13 +215,19 @@ interface ItemNotify {
 }
 
 export default defineComponent({
+  props: {
+    updateSidebar: {
+      type: Boolean,
+      default: false
+    }
+  },
   name: "AdminDashboardNavSearch",
   components: {
     RiUser2Line,
     RiLogoutCircleFill,
   },
 
-  setup() {
+  setup(props) {
     const store = useMainStore();
     const adminName = store.$state.user?.name;
     const currentSkipNotify = ref<number>(0);
@@ -253,6 +258,7 @@ export default defineComponent({
         }
       );
     };
+
 
     const notifySuccessAndRemoveTokenJwt = () => {
       ElNotification({ title: "Success", type: "success", showClose: false });
@@ -311,6 +317,13 @@ export default defineComponent({
             },
           });
         });
+
+      // const { $bus }: any = useNuxtApp();
+      // $bus.$on('clearNotify', (data: {notifyId: string}) => {
+      //   if (data.notifyId) {
+      //     listNotify.value = listNotify.value.filter((item: ItemNotify) => item.id !== data.notifyId);
+      //   }
+      // })
       await getListNotify();
     });
 

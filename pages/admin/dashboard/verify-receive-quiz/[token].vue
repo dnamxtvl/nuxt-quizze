@@ -74,7 +74,6 @@ import type { ErrorResponse } from "~/constants/type";
 import { CODE } from "~/constants/application";
 import type { Quizz } from "~/constants/type";
 
-
 definePageMeta({
     layout: "admin-dashboard",
 })
@@ -137,7 +136,9 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                     ElNotification({title: "Error",message: err.error.shift(),type: "error"});
                     if (err.code == CODE.NOT_FOUND) {
-                        return navigateTo("/not-found");
+                        if (err.responseCode != CODE.ERROR_RECJECT_QUIZZE) {
+                            return navigateTo("/not-found");   
+                        }
                     }
                 }
             )
@@ -165,6 +166,8 @@ export default defineComponent({
                 (res: any) => {
                     ElLoading.service({ fullscreen: true }).close();
                     ElNotification({title: "Success",message: "Đã từ chối bộ cảu hỏi!",type: "success"});
+                    // const { $bus }: any = useNuxtApp();
+                    // $bus.$emit('clearNotify', { notifyId: route.query.notification_id as string }) // Phát sự kiện lên Global Event Bus
                     return navigateTo("/admin/dashboard/my-library/");
                 },
                 (err: ErrorResponse) => {

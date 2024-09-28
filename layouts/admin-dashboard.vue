@@ -8,6 +8,7 @@
             <div class="layout-page">
                 <!-- Navbar search -->
                 <AdminDashboardNavSearch />
+                <slot @updateSidebar="onSidebarUpdate" />
                 <!-- / Navbar search -->
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
@@ -39,12 +40,20 @@
     </div>
 </template>
 <script lang="ts">
-  
-export default {
+  export default defineComponent({
     components: {
       
-    }
-}
+    },
+    setup() {
+        
+        onMounted(() => {
+        });
+
+        return {
+            
+        };
+    },
+});
 </script>
 <style scoped></style>
   
