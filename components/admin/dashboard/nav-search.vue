@@ -74,7 +74,7 @@
                           v-if="item.is_read == 0"
                           ><span class="badge badge-dot"></span
                         ></a>
-                        <a
+                        <a @click="deleteNotify(item.id)"
                           href="javascript:void(0)"
                           class="dropdown-notifications-archive"
                           ><span class="ti ti-x"></span
@@ -117,7 +117,7 @@
                             v-if="item.is_read == 0"
                             ><span class="badge badge-dot"></span
                           ></a>
-                          <a
+                          <a @click="deleteNotify(item.id)"
                             href="javascript:void(0)"
                             class="dropdown-notifications-archive"
                             ><span class="ti ti-x"></span
@@ -135,7 +135,7 @@
                 <span
                   @click="getListNotify"
                   class="text-center text-primary cursor-pointer"
-                  v-if="defaultPerPage >= listNotify.length"
+                  v-if="defaultPerPage <= listNotify.length"
                   >Xem thêm</span
                 >
               </li>
@@ -145,7 +145,6 @@
               >
                 <span
                   v-if="!disabledLoadMore"
-                  defaultPerPage
                   @click="getListNotify"
                   class="text-center text-primary cursor-pointer"
                   >Xem thêm</span
@@ -254,6 +253,7 @@ export default defineComponent({
       );
     };
 
+
     const notifySuccessAndRemoveTokenJwt = () => {
       ElNotification({ title: "Success", type: "success", showClose: false });
       CookieManager.removeCookie(JWT_KEY_ACEESS_TOKEN_NAME);
@@ -291,13 +291,39 @@ export default defineComponent({
       return helperApp.calculateTimeAgo(time);
     };
 
+    const deleteNotify = async (id: string) => {
+      await api.notification.deleteNotify(
+        id,
+        (res: any) => {
+          let notify = listNotify.value.find((item) => item.id == id);
+          listNotify.value = listNotify.value.filter((item) => item.id != id);
+          if (notify && notify.is_read == 0) {
+            totalUnreadNotify.value--;
+          }
+        },
+        (err: ErrorResponse) => {
+          ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+        }
+      );
+    }
+
     onMounted(async () => {
       const { $echo }: any = useNuxtApp();
       $echo
         .private("admin.share-quiz." + store.$state.user?.id)
         .listen("ShareQuizEvent", (e: any) => {
           totalUnreadNotify.value++;
-          listNotify.value.unshift(e);
+          listNotify.value.unshift({
+            id: e.notifyId,
+            title: e.title,
+            content: e.content,
+            avatar_notify: e.avatarNotify ?? null,
+            type: e.type ?? 0,
+            user_id: e.userId,
+            link: e.link,
+            is_read: 0,
+            created_at: e.createdAt,
+          });
           ElNotification({
             type: "success",
             title: "Thông báo",
@@ -305,12 +331,25 @@ export default defineComponent({
             duration: 0,
             position: "bottom-right",
             onClick() {
-              return navigateTo(e.link, {
+              return navigateTo(e.link + '?notification_id=' + e.notifyId, {
                 external: true,
               });
             },
           });
         });
+
+      const { $bus }: any = useNuxtApp();
+      $bus.$on('clearNotify', (data: {notifyId: string}) => {
+        if (data.notifyId) {
+          let notify = listNotify.value.find((item: ItemNotify) => item.id === data.notifyId);
+          if (notify) {
+            listNotify.value = listNotify.value.filter((item: ItemNotify) => item.id !== data.notifyId);
+            if (notify.is_read == 0) {
+              totalUnreadNotify.value = totalUnreadNotify.value > 0 ? totalUnreadNotify.value - 1 : 0;
+            }
+          }
+        }
+      })
       await getListNotify();
     });
 
@@ -326,6 +365,7 @@ export default defineComponent({
       countLoadMore,
       firstPage,
       disabledLoadMore,
+      deleteNotify,
     };
   },
 });

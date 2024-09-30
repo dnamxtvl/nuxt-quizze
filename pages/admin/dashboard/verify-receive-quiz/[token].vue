@@ -74,7 +74,6 @@ import type { ErrorResponse } from "~/constants/type";
 import { CODE } from "~/constants/application";
 import type { Quizz } from "~/constants/type";
 
-
 definePageMeta({
     layout: "admin-dashboard",
 })
@@ -95,6 +94,7 @@ export default defineComponent({
     },
     setup() {
         const route = useRoute();
+        const { $bus }: any = useNuxtApp();
         const quizDetail = ref<Quizz>({
             id: '',
             title: '',
@@ -135,9 +135,13 @@ export default defineComponent({
                 },
                 (err: ErrorResponse) => {
                     ElLoading.service({ fullscreen: true }).close();
-                    ElNotification({title: "Error",message: err.error.shift(),type: "error"});
+                    ElNotification({title: "Warning", message: err.error.shift(), type: "warning"});
                     if (err.code == CODE.NOT_FOUND) {
-                        return navigateTo("/not-found");
+                        if (err.responseCode != CODE.ERROR_RECJECT_QUIZZE) {
+                            return navigateTo("/not-found");   
+                        }
+
+                        return navigateTo("/admin/dashboard/my-library/");
                     }
                 }
             )
@@ -150,7 +154,8 @@ export default defineComponent({
                 (res: any) => {
                     ElLoading.service({ fullscreen: true }).close();
                     ElNotification({title: "Success",message: "Đã chấp nhận bộ cảu hỏi!",type: "success"});
-                    return navigateTo("/admin/dashboard/my-library/" + quizDetail.value.id);
+                    $bus.$emit('clearNotify', { notifyId: route.query.notification_id as string }) // Phát sự kiện lên Global Event Bus
+                    return navigateTo("/admin/dashboard/my-library/");
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Error",message: err.error.shift(),type: "error"});
@@ -165,6 +170,7 @@ export default defineComponent({
                 (res: any) => {
                     ElLoading.service({ fullscreen: true }).close();
                     ElNotification({title: "Success",message: "Đã từ chối bộ cảu hỏi!",type: "success"});
+                    $bus.$emit('clearNotify', { notifyId: route.query.notification_id as string }) // Phát sự kiện lên Global Event Bus
                     return navigateTo("/admin/dashboard/my-library/");
                 },
                 (err: ErrorResponse) => {

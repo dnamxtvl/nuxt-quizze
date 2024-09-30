@@ -78,7 +78,8 @@ export const CODE = {
     AUTHTHENTICATE_FAIL: 401,
     ERROR_THROW: {
         ROOM_IS_RUNNING: 1001887,
-    }
+    },
+    ERROR_RECJECT_QUIZZE: 1001891,
 }
 
 export const GROUP_ROUTE = {

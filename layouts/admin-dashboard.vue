@@ -39,12 +39,21 @@
     </div>
 </template>
 <script lang="ts">
-  
-export default {
+  export default defineComponent({
     components: {
       
-    }
-}
+    },
+    setup() {
+        
+        onMounted(() => {
+        });
+
+        return {
+            
+        };
+    },
+});
 </script>
-<style scoped></style>
+<style scoped>
+</style>
   
