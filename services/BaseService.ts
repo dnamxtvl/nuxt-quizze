@@ -148,7 +148,7 @@ export default class BaseService {
         let store = useMainStore();
         const config = useRuntimeConfig();
         const instance = axios.create({
-            baseURL: 'http://192.168.0.99/api/',
+            baseURL: config.public.BACKEND_URL + 'api',
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
