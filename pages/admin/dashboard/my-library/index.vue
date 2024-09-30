@@ -173,12 +173,12 @@
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 2">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeSharedWithMe">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 3">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeCreatedByMe">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
@@ -245,6 +245,8 @@ export default defineComponent({
         const emailShare = ref<string>("");
         const validateMessageEmailBeforeShare = ref<string[]>([]);
         const defaultTypeQuiz = ref<number>(QUIZ_TYPE.ALL.id);
+        const typeSharedWithMe = ref<number>(QUIZ_TYPE.SHARE_WITH_ME.id);
+        const typeCreatedByMe = ref<number>(QUIZ_TYPE.CREATED_BY_ME.id);
 
         const getListQuizzes = async () => {
             await api.quizze.list(
@@ -486,6 +488,8 @@ export default defineComponent({
             changeTypeQuizFilter,
             currentPageShared,
             currentPageCreatedByMe,
+            typeSharedWithMe,
+            typeCreatedByMe,
         }
     }
 })
