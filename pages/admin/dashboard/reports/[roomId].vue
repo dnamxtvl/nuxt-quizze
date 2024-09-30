@@ -39,9 +39,9 @@
         </el-dialog>
          <!-- end show current question -->
         <!-- Header Section -->
-        <div class="header">
+        <div class="header" v-if="roomDetail.id">
             <div class="d-flex justify-content-start">
-                <h4 class="text-dark">{{ roomDetail.quizze.title }}</h4>
+                <h4 class="text-dark">{{ roomDetail.quizze?.title }}</h4>
                 <span v-if="roomDetail.type != homeworkType" class="fw-bold fs-4 ms-3 mt-1 text-success">{{
                     roomDetail.code }}</span>
                 <span v-if="roomDetail.type != homeworkType" @click="copyCode">
@@ -66,7 +66,7 @@
         </div>
         <!-- Game Info -->
         <div class="main-card">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center" v-if="roomDetail.id">
                 <div class="d-flex">
                     <span>{{ roomDetail.type == homeworkType ? 'Bắt đầu vào:' : 'Được tạo lúc:' }} 
                         <strong>
@@ -182,12 +182,12 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4 d-flex">
+            <div class="mt-4 d-flex" v-if="roomDetail.id">
                 <button @click="navigateTo('/admin/dashboard/activity/' + roomDetail.id)" class="btn btn-primary me-2 text-white" v-if="roomDetail.type != homeworkType && roomDetail.status != finishedStatus && roomDetail.status != cancelStatus">
                     <RiQuestionLine size="19" />
                     Bảng điều kiển
                 </button>
-                <button @click="navigateTo('/admin/dashboard/my-library/' + roomDetail.quizze?.id)" class="btn btn-outline-secondary me-2 text-dark">
+                <button v-if="roomDetail.quizze != null" @click="navigateTo('/admin/dashboard/my-library/' + roomDetail.quizze?.id)" class="btn btn-outline-secondary me-2 text-dark">
                     <RiQuestionLine size="19" />
                     Xem Quizz
                 </button>

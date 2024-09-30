@@ -47,4 +47,7 @@ export default class QuizzeService extends BaseService {
         }
         await this.post(urlDetail, {}, success, error);
     };
+    listCategory = async (success: any, error: any) => {
+        await this.get(API_CONST.CATEGORY.LIST_CATEGORY, {}, success, error);
+    };
 }

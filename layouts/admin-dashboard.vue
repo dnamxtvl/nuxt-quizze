@@ -8,7 +8,6 @@
             <div class="layout-page">
                 <!-- Navbar search -->
                 <AdminDashboardNavSearch />
-                <slot @updateSidebar="onSidebarUpdate" />
                 <!-- / Navbar search -->
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
@@ -55,5 +54,6 @@
     },
 });
 </script>
-<style scoped></style>
+<style scoped>
+</style>
   

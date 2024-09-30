@@ -16,6 +16,9 @@ const API_CONST = {
         ACCEPT_SHARE_QUIZZE: 'admin/quizzes/accept-share',
         REJECT_SHARE_QUIZZE: 'admin/quizzes/reject-share',
     },
+    CATEGORY: {
+        LIST_CATEGORY: 'admin/category/list',
+    },
     ROOM: {
         CREATE: 'admin/room/create',
         CHECK_VALID: 'admin/room/check-valid',
@@ -43,6 +46,7 @@ const API_CONST = {
     },
     NOTIFICATION: {
         LIST_NOTIFICATION: 'admin/notification/list',
+        DELETE_NOTIFICATION: 'admin/notification/delete',
     }
 };
 
