@@ -168,17 +168,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 1">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 1">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 2">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 2">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 3">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 3">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />

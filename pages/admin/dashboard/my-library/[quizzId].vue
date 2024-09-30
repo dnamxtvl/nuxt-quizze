@@ -60,7 +60,7 @@
             <div class="col-md-6">
                 <h5 class="text-primary mb-0 pt-3">{{ listQuestions.length }} câu hỏi</h5>
             </div>
-            <div class="col-md-6 d-flex justify-content-end">
+            <div class="col-md-6 d-flex justify-content-end" v-if="authId == quizDetail.user_id">
                 <button @click="handleAddQuestion" class="btn btn-primary text-white me-2 mt-2">
                     <RiAddLine size="18" class="mb-1" />
                     Thêm câu hỏi
@@ -85,10 +85,10 @@
                                 <span class="text-dark me-2 mt-2 cursor-pointer">
                                     <RiArrowDownLine size="20" class="mb-1" />
                                 </span> -->
-                                <span @click="handleEditQuestion(item)" class="text-primary text-white me-2 mt-2 cursor-pointer">
+                                <span v-if="authId == quizDetail.user_id" @click="handleEditQuestion(item)" class="text-primary text-white me-2 mt-2 cursor-pointer">
                                     <RiEditFill size="18" class="mb-1" />
                                 </span>
-                                <span @click="handleRemoveQuestion(item.id)" class="text-danger me-2 mt-2 cursor-pointer">
+                                <span v-if="authId == quizDetail.user_id" @click="handleRemoveQuestion(item.id)" class="text-danger me-2 mt-2 cursor-pointer">
                                     <RiDeleteBin2Fill size="18" class="mb-1" />
                                 </span>
                             </div>
@@ -123,6 +123,7 @@ import { useRoute } from "vue-router";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
 import { RULES_VALIDATION } from "~/constants/application";
 import { useValidator } from "#imports";
+import { useMainStore } from "~/store";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -151,6 +152,8 @@ export default defineComponent({
         RiArrowUpLine,
     },
     setup() {
+        const store = useMainStore();
+        const authId = ref<string>(store.$state.user?.id as string);
         const route = useRoute();
         const showModelEndGame = ref<boolean>(false);
         const listQuestions = ref<ItemQuestion[]>([]);
@@ -158,6 +161,7 @@ export default defineComponent({
         const quizDetail = ref<Quizz>({
             id: '',
             title: '',
+            user_id: '',
             category_id: 0,
             created_at: '',
             updated_at: ''
@@ -384,6 +388,7 @@ export default defineComponent({
             showModalDeleteQuestion,
             handleRemoveQuestion,
             removeQuestion,
+            authId,
         }
     }
 })
