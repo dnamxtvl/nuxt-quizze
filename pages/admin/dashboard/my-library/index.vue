@@ -48,6 +48,25 @@
                     </template>
                 </el-dialog>
                  <!-- end show modal warning room is running  -->
+                <!-- Show modal share quizz-->
+                <el-dialog v-model="showModalShare" :show-close="false" title="Chia sẻ bộ câu hỏi" width="500" align-center>
+                    <span>{{ messageWarningRoomRunning }}</span>
+                    <div v-if="validateMessageEmailBeforeShare.length > 0">
+                        <div class="error-validate text-danger" v-for="(error, index) in validateMessageEmailBeforeShare" :key="index">{{ error }}</div>
+                    </div>
+                    <el-form-item label="Email">
+                        <el-input v-model="emailShare" />
+                    </el-form-item>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="showModalShare = false">Hủy</el-button>
+                            <el-button type="primary" @click="shareQuiz()">
+                                Xác nhận
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
+                <!-- End show modal share-->
                 <!-- Email Sidebar -->
                 <div class="col-lg-3 app-email-sidebar border-end flex-grow-0">
                     <div class="btn-compost-wrapper d-grid">
@@ -60,25 +79,14 @@
                     <div class="email-filters py-2">
                         <!-- Email Filters: Folder -->
                         <ul class="email-filter-folders list-unstyled mb-4">
-                            <li class="active d-flex justify-content-between" data-target="inbox">
+                            <li @click="changeTypeQuizFilter(item.id)" :class='"d-flex justify-content-between cursor-pointer " + (defaultTypeQuiz == item.id ? "active" : "")' data-target="inbox" v-for="(item, index) in getGetQuizType()">
                                 <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
-                                    <i class="ti ti-mail"></i>
-                                    <span class="align-middle ms-2">Tất cả</span>
+                                    <i :class="item.icon"></i>
+                                    <span class="align-middle ms-2">{{ item.text }}</span>
                                 </a>
-                                <div class="badge bg-label-primary rounded-pill badge-center">4
+                                <div class="badge bg-label-primary rounded-pill badge-center" v-if="item.id == defaultTypeQuiz">
+                                    {{ totalPageQuizzes }}
                                 </div>
-                            </li>
-                            <li class="d-flex" data-target="sent">
-                                <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
-                                    <i class="ti ti-send ti-xs"></i>
-                                    <span class="align-middle ms-2">Được chia sẻ với tôi</span>
-                                </a>
-                            </li>
-                            <li class="d-flex" data-target="draft">
-                                <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center">
-                                    <i class="ti ti-file"></i>
-                                    <span class="align-middle ms-2">Được tạo bởi tôi</span>
-                                </a>
                             </li>
                         </ul>
                     </div>
@@ -141,13 +149,13 @@
                                                     <div class="row d-flex justify-content-between">
                                                         <div
                                                             class="title-content-list-answer mb-0 d-flex justify-content-between col-md-6">
-                                                            <p class="text-start fs-6 ms-3">nam.dovan1</p>
+                                                            <p class="text-start fs-6 ms-3">{{ item.user ? item.user.name : '' }}</p>
                                                             <p class="text-start fs-6">{{
                                                                 getRangeTimeCreateQuizz(item)
                                                                 }}</p>
                                                         </div>
                                                         <div class="col-md-6 d-flex justify-content-end pe-4">
-                                                            <button class="btn btn-link">
+                                                            <button @click="handleShowModalShare(item.id)" class="btn btn-link">
                                                                 Chia sẻ
                                                             </button>
                                                             <button class="btn btn-primary ms-3"
@@ -160,9 +168,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row pagination" v-if="listQuizzes.length > 0">
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 1">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
-                                            @current-change="handleCurrentChangeQuizze" background
+                                            @change="handleCurrentChangeQuizze" background
+                                            layout="prev, pager, next" :total="totalPageQuizzes" />
+                                    </div>
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 2">
+                                        <el-pagination class="d-flex justify-content-center" :page-size="perpage"
+                                            @change="handleCurrentChangeQuizze" background
+                                            layout="prev, pager, next" :total="totalPageQuizzes" />
+                                    </div>
+                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length >= 0 && defaultTypeQuiz == 3">
+                                        <el-pagination class="d-flex justify-content-center" :page-size="perpage"
+                                            @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
                                 </div>
@@ -182,10 +200,12 @@ import type { ErrorResponse, ItemQuizze } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
 import helperApp from "~/utils/helper";
-import { RiMore2Fill, RiDeleteBin7Fill } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine } from "@remixicon/vue";
 import { RoomType } from "~/constants/room";
 import moment from "moment";
+import { useMainStore } from '~/store';
 import { CODE, RULES_VALIDATION } from "~/constants/application";
+import { QUIZ_TYPE } from "~/constants/quiz";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -195,11 +215,15 @@ export default defineComponent({
     components: {
         RiMore2Fill,
         RiDeleteBin7Fill,
+        RiCloseCircleLine,
     },
     setup() {
+        const store = useMainStore();
         const listQuizzes = ref<Array<ItemQuizze>>([]);
         const totalPageQuizzes = ref<number>(0);
-        const currentPage = ref<number>(1);
+        const currentPageAll = ref<number>(1);
+        const currentPageShared = ref<number>(1);
+        const currentPageCreatedByMe = ref<number>(1);
         const currentQuizzId = ref<string>("");
         const showModalDelete = ref<boolean>(false);
         const showModalCreateRoom = ref<boolean>(false);
@@ -216,25 +240,37 @@ export default defineComponent({
         const defaultTime = new Date();
         const errorMessageValidate = ref<Array<string> | []>([]);
         const perpage = ref<number>(7);
+        const showModalShare = ref<boolean>(false);
+        const currentQuizIdShare = ref<string>("");
+        const emailShare = ref<string>("");
+        const validateMessageEmailBeforeShare = ref<string[]>([]);
+        const defaultTypeQuiz = ref<number>(QUIZ_TYPE.ALL.id);
 
         const getListQuizzes = async () => {
             await api.quizze.list(
-                { page: currentPage.value },
+                { page: currentPageAll.value, type: defaultTypeQuiz.value },
                 (res: any) => {
-                    ElLoading.service({ fullscreen: true }).close();
                     listQuizzes.value = res.data;
                     totalPageQuizzes.value = res.total;
                 },
                 (err: ErrorResponse) => {
-                    ElLoading.service({ fullscreen: true }).close();
-                    ElNotification({title: "Error",message: err.error.shift(),type: "error"});
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
                 }
             )
+            ElLoading.service({ fullscreen: true }).close();
+        }
+
+        const changeTypeQuizFilter = async (quizType: number) => {
+            if (defaultTypeQuiz.value != quizType) {
+                currentPageAll.value = 1;
+                defaultTypeQuiz.value = quizType;
+                await getListQuizzes();
+            }
         }
 
         const handleCurrentChangeQuizze = async (page: number) => {
-            currentPage.value = page;
-            await getListQuizzes();
+            currentPageAll.value = page;
+            await getListQuizzes();  
         }
 
         const createRoom = async () => {
@@ -347,6 +383,73 @@ export default defineComponent({
             errorMessageValidate.value = [];
         }
 
+        const handleShowModalShare = (id: string) => {
+            emailShare.value = '';
+            showModalShare.value = true;
+            currentQuizIdShare.value = id;
+        }
+
+        const shareQuiz = async () => {
+            if (!validateEmailShare()) {
+                return ;
+            }
+
+            await api.quizze.shareQuiz(
+                currentQuizIdShare.value,
+                { email: emailShare.value },
+                (res: any) => {
+                    showModalShare.value = false;
+                    ElNotification({title: "Success", message: 'Chia bạn bộ cảu hỏi thành công!', type: "success"});
+                },
+                (err: ErrorResponse) => {
+                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                }
+            )
+        }
+
+        const validateEmailShare = () => {
+            let isPassValidate: boolean = true;
+            let errorMessagesValidate: string[] = [];
+            const validator = useValidator();
+            let requiredEmail = validator.required(emailShare.value, "Email");
+            let isLengthEmail = validator.isLength(
+                emailShare.value,
+                "Email",
+                RULES_VALIDATION.EMAIL_LENGTH.MIN,
+                RULES_VALIDATION.EMAIL_LENGTH.MAX,
+                true
+            );
+            let isValidEmail = validator.isInvalidEmail(emailShare.value, false);
+        
+            if (requiredEmail != true) {
+                errorMessagesValidate.push(requiredEmail);
+                isPassValidate = false;
+            }
+
+            if (isLengthEmail != true) {
+                errorMessagesValidate.push(isLengthEmail);
+                isPassValidate = false;
+            }
+
+            if (isValidEmail != true) {
+                errorMessagesValidate.push('Email không hợp lệ!');
+                isPassValidate = false;
+            }
+
+            if (emailShare.value == store.$state.user?.email) {
+                errorMessagesValidate.push('Không thể chia sẻ cho chính mình!');
+                isPassValidate = false;
+            }
+
+            validateMessageEmailBeforeShare.value = errorMessagesValidate;
+
+            return isPassValidate
+        }
+
+        const getGetQuizType = () => {
+            return QUIZ_TYPE;
+        }
+
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
             await getListQuizzes();
@@ -355,7 +458,7 @@ export default defineComponent({
         return {
             listQuizzes,
             totalPageQuizzes,
-            currentPage,
+            currentPageAll,
             handleCurrentChangeQuizze,
             createRoom,
             getRangeTimeCreateQuizz,
@@ -373,6 +476,16 @@ export default defineComponent({
             showModalWarningRoomRunning,
             messageWarningRoomRunning,
             perpage,
+            handleShowModalShare,
+            showModalShare,
+            emailShare,
+            shareQuiz,
+            validateMessageEmailBeforeShare,
+            getGetQuizType,
+            defaultTypeQuiz,
+            changeTypeQuizFilter,
+            currentPageShared,
+            currentPageCreatedByMe,
         }
     }
 })

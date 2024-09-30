@@ -25,13 +25,14 @@
                                 placeholder="Câu hỏi tin học">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Lĩnh vực <span
+                            <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Chủ đề <span
                                     class="text-danger">*</span></label>
                             <select v-model="categoryId" type="text" class="form-control col-md-6"
                                 placeholder="Câu hỏi tin học">
-                                <option value="">Chọn lĩnh vực</option>
-                                <option value="1">Tin học</option>
-                                <option value="2">Giáo dục</option>
+                                <option value="">Chọn chủ đề</option>
+                                <option :value="item.id" v-if="listCategory.length > 0" v-for="(item,index) in listCategory" :key="index">
+                                    {{ item.name }}
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -136,6 +137,12 @@ interface ItemQuestion {
     answers: ItemAnswer[]
 }
 
+interface Category {
+    id: number;
+    name: string,
+    created_at: string
+}
+
 export default defineComponent({
     components: {
         RiAddCircleFill,
@@ -154,6 +161,7 @@ export default defineComponent({
         const errorMessagesPasteListQuestion = ref<Array<string>>([]);
         const contentOfFile = ref<Array<ItemQuestion>>([]);
         const isValidQuestions = ref<boolean>(false);
+        const listCategory = ref<Array<Category>>([]);
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -174,6 +182,14 @@ export default defineComponent({
                 submitQuestions(questionArray.value);
             }
             
+        }
+
+        const getCatogory = async () => {
+            await api.quizze.listCategory((res: any) => {
+                listCategory.value = res;
+            }, (err: ErrorResponse) => {
+                ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+            })
         }
 
         const submitQuestions = async (listQuestion: ItemQuestion[]) => {
@@ -393,6 +409,10 @@ export default defineComponent({
             return isPassValidateFile;
         }
 
+        onMounted(async () => {
+            await getCatogory();
+        })
+
         return {
             activeName,
             handleClick,
@@ -406,6 +426,7 @@ export default defineComponent({
             onFileChange,
             errorMessagesUpload,
             errorMessagesPasteListQuestion,
+            listCategory,
         }
     }
 })

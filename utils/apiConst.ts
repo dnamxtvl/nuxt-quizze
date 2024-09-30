@@ -11,6 +11,13 @@ const API_CONST = {
         UPDATE_QUESTION: 'admin/quizzes/update-question',
         CREATE_QUESTION: 'admin/quizzes/create-question',
         DELETE_QUESTION: 'admin/quizzes/delete-question',
+        SHARE_QUIZZE: 'admin/quizzes/share',
+        DETAIL_SHARE_QUIZZE: 'admin/quizzes/detail-share',
+        ACCEPT_SHARE_QUIZZE: 'admin/quizzes/accept-share',
+        REJECT_SHARE_QUIZZE: 'admin/quizzes/reject-share',
+    },
+    CATEGORY: {
+        LIST_CATEGORY: 'admin/category/list',
     },
     ROOM: {
         CREATE: 'admin/room/create',
@@ -36,6 +43,10 @@ const API_CONST = {
         HOMEWORK: '/user/join/homework',
         REPORT_DETAIL: '/admin/dashboard/reports',
         DETAIL_QUIZ: '/admin/dashboard/my-library',
+    },
+    NOTIFICATION: {
+        LIST_NOTIFICATION: 'admin/notification/list',
+        DELETE_NOTIFICATION: 'admin/notification/delete',
     }
 };
 

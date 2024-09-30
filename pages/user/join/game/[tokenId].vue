@@ -6,8 +6,8 @@
                 </p>
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
-            <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center mt-4" style="flex:1">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer"
+            <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center me-0 mt-4" style="flex:1">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer pe-0"
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
                         :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)">
@@ -211,11 +211,6 @@ export default defineComponent({
                     if (res.room.status == RoomStatus.HAPPING) {
                         timeReply.value = res.time_remaining;
                         calculateTimeReply();
-                        if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-                            setTimeout(async () => {
-                                await getListQuestion();
-                            }, res.time_remaining * 1000);
-                        }
                     }
                     if (res.room.status == RoomStatus.PREPARE_FINISH) {
                         showQuestion.value = false;
@@ -297,9 +292,16 @@ export default defineComponent({
             }
         }
         
-        watch(timeReply, (newValue, oldValue) => {
+        watch(timeReply, async (newValue, oldValue) => {
             if (oldValue == newValue + 1 && newValue == 0 &&
                 (currentRoomStatus.value == RoomStatus.HAPPING || currentRoomStatus.value == RoomStatus.PENDING)) {
+                    console.log('currentQuestionIndex' + currentQuestionIndex.value);
+                if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+                    await getListQuestion();
+                    showQuestion.value = false;
+                    showResult.value = true;
+                }
+
                 if (currentScoreAnswer.value != null) {
                     if (currentScoreAnswer.value > 0) {
                         ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
@@ -328,13 +330,6 @@ export default defineComponent({
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
-                    if (listQuestion.value.length == 1) {
-                        setTimeout(async () => {
-                            if (isRoomRunning.value) {
-                                await getListQuestion();
-                            }
-                        }, RoomSetting.TIME_REPLY * 1000);
-                    }
                     ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
                 })
                 .listen('NextQuestionEvent', (e: any) => {
@@ -344,13 +339,6 @@ export default defineComponent({
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
-                    if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-                        setTimeout(async () => {
-                            if (isRoomRunning.value) {
-                                await getListQuestion();
-                            }
-                        }, RoomSetting.TIME_REPLY * 1000);
-                    }
                 }).listen('AdminEndgameEvent', (e: any) => {
                     if (currentRoomStatus.value == RoomStatus.PREPARE) {
                         ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
