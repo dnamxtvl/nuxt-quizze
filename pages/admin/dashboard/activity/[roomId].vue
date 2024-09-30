@@ -70,7 +70,7 @@
                                 <tbody>
                                     <tr v-for="(item, index) in listGamerResult" :key="index">
                                         <th scope="row" class="text-white">{{ index + 1 }}</th>
-                                        <td class="text-white">{{ item.name }}</td>
+                                        <td class="text-white">{{ item.name ?? 'Sóc ẩn danh' }}</td>
                                         <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(item) }}</td>
                                         <td class="text-white text-center">
