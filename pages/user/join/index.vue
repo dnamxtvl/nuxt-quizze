@@ -27,6 +27,7 @@ import type { ErrorResponse } from "~/constants/type";
 import { useMainStore } from "~/store";
 import CookieManager from "~/utils/cookies";
 import { JWT_KEY_ACEESS_TOKEN_NAME } from "~/constants/application";
+import { useRoute } from "vue-router";
 
 definePageMeta({
   layout: 'user-join'
@@ -34,6 +35,7 @@ definePageMeta({
 
 export default defineComponent({
   setup() {
+    const route = useRoute();
     const code = ref<number | ''>('');
     const store = useMainStore();
 
@@ -47,6 +49,10 @@ export default defineComponent({
             return;
         }
 
+        await verifyCodeGamer();
+    }
+
+    const verifyCodeGamer = async () => {
         await api.room.verifyCode(
             parseInt(code.value?.toString()),
             (res: any) => {
@@ -63,12 +69,24 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      
+        if (route.query.gc) {
+            code.value = route.query.gc as number;
+            const validator = useValidator();
+            if (!validator.isValidCode(code.value?.toString())) {
+                ElNotification({title: "Error", message: 'Code phải gồm 6 chữ số!', type: "error"});
+                ElLoading.service({ fullscreen: true }).close();
+                return;
+            }
+
+            ElLoading.service({ fullscreen: true });
+            await verifyCodeGamer();
+        }
     });
 
     return {
         code,
         verifyCode,
+        route,
     }
   }
 })
