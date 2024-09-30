@@ -1,16 +1,21 @@
 <template>
     <div class="row position-relative body-admin-game w-full g-0">
-        <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center"
+        <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center ms-0 me-0"
             v-if="showPrepare">
             <div
-                class="col-md-4 join-code header row d-flex justify-content-center p-4 gap-4 bg-ds-dark-500-900 rounded">
-                <div class="row join-code-body rounded">
-                    <div class="col-xl-2 col-lg-3 col-md-4 text-white text-center mt-2">Nhập mã tham gia</div>
-                    <div class="col-xl-8 col-lg-6 col-md-6 text-center">
-                        <h1 class="text-white random-code">{{ code }}</h1>
+                class="col-xxl-4 col-xl-6 col-lg-8 col-md-9 join-code header row d-flex justify-content-center p-4 gap-4 bg-ds-dark-500-900 rounded ms-0 me-0">
+                <div class="row d-flex justify-content-center join-code-body rounded">
+                    <div class="col-xxl-8 col-xl-8 col-lg-7 col-md-6 col-12 mt-4">
+                        <div class="col-xxl-5 col-lg-9 col-md-6 text-white text-center mt-2">Nhập mã tham gia</div>
+                        <div class="col-xxl-5 col-lg-9 col-md-6 text-center">
+                            <h1 class="text-white random-code">{{ code }}</h1>
+                        </div>
                     </div>
-                    <div class="col-xl-2 col-md-2 icon copy text-center mt-2">
+                    <div class="col-xxl-1 col-md-2 icon copy text-center mt-5 pe-4">
                         <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
+                    </div>
+                    <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-6 col-12 text-center">
+                        <img :src="qrImage" alt="qrCode" class="w-30 qr-code-join-room mt-4">
                     </div>
                 </div>
                 <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
@@ -38,13 +43,15 @@
         </div>
         <div class="w-full h-80-percent d-flex flex-column" v-if="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1;">
-                <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}. {{ currentQuestion.title }}</p>
+                <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id)
+                    + 1 }}. {{ currentQuestion.title }}</p>
                 <h3 class="text-warning text-center fs-1">{{remainingTime }}</h3>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-2" style="flex:1;">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0" v-for="(item, index) in currentQuestion.answers"
-                    :key="index">
-                    <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0"
+                    v-for="(item, index) in currentQuestion.answers" :key="index">
+                    <div
+                        class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative">
                         <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
                             1}}</span>
                         <p class="text-white lh-base fs-2 pt-4 text-center">{{ item.answer }}</p>
@@ -74,9 +81,12 @@
                                         <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
                                         <td class="text-white">{{ countQuestionTrue(item) }}</td>
                                         <td class="text-white text-center">
-                                            <span :class="'badge rounded-pill width-2 ms-1 ' + getResultQuestionColor(item.gamer_answers, question.id).class" v-for="(question, key) in listQuestion" :key="key">
+                                            <span
+                                                :class="'badge rounded-pill width-2 ms-1 ' + getResultQuestionColor(item.gamer_answers, question.id).class"
+                                                v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
-                                                <p>{{ getResultQuestionColor(item.gamer_answers, question.id).score }}</p>
+                                                <p>{{ getResultQuestionColor(item.gamer_answers, question.id).score }}
+                                                </p>
                                             </span>
                                         </td>
                                     </tr>
@@ -95,7 +105,7 @@
                                         </hr>
                                         <div class="question-answer-review px-4 pt-2 mb-2">
                                             <div class="form-check" v-for="(answer, index) in item.answers">
-                                                <RiCheckFill :color="answer.is_correct ? 'green' : 'red'"/>
+                                                <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
                                                 <label class="form-check-label text-white ms-2" for="flexCheckDefault">
                                                     {{ answer.answer }}
                                                 </label>
@@ -123,11 +133,14 @@
                     </span>
                     <div class="divider hidden sm:block"></div>
                     <div>
-                        <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{ (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" + listQuestion.length }}
+                        <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{
+                            (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" +
+                            listQuestion.length }}
                         </button>
                     </div>
                     <div>
-                        <button @click="nextQuestion(currentQuestion.id)"  v-if="showButtonNext" class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
+                        <button @click="nextQuestion(currentQuestion.id)" v-if="showButtonNext"
+                            class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
                             Tiếp theo
                         </button>
                     </div>
@@ -156,6 +169,7 @@ import helperApp from "~/utils/helper";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 import type Echo from "laravel-echo";
+import QRCode from 'qrcode';
 
 definePageMeta({
     layout: "admin-game",
@@ -167,6 +181,7 @@ export default defineComponent({
         RiCheckFill,
     },
     setup() {
+        const config = useRuntimeConfig();
         const route = useRoute();
         const code = ref<string>('');
         const showPrepare = ref<boolean>(true);
@@ -199,6 +214,7 @@ export default defineComponent({
         ]);
         const remainingTime = ref<number>(0);
         const remainingTimeReload = ref<number>(0);
+        const qrImage = ref<string>('');
         let intervalId: any;
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -215,6 +231,7 @@ export default defineComponent({
                     listUserJoined.value = res.room.gamers;
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
+                    console.log(res);
                     if (res.room.status == RoomStatus.HAPPING) {
                         remainingTimeReload.value = res.time_remaining;
                         remainingTime.value = res.time_remaining;
@@ -367,12 +384,21 @@ export default defineComponent({
             ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
         };
 
+        const generateQR = async (text: string) => {
+            try {
+                qrImage.value = await QRCode.toDataURL(text);
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
         onMounted(async () => {
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true });
             // @ts-ignore
             const { $echo }: Echo = useNuxtApp();
             await checkValidRoom();
+            await generateQR(config.public.FRONTEND_URL + 'user/join?gc=' + code.value);
             setRoomStatus();
             $echo.private('user.join-room.' + route.params.roomId.toString())
                 .listen('UserJoinRoomEvent', (e: {gamers: GamerInfo[]}) => {
@@ -404,6 +430,7 @@ export default defineComponent({
             getResultQuestionColor,
             remainingTime,
             copyCode,
+            qrImage,
         }
     }
 })
