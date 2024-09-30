@@ -79,6 +79,7 @@ export const CODE = {
     ERROR_THROW: {
         ROOM_IS_RUNNING: 1001887,
     },
+    ERROR_ROOM_FINISHED: 1001886,
     ERROR_RECJECT_QUIZZE: 1001891,
 }
 
