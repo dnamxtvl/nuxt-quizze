@@ -76,6 +76,7 @@ export interface GamerToken {
 export interface Quizz {
     id: string;
     title: string;
+    user_id?: string;
     category_id: number;
     created_at: string
     updated_at: string

@@ -224,7 +224,7 @@ export default defineComponent({
             }
 
             if (!categoryId.value) {
-                errorMessagesValidateFail.push("Vui lòng chọn lĩnh vực!");
+                errorMessagesValidateFail.push("Vui lòng chọn chủ đề!");
                 isPassAllValidate = false;
             }
 
@@ -383,7 +383,7 @@ export default defineComponent({
             }
 
             if (!categoryId.value) {
-                errorMessagesValidate.push("Vui lòng chọn lĩnh vực!");
+                errorMessagesValidate.push("Vui lòng chọn chủ đề!");
                 isPassValidateFile = false;
             }
 
