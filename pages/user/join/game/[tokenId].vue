@@ -125,6 +125,7 @@ import type { TabsPaneContext } from 'element-plus';
 import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
 import type { GamerAnswer } from "~/constants/type";
 import helperApp from "~/utils/helper";
+import { CODE } from "~/constants/application";
 
 definePageMeta({
   layout: 'user-game'
@@ -229,6 +230,9 @@ export default defineComponent({
                     if (err.code === HttpStatusCode.NotFound) {
                         currentRoomStatus.value = -1;
                         return navigateTo("/not-found");
+                    }
+                    if (err.responseCode == CODE.ERROR_ROOM_FINISHED) {
+                        return navigateTo("/user/join");
                     }
                 }
             )
