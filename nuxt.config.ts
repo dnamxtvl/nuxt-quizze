@@ -21,6 +21,7 @@ export default defineNuxtConfig({
       BACKEND_URL: process.env.BACKEND_URl,
       REVERB_KEY: process.env.REVERB_KEY,
       BACKEND_HOST: process.env.BACKEND_HOST,
+      FRONTEND_URL: process.env.FRONTEND_URL,
     }
   },
 

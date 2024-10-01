@@ -1,6 +1,7 @@
 <template>
-    <div class="flex flex-col w-full h-max justify-start items-center animated zoomIn anim-300-duration body-user-join-page">
-        <div class="relative flex flex-col justify-start items-center">
+    <div
+        class="flex flex-col w-full h-max justify-start items-center animated zoomIn anim-300-duration body-user-join-page">
+        <div v-if="!scanningQR" class="relative flex flex-col justify-start items-center">
             <div class="flex flex-col items-center mt-24 d-flex justify-content-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="400" height="180" viewBox="0 0 400 180" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -9,11 +10,27 @@
                 </svg>
             </div>
             <div class="row form-submit-join-code mt-24 d-flex justify-content-center ms-2 me-2">
-                <form class="flex flex-col items-center mt-8 col-xl-3 col-lg-6 col-md-9 col-12 position-relative" @submit="verifyCode">
-                    <input type="number" v-model="code" class="form-control w-1/2 input-text-dress-code-join" placeholder="Enter your code" />
-                    <button type="submit" class="btn btn-primary mt-4 font-500 position-absolute me-4 mb-2 right-0 button-join-game">Join</button>
+                <form class="row flex flex-col items-center mt-8 col-xl-3 col-lg-6 col-md-9 col-12"
+                    @submit="verifyCode">
+                    <div class="col-11 position-relative">
+                        <input type="number" v-model="code" class="form-control w-1/2 input-text-dress-code-join"
+                            placeholder="Enter your code" />
+                        <button type="submit"
+                            class="btn btn-primary mt-4 font-500 position-absolute me-4 mb-2 right-0 button-join-game">Join</button>
+                    </div>
+                    <div class="col-1 mt-3 ps-0 cursor-pointer" @click="handleStartScan">
+                        <RiQrCodeLine size="40" />
+                    </div>
                 </form>
             </div>
+        </div>
+        <div class="row form-submit-join-code d-flex justify-content-center position-relative">
+            <span v-if="scanningQR" class="icon-stop-scan text-danger position-absolute top-0 cursor-pointer" @click="handleStopScan">
+                <RiCloseFill size="35" />
+            </span>
+            <video id="video-scanner">
+            </video>
+            <div id="qr-overlay" class="qr-overlay"></div>
         </div>
     </div>
 </template>
@@ -28,49 +45,29 @@ import { useMainStore } from "~/store";
 import CookieManager from "~/utils/cookies";
 import { JWT_KEY_ACEESS_TOKEN_NAME } from "~/constants/application";
 import { useRoute } from "vue-router";
+import { RiCloseFill, RiQrCodeLine } from "@remixicon/vue";
+import QrScanner from "qr-scanner";
 
 definePageMeta({
   layout: 'user-join'
 })
 
 export default defineComponent({
-  setup() {
-    const route = useRoute();
-    const code = ref<number | ''>('');
-    const store = useMainStore();
-
-    const verifyCode = async (e: SubmitEvent) => {
-        e.preventDefault();
-        ElLoading.service({ fullscreen: true });
-        const validator = useValidator();
-        if (!validator.isValidCode(code.value?.toString())) {
-            ElNotification({title: "Error", message: 'Code phải gồm 6 chữ số!', type: "error"});
-            ElLoading.service({ fullscreen: true }).close();
-            return;
-        }
-
-        await verifyCodeGamer();
-    }
-
-    const verifyCodeGamer = async () => {
-        await api.room.verifyCode(
-            parseInt(code.value?.toString()),
-            (res: any) => {
-                ElLoading.service({ fullscreen: true }).close();
-                store.saveGamerId(store.$state, res.gamer_id);
-                CookieManager.setCookie('gamerId' + JWT_KEY_ACEESS_TOKEN_NAME, res.gamer_id);
-                return navigateTo("/user/join/pre-game/" + res.token);
-            },
-            (err: ErrorResponse) => {
-                ElLoading.service({ fullscreen: true }).close();
-                ElNotification({title: "Error" ,message: err.error.shift(), type: "error"});
-            }
-        )
-    }
-
-    onMounted(async () => {
-        if (route.query.gc) {
-            code.value = route.query.gc as number;
+    components: {
+        RiQrCodeLine,
+        RiCloseFill,
+    },
+    setup() {
+        const route = useRoute();
+        const code = ref<number | ''>('');
+        const store = useMainStore();
+        const scanningQR = ref<boolean>(false);
+        const errorMessageDecode = ref<string>('');
+        const qrScannerDevice = ref<QrScanner>();
+        const redirectLink = ref<string>('');
+        const verifyCode = async (e: SubmitEvent) => {
+            e.preventDefault();
+            ElLoading.service({ fullscreen: true });
             const validator = useValidator();
             if (!validator.isValidCode(code.value?.toString())) {
                 ElNotification({title: "Error", message: 'Code phải gồm 6 chữ số!', type: "error"});
@@ -78,17 +75,93 @@ export default defineComponent({
                 return;
             }
 
-            ElLoading.service({ fullscreen: true });
             await verifyCodeGamer();
         }
-    });
 
-    return {
-        code,
-        verifyCode,
-        route,
+        const verifyCodeGamer = async () => {
+            await api.room.verifyCode(
+                parseInt(code.value?.toString()),
+                (res: any) => {
+                    ElLoading.service({ fullscreen: true }).close();
+                    store.saveGamerId(store.$state, res.gamer_id);
+                    CookieManager.setCookie('gamerId' + JWT_KEY_ACEESS_TOKEN_NAME, res.gamer_id);
+                    return navigateTo("/user/join/pre-game/" + res.token);
+                },
+                (err: ErrorResponse) => {
+                    ElLoading.service({ fullscreen: true }).close();
+                    ElNotification({title: "Error" ,message: err.error.shift(), type: "error"});
+                }
+            )
+        }
+
+        watch(redirectLink, (newValue, oldValue) => {
+            if (newValue.length > 0 && oldValue.length == 0) {
+                window.location.href = newValue;
+            }
+        })
+
+        const handleStartScan = async () => {
+            const videoElem = document.getElementById('video-scanner') as HTMLVideoElement;
+            const qrScanner = new QrScanner(
+                videoElem,
+                result => redirectLink.value = result.data,
+                {
+                    onDecodeError: (error) => {
+                        if (error) {
+                            errorMessageDecode.value = error as string;
+                        }
+                    },
+                    maxScansPerSecond: 10,
+                    returnDetailedScanResult: true,
+                    highlightScanRegion: true,
+                    highlightCodeOutline: true,
+                }
+            );
+            const hasCamera = await QrScanner.hasCamera();
+            if (!hasCamera) {
+                ElNotification({title: "Error", message: 'Không tìm thấy camera', type: "error"});
+                return;
+            }
+            qrScanner.start().then(
+                () => {
+                    scanningQR.value = true;
+                    qrScannerDevice.value = qrScanner;
+                },
+                (error) => {
+                    console.error('Error scanning QR code:', error);
+                }
+            );
+        }
+
+        const handleStopScan = () => {
+            qrScannerDevice.value?.destroy();
+            scanningQR.value = false;
+        }
+
+        onMounted(async () => {
+            if (route.query.gc) {
+                code.value = route.query.gc as number;
+                const validator = useValidator();
+                if (!validator.isValidCode(code.value?.toString())) {
+                    ElNotification({title: "Error", message: 'Code phải gồm 6 chữ số!', type: "error"});
+                    ElLoading.service({ fullscreen: true }).close();
+                    return;
+                }
+
+                ElLoading.service({ fullscreen: true });
+                await verifyCodeGamer();
+            }
+        });
+
+        return {
+            code,
+            verifyCode,
+            route,
+            handleStartScan,
+            scanningQR,
+            handleStopScan,
+        }
     }
-  }
 })
 </script>
 <style scoped>
@@ -98,5 +171,8 @@ export default defineComponent({
 }
 .body-user-join-page {
     min-height: 670px;
+}
+.icon-stop-scan {
+    z-index: 1000;
 }
 </style>
