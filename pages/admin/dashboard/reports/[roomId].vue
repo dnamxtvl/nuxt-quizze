@@ -48,7 +48,7 @@
                     <RiFileCopyLine class="ms-3 cursor-pointer" />
                 </span>
             </div>
-            <div class="mb-auto">
+            <!-- <div class="mb-auto">
                 <button v-if="roomDetail.status == defaultStatus" class="btn btn-outline-secondary text-dark">Chỉnh sửa
                     câu hỏi</button>
                 <button v-if="roomDetail.status == defaultStatus" class="btn btn-outline-secondary text-dark">Chỉnh sửa
@@ -62,7 +62,7 @@
                     <RiDeleteBin2Fill size="16" class="mb-1"/>
                     Xóa
                 </button>
-            </div>
+            </div> -->
         </div>
         <!-- Game Info -->
         <div class="main-card">
@@ -70,7 +70,7 @@
                 <div class="d-flex">
                     <span>{{ roomDetail.type == homeworkType ? 'Bắt đầu vào:' : 'Được tạo lúc:' }} 
                         <strong>
-                            {{ formatDate(roomDetail.started_at) }}
+                            {{ roomDetail.type == homeworkType ? formatDate(roomDetail.started_at) : formatDate(roomDetail.created_at) }}
                         </strong>
                     </span>
                     <span :class="'badge ms-1 ' + getStatusText(roomDetail.status)?.className">{{
