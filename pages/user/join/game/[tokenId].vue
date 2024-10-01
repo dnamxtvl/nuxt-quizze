@@ -40,8 +40,8 @@
             </div>
         </div>
         <div class="table-preview-result" v-if="showResult">
-            <div class="row d-flex justify-content-center">
-                <div class="col-md-10">
+            <div class="row d-flex justify-content-center ms-0 me-0">
+                <div class="col-md-10 ms-0 me-0">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Tổng Quan" name="first">
                             <table class="table">
@@ -73,7 +73,7 @@
                             </table>
                         </el-tab-pane>
                         <el-tab-pane label="Câu hỏi" name="second">
-                            <div class="row pt-4 rounded rounded-5 body-answer-review">
+                            <div class="row pt-4 rounded rounded-5 body-answer-review ms-0 me-0">
                                 <div class="col-lg-12 px-4 mb-2">
                                     <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
