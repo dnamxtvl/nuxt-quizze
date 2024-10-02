@@ -33,9 +33,9 @@
                 <div class="row d-flex justify-content-between p-4 pt-0">
                     <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
                         <button class="btn btn-outline-secondary text-white w-full text-center">
-                            <span class="text-primary fs-5">
+                            <span class="text-primary text-break fs-5">
                                 {{ item.name ?? 'Sóc ẩn danh'}}
-                            </span><span class="ms-2"> đã join</span>
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -228,10 +228,11 @@ export default defineComponent({
                 roomId,
                 (res: any) => {
                     code.value = res.room.code;
-                    listUserJoined.value = res.room.gamers;
+                    if (res.room.gamers.length > 0) {
+                        listUserJoined.value = res.room.gamers.filter(item => item.name != null)
+                    }
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
-                    console.log(res);
                     if (res.room.status == RoomStatus.HAPPING) {
                         remainingTimeReload.value = res.time_remaining;
                         remainingTime.value = res.time_remaining;
@@ -401,8 +402,9 @@ export default defineComponent({
             await generateQR(config.public.FRONTEND_URL + 'user/join?gc=' + code.value);
             setRoomStatus();
             $echo.private('user.join-room.' + route.params.roomId.toString())
-                .listen('UserJoinRoomEvent', (e: {gamers: GamerInfo[]}) => {
-                    listUserJoined.value = e.gamers;
+                .listen('UserJoinRoomEvent', (e: {gamer: GamerInfo}) => {
+                console.log(e);
+                    listUserJoined.value.push(e.gamer);
                 });
         });
 
