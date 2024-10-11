@@ -412,8 +412,7 @@ export default defineComponent({
                 let answerCorrect = currentQuestion.value.answers.find((item: Answer) => item.is_correct == true);
                 if (answerCorrect) {
                     showModalCongratulations.value = true;
-                    let answerCorrectIndex = currentQuestion.value.answers.findIndex((item: Answer) => item.id == answerCorrect.id) + 1;
-                    currentCorrectAnswer.value = answerCorrectIndex + '.' + answerCorrect?.answer;
+                    currentCorrectAnswer.value = answerCorrect?.answer;
                 }
             }
         }
