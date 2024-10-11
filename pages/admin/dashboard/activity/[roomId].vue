@@ -1,5 +1,13 @@
 <template>
     <div class="row position-relative body-admin-game w-full g-0">
+        <el-dialog v-model="showModalCongratulations" class="fw-bold" title="Xin chúc mừng!" width="500" :show-close="false" center>
+            <div class="row d-flex justify-content-center text-success fw-bold">
+                <RiCheckFill size="60"/>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <h5 class="text-center">{{ currentCorrectAnswer }}</h5>
+            </div>
+        </el-dialog>
         <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center ms-0 me-0"
             v-if="showPrepare">
             <div
@@ -215,6 +223,8 @@ export default defineComponent({
         const remainingTime = ref<number>(0);
         const remainingTimeReload = ref<number>(0);
         const qrImage = ref<string>('');
+        const showModalCongratulations = ref<boolean>(false);
+        const currentCorrectAnswer = ref<string>('');
         let intervalId: any;
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -258,6 +268,7 @@ export default defineComponent({
 
         const startGame = async () => {
             ElLoading.service({ fullscreen: true });
+            showModalCongratulations.value = false;
             await api.room.startGame(
                 route.params.roomId.toString(),
                 (res: any) => {
@@ -290,6 +301,7 @@ export default defineComponent({
                 return ;
             }
             ElLoading.service({ fullscreen: true });
+            showModalCongratulations.value = false;
             await api.room.nextQuestion(
                 {
                     room_id: route.params.roomId.toString(),
@@ -311,6 +323,7 @@ export default defineComponent({
                             showButtonNext.value = true;
                             showResult.value = true;
                             showQuestion.value = false;
+                            getCurrentCorrectAnswerText();
                         }, RoomSetting.TIME_REPLY * 1000);
                     }
                 },
@@ -332,6 +345,7 @@ export default defineComponent({
                 showButtonNext.value = true;
                 showResult.value = true;
                 showQuestion.value = false;
+                getCurrentCorrectAnswerText();
             }, delay);
         }
 
@@ -393,6 +407,17 @@ export default defineComponent({
             }
         }
 
+        const getCurrentCorrectAnswerText = () => {
+            if (currentQuestion.value.id != '') {
+                let answerCorrect = currentQuestion.value.answers.find((item: Answer) => item.is_correct == true);
+                if (answerCorrect) {
+                    showModalCongratulations.value = true;
+                    let answerCorrectIndex = currentQuestion.value.answers.findIndex((item: Answer) => item.id == answerCorrect.id) + 1;
+                    currentCorrectAnswer.value = answerCorrectIndex + '.' + answerCorrect?.answer;
+                }
+            }
+        }
+
         onMounted(async () => {
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true });
@@ -410,6 +435,7 @@ export default defineComponent({
 
         onBeforeUnmount(() => {
             clearInterval(intervalId);
+            showModalCongratulations.value = false;
         });
 
         return {
@@ -433,6 +459,8 @@ export default defineComponent({
             remainingTime,
             copyCode,
             qrImage,
+            showModalCongratulations,
+            currentCorrectAnswer,
         }
     }
 })
