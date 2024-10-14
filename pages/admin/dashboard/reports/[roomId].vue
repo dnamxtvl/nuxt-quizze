@@ -410,7 +410,9 @@ export default defineComponent({
                 (res: any) => {
                     roomDetail.value = res.room;
                     listQuestionRooms.value = res.questions;
-                    listGamers.value = res.gamers;
+                    if (res.gamers.length > 0) {
+                        listGamers.value = res.gamers.filter(item => item.name != null);
+                    }
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Error",message: err.error.shift(),type: "error"});

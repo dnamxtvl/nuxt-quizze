@@ -251,7 +251,9 @@ export default defineComponent({
                             countReload.value ++;
                         }
                     }
-                    listGamerResult.value = res.gamers;
+                    if (res.gamers.length > 0) {
+                        listGamerResult.value = res.gamers.filter(item => item.name != null);
+                    }
                     currentQuestion.value = res.room.current_question_id ?
                         res.questions.find((item: ItemQuestion) => item.id == res.room.current_question_id) : res.questions[0];
                     ElLoading.service({ fullscreen: true }).close();

@@ -21,9 +21,6 @@
                 <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
                     <div class="ring d-flex">
                         <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
-                            <div class="coccoc-alo-ph-circle"></div>
-                            <div class="coccoc-alo-ph-circle-fill"></div>
-                            <div class="coccoc-alo-ph-img-circle"></div>
                         </div>
                         <span class="fs-4 text-white text-center user-name-text me-3 text-primary">
                             {{ gamerInfo?.name }}
@@ -269,6 +266,10 @@ export default defineComponent({
         let intervalId: any;
 
         const calculateTimeReply = () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+
             intervalId = setInterval(() => {
                 if (timeReply.value > 0) {
                     timeReply.value = timeReply.value - 1;

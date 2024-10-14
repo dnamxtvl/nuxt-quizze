@@ -8,7 +8,7 @@ export enum RoomStatus {
 }
 
 export enum RoomSetting {
-    TIME_REPLY = 30,
+    TIME_REPLY = 15,
     TIME_DISPLAY_TOAST = 5000,
     PER_PAGE = 12,
 }
