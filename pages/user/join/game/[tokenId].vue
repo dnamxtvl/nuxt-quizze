@@ -257,7 +257,7 @@ export default defineComponent({
                     currentScoreAnswer.value = res.score;
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Oh no!", message: err.error.shift(), type: "error", duration: RoomSetting.TIME_DISPLAY_TOAST});
+                    ElNotification({title: "Oh no!", message: err.error.shift(), type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 }
             )
             isSubmited.value = true;
