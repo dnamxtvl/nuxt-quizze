@@ -2,6 +2,48 @@
     <div class="row ms-4 me-4">
         <div class="app-email card h-100-vh">
             <div class="row g-0 h-100-vh">
+                <el-dialog v-model="showModalCreateOrUpdateEditQuestion" close-icon="false"
+                    :close-on-click-modal="false" :title="isUpdate ? 'Cập nhật' : 'Tạo mới'" width="500" align-center>
+                    <div v-for="(error, index) in errorMessageUpdateQuestions" :key="index" class="text-danger"
+                        v-show="errorMessageUpdateQuestions.length > 0">
+                        {{ error }}
+                    </div>
+                    <label for="inputPassword6" class="col-form-label fw-bold">Câu hỏi</label>
+                    <input type="text" class="form-control" v-model="currentQuestion.title" />
+                    <div class="row mt-3">
+                        <span class="text-primary">
+                            <label for="inputPassword6" class="col-form-label fw-bold">Câu trả lời</label>
+                            
+                            <span v-if="currentQuestion.answers.length < maxAnswerOFQuestion" class="cursor-pointer"
+                                @click="addAnswerOfQuestion">
+                                <RiAddCircleLine size="18" class="mb-1 ms-1" />
+                            </span>
+                        </span>
+                        <div v-for="(checkbox, index) in currentQuestion.answers" :key="index"
+                            class="d-flex form-check mb-3 ms-2 pe-4">
+                            <input class="form-check-input mt-2" type="checkbox" :id="'checkbox-' + index"
+                                v-model="checkbox.is_correct">
+                            <input class="form-control form-check-label ms-1" :for="'checkbox-' + index"
+                                v-model="checkbox.answer">
+                            <span v-if="currentQuestion.answers.length > minAnswerOFQuestion"
+                                class="text-danger cursor-pointer mt-2">
+                                <RiCloseLine size="18" class="mb-1 ms-1" @click="removeAnswerOfQuestion(checkbox.id)" />
+                            </span>
+                        </div>
+                    </div>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="showModalCreateOrUpdateEditQuestion = false">
+                                <RiCloseLine size="18" />
+                                Hủy
+                            </el-button>
+                            <el-button type="primary" @click="updateQuestion">
+                                <RiEditFill size="18" />
+                                Xác nhận
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
                 <!-- Create Quizz -->
                 <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                     <div class="row d-flex align-items-center ms-1 me-1 mb-1" v-if="errorMessagesUpload.length > 0">
@@ -30,7 +72,8 @@
                             <select v-model="categoryId" type="text" class="form-control col-md-6"
                                 placeholder="Câu hỏi tin học">
                                 <option value="">Chọn chủ đề</option>
-                                <option :value="item.id" v-if="listCategory.length > 0" v-for="(item,index) in listCategory" :key="index">
+                                <option :value="item.id" v-if="listCategory.length > 0"
+                                    v-for="(item,index) in listCategory" :key="index">
                                     {{ item.name }}
                                 </option>
                             </select>
@@ -88,7 +131,8 @@
                                     </div>
                                     <div class="footer-form row d-flex justify-content-center">
                                         <div class="col-md-4">
-                                            <a :href="useRuntimeConfig().public.BACKEND_URL + 'format_import_question.csv'" class="btn btn-success w-100 mt-3 upload-button text-white">
+                                            <a :href="useRuntimeConfig().public.BACKEND_URL + 'format_import_question.csv'"
+                                                class="btn btn-success w-100 mt-3 upload-button text-white">
                                                 <RiDownloadLine size="18" class="me-1" />Tải xuống format
                                             </a>
                                         </div>
@@ -100,6 +144,21 @@
                                     </div>
                                 </div>
                             </form>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="Tạo câu hỏi" name="third">
+                        <div class="flex flex-col w-full gap-6">
+                            <form class="p-3" @submit="createQuizz">
+                                <textarea v-model="listQuizzText" :placeholder="'' + defaultPlaceholder"
+                                    class="form-control list-question-textarea" name="" id="" cols="30"
+                                    rows="22"></textarea>
+                                <button type="submit" class="btn btn-primary mt-3 float-end">
+                                    <RiAddCircleFill size="18" /> Tạo quizz
+                                </button>
+                            </form>
+                            <button @click="handleAddQuestion" class="btn btn-primary float-end me-3">
+                                <RiAddCircleFill size="18" /> Tạo câu hỏi
+                            </button>
                         </div>
                     </el-tab-pane>
                     <!-- <el-tab-pane label="Nhập từng câu" name="third">
@@ -115,11 +174,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, ItemQuestion as ItemQuestionDetail } from "~/constants/type";
 import { ElNotification } from "element-plus";
 import api from "~/api/axios";
 import type { TabsPaneContext } from 'element-plus'
-import { RiAddCircleFill, RiUploadLine, RiDownloadLine } from "@remixicon/vue";
+import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
 
@@ -148,6 +207,9 @@ export default defineComponent({
         RiAddCircleFill,
         RiUploadLine,
         RiDownloadLine,
+        RiCloseLine,
+        RiAddCircleLine,
+        RiEditFill,
     },
     setup() {
         const activeName = ref<string>('first')
@@ -162,6 +224,20 @@ export default defineComponent({
         const contentOfFile = ref<Array<ItemQuestion>>([]);
         const isValidQuestions = ref<boolean>(false);
         const listCategory = ref<Array<Category>>([]);
+        const errorMessageUpdateQuestions = ref<string[]>([]);
+        const isUpdate = ref<boolean>(false);
+        const showModalDeleteQuestion = ref<boolean>(false);
+        const currentQuestionIdDelete = ref<string>('');
+        const currentQuestion = ref<ItemQuestionDetail>({
+            id: '',
+            title: '',
+            quizze_id: '',
+            answers: [],
+            created_at: ''
+        });
+        const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
+        const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
+        const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -413,6 +489,35 @@ export default defineComponent({
             await getCatogory();
         })
 
+        const handleAddQuestion = () => {
+            isUpdate.value = false;
+            showModalCreateOrUpdateEditQuestion.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
+                id: '',
+                title: '',
+                quizze_id: '',
+                answers: [],
+                created_at: ''
+            };
+            for (let i = 0; i < RULES_VALIDATION.QUESTION.MAX_ANSWER; i++) {
+                addAnswerOfQuestion();
+            }
+        }
+
+        const addAnswerOfQuestion = () => {
+            currentQuestion.value.answers.push({
+                id: currentQuestion.value.answers.length > 0 ? currentQuestion.value.answers[currentQuestion.value.answers.length - 1].id + 1 : 1,
+                answer: '',
+                is_correct: false,
+                created_at: '',
+            });
+        }
+
+        const removeAnswerOfQuestion = (answerId: number) => {
+            currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
+        }
+
         return {
             activeName,
             handleClick,
@@ -427,6 +532,17 @@ export default defineComponent({
             errorMessagesUpload,
             errorMessagesPasteListQuestion,
             listCategory,
+            isUpdate,
+            errorMessageUpdateQuestions,
+            showModalDeleteQuestion,
+            currentQuestionIdDelete,
+            currentQuestion,
+            maxAnswerOFQuestion,
+            minAnswerOFQuestion,
+            handleAddQuestion,
+            addAnswerOfQuestion,
+            showModalCreateOrUpdateEditQuestion,
+            removeAnswerOfQuestion
         }
     }
 })
