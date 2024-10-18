@@ -79,7 +79,59 @@
                             </select>
                         </div>
                     </div>
-                    <el-tab-pane label="Dán câu hỏi" name="first">
+                    <el-tab-pane label="Tạo câu hỏi" name="first">
+                        <div class="flex flex-col w-full gap-6">
+                            <button @click="handleAddQuestion" class="btn btn-primary me-3 mt-3 mb-2 ps-2 ms-3">
+                                <RiAddCircleFill size="18"/> Tạo câu hỏi
+                            </button>
+                            <div class="players-card main-card">
+                                <div class="row pt-2 rounded rounded-5">
+                                    <div class="col-lg-12 px-4 mb-2">
+                                        <div v-for="(item, index) in questionArray"
+                                            class="question-preview-content border rounded rounded-3 pl-2 mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="col-md-9 d-flex justify-content-start mt-2">
+                                                    <span
+                                                        class="text-black fw-normal fs-5 pt-2 px-4 text-start font-bold">
+                                                        {{ (index + 1) + ". " + item.title }}
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-3 d-flex justify-content-end mt-2">
+                                                    <!-- <span @click="handleEditQuestion(item)"
+                                                        class="text-primary text-white me-2 mt-2 cursor-pointer">
+                                                        <RiEditFill size="18" class="mb-1" />
+                                                    </span> -->
+                                                    <span @click="handleRemoveQuestion(index)"
+                                                        class="text-danger me-2 mt-2 cursor-pointer">
+                                                        <RiDeleteBin2Fill size="18" class="mb-1" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            </hr>
+                                            <div
+                                                class="d-flex justify-content-between question-answer-review px-4 pt-2 mb-2">
+                                                <div class="col-xl-9 col-lg-9 col-md-8 col-sm-6">
+                                                    <div class="form-check" v-for="(answer, index) in item.answers">
+                                                        <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
+                                                        <label class="form-check-label ms-2" for="flexCheckDefault">
+                                                            {{ answer.answer }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="p-3" @submit="createQuizz" >
+                                <button v-if="questionArray.length > 0" type="submit" class="btn btn-primary  float-end">
+                                    <RiAddCircleFill size="18" /> Tạo quizz
+                                </button>
+                            </form>
+                        </div>
+                    </el-tab-pane>
+                    <!-- <el-tab-pane label="Dán câu hỏi" name="third">
                         <div class="flex flex-col w-full gap-6">
                             <span class="fw-500 fs-5 ms-3 mb-0">Sao chép và dán văn bản câu hỏi để tạo bài kiểm tra từ
                                 đó <span class="text-danger">*</span></span>
@@ -92,7 +144,7 @@
                                 </button>
                             </form>
                         </div>
-                    </el-tab-pane>
+                    </el-tab-pane> -->
                     <el-tab-pane label="Import" name="second">
                         <div class="flex flex-col w-full gap-6 rounded-pill">
                             <form @submit="uploadFileListQuestion"
@@ -146,21 +198,6 @@
                             </form>
                         </div>
                     </el-tab-pane>
-                    <el-tab-pane label="Tạo câu hỏi" name="third">
-                        <div class="flex flex-col w-full gap-6">
-                            <form class="p-3" @submit="createQuizz">
-                                <textarea v-model="listQuizzText" :placeholder="'' + defaultPlaceholder"
-                                    class="form-control list-question-textarea" name="" id="" cols="30"
-                                    rows="22"></textarea>
-                                <button type="submit" class="btn btn-primary mt-3 float-end">
-                                    <RiAddCircleFill size="18" /> Tạo quizz
-                                </button>
-                            </form>
-                            <button @click="handleAddQuestion" class="btn btn-primary float-end me-3">
-                                <RiAddCircleFill size="18" /> Tạo câu hỏi
-                            </button>
-                        </div>
-                    </el-tab-pane>
                     <!-- <el-tab-pane label="Nhập từng câu" name="third">
                         <h4 class="text-center">Tính năng sắp phát triển ^^
                         </h4>
@@ -178,7 +215,7 @@ import type { Answer, ErrorResponse, ItemQuestion as ItemQuestionDetail } from "
 import { ElNotification } from "element-plus";
 import api from "~/api/axios";
 import type { TabsPaneContext } from 'element-plus'
-import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill } from "@remixicon/vue";
+import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill, RiDeleteBin2Fill, RiCheckFill } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
 
@@ -210,12 +247,14 @@ export default defineComponent({
         RiCloseLine,
         RiAddCircleLine,
         RiEditFill,
+        RiDeleteBin2Fill,
+        RiCheckFill,
     },
     setup() {
         const activeName = ref<string>('first')
         const defaultPlaceholder = ref<string>("Question 1 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true) \n \n Question 2 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true)");
         const listQuizzText = ref<string>('');
-        const questionArray = ref([]);
+        const questionArray = ref<Array<ItemQuestion>>([]);;
         const title = ref<string>('');
         const categoryId = ref<number | "">("");
         const fileListQuestion = ref<File | null>(null);
@@ -243,22 +282,23 @@ export default defineComponent({
             console.log(tab, event)
         }
 
-        const createQuizz = async (e: SubmitEvent) => {
-            e.preventDefault();
-            errorMessagesPasteListQuestion.value = [];
-            errorMessagesUpload.value = [];
-            if (listQuizzText.value.trim() === '') {
-                errorMessagesPasteListQuestion.value.push("Vui lòng nhập danh sách câu hỏi!");
-                return ;          
-            }
-            const blockQuestions = listQuizzText.value.trim().split(/\n\s*\n/);
-            const validateResult = validateQuestions(blockQuestions);
-            if (validateResult) {
-                convertTextToQuestions();
-                submitQuestions(questionArray.value);
-            }
+        // const createQuizz = async (e: SubmitEvent) => {
+        //     e.preventDefault();
+        //     errorMessagesPasteListQuestion.value = [];
+        //     errorMessagesUpload.value = [];
+        //     if (listQuizzText.value.trim() === '') {
+        //         errorMessagesPasteListQuestion.value.push("Vui lòng nhập danh sách câu hỏi!");
+        //         return ;          
+        //     }
+        //     const blockQuestions = listQuizzText.value.trim().split(/\n\s*\n/);
+        //     const validateResult = validateQuestions(blockQuestions);
+        //     if (validateResult) {
+        //         convertTextToQuestions();
+        //         console.log(questionArray.value);
+        //         // submitQuestions(questionArray.value);
+        //     }
             
-        }
+        // }
 
         const getCatogory = async () => {
             await api.quizze.listCategory((res: any) => {
@@ -307,7 +347,7 @@ export default defineComponent({
             for (let i = 0; i < blocks.length; i++) {
                 const lines = blocks[i].trim().split('\n');
                 const title = lines[0].trim();
-                if (lines.length < RULES_VALIDATION.QUESTION.MIN_ANSWER || lines.length > RULES_VALIDATION.QUESTION.MAX_ANSWER) {
+                if (lines.length - 1 < RULES_VALIDATION.QUESTION.MIN_ANSWER || lines.length - 1 > RULES_VALIDATION.QUESTION.MAX_ANSWER) {
                     errorMessagesValidateFail.push(`Question "${title}" phải có từ 2 đến 4 câu trả lời!`);
                     isPassAllValidate = false;
                 }
@@ -316,7 +356,7 @@ export default defineComponent({
 
                 for (let j = 1; j < lines.length; j++) {
                     const line = lines[j];
-                    if (!answerRegex.test(line)) {
+                    if (!answerRegex.test(line.trim())) {
                         errorMessagesValidateFail.push(`Câu trả lời ${j} in "${title}" không đúng định dạng nhập.Phải là number) answer"!`);
                         isPassAllValidate = false;
                     }
@@ -518,6 +558,172 @@ export default defineComponent({
             currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
         }
 
+        const updateQuestion = async () => {
+            const resultValidate = validateQuestionUpdateOrCreate();
+            if (!resultValidate) {
+                return;
+            }
+
+            questionArray.value.push(
+                {
+                    title: currentQuestion.value.title,
+                    answers: currentQuestion.value.answers.map(answer => ({
+                        answer: answer.answer,
+                        is_correct: answer.is_correct
+                    }) )
+                }
+            );
+
+            console.log(questionArray.value);
+
+            showModalCreateOrUpdateEditQuestion.value = false;
+            // if (isUpdate.value) {
+            //     await api.quizze.updateQuestion(
+            //         currentQuestion.value.id,
+            //         currentQuestion.value,
+            //         (res: any) => {
+            //             showModalCreateOrUpdateEditQuestion.value = false;
+            //             ElNotification({ title: "Success", message: "Cập nhật câu hỏi thành công!", type: "success" });
+            //             // getListQuestion();
+            //         },
+            //         (err: ErrorResponse) => {
+            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            //         }
+            //     )
+            // }
+            // else {
+            //     await api.quizze.createQuestion(
+            //         route.params.quizzId as string,
+            //         currentQuestion.value,
+            //         (res: any) => {
+            //             showModalCreateOrUpdateEditQuestion.value = false;
+            //             ElNotification({ title: "Success", message: "Thêm câu hỏi thành công!", type: "success" });
+            //             getListQuestion();
+            //         },
+            //         (err: ErrorResponse) => {
+            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            //         }
+            //     )
+            // }
+        }
+
+
+
+        const validateQuestionUpdateOrCreate = () => {
+            const validator = useValidator();
+            let isPassvalidate: boolean = true;
+            let errorMessagesValidate: string[] = [];
+            if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
+                errorMessagesValidate.push(`Câu hỏi phải có 2 đến 4 câu trả lời!`);
+                isPassvalidate = false;
+            }
+
+            let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
+            if (counAnswerCorrect == 0) {
+                errorMessagesValidate.push(`Câu hỏi phải có ít nhất 1 đáp án đúng!`);
+                isPassvalidate = false;
+            }
+
+            let requiredQuestionTitle = validator.required(currentQuestion.value.title.trim(), "Câu hỏi");
+            let isLengthTitleQuestion = validator.isLength(
+                currentQuestion.value.title,
+                "Câu hỏi",
+                RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH,
+                RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH,
+                true,
+            );
+
+            if (requiredQuestionTitle != true) {
+                errorMessagesValidate.push(requiredQuestionTitle);
+                isPassvalidate = false;
+            }
+
+            if (isLengthTitleQuestion != true) {
+                errorMessagesValidate.push(isLengthTitleQuestion);
+                isPassvalidate = false;
+            }
+
+            let defaultStringAnwser = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            currentQuestion.value.answers.forEach((answer: Answer, index: number) => {
+                let requiredAnswer = validator.required(answer.answer.trim(), "Đáp án " + defaultStringAnwser[index]);
+                let isLengthAnswer = validator.isLength(
+                    answer.answer.trim(),
+                    "Đáp án " + defaultStringAnwser[index],
+                    RULES_VALIDATION.QUESTION.ANSWER.MIN_LENGTH,
+                    RULES_VALIDATION.QUESTION.ANSWER.MAX_LENGTH,
+                    true,
+                );
+                if (requiredAnswer != true) {
+                    errorMessagesValidate.push(requiredAnswer);
+                    isPassvalidate = false;
+                }
+
+                if (isLengthAnswer != true) {
+                    errorMessagesValidate.push(isLengthAnswer);
+                    isPassvalidate = false;
+                }
+            })
+
+            errorMessageUpdateQuestions.value = errorMessagesValidate;
+
+            return isPassvalidate;
+        }
+
+        const createQuizz = async (e: SubmitEvent) => {
+            e.preventDefault();
+            errorMessagesPasteListQuestion.value = [];
+            errorMessagesUpload.value = [];
+            if (questionArray.value.length < 1) {
+                errorMessagesPasteListQuestion.value.push("Vui lòng tạo câu hỏi!");
+                return;
+            }
+
+            const validateResult = validateCreateQuestions();
+            if (validateResult) {
+                submitQuestions(questionArray.value);
+            }
+
+        }
+
+        const validateCreateQuestions = () => {
+            let isPassAllValidate: boolean = true;
+            let errorMessagesValidateFail: string[] = [];
+            if (title.value.trim() === '') {
+                errorMessagesValidateFail.push("Tiêu đề đang để trống!");
+                isPassAllValidate = false;
+            }
+
+            if (title.value.length > RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH || title.value.length < RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH) {
+                errorMessagesValidateFail.push(`Tiêu đề  phải có 6 đến 255 ký tự!`);
+                isPassAllValidate = false;
+            }
+
+            if (!categoryId.value) {
+                errorMessagesValidateFail.push("Vui lòng chọn chủ đề!");
+                isPassAllValidate = false;
+            }
+            errorMessagesPasteListQuestion.value = errorMessagesValidateFail;
+
+            return isPassAllValidate;
+        };
+
+        const handleRemoveQuestion = (index: number) => {
+            questionArray.value.splice(index, 1);
+        };
+
+        const handleEditQuestion = (item: ItemQuestion) => {
+            showModalCreateOrUpdateEditQuestion.value = true;
+            isUpdate.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
+                ...item,
+                answers: item.answers.map(answer => ({
+                    ...answer,
+                    is_correct: !!answer.is_correct
+                }))
+            };
+        } 
+
         return {
             activeName,
             handleClick,
@@ -542,7 +748,13 @@ export default defineComponent({
             handleAddQuestion,
             addAnswerOfQuestion,
             showModalCreateOrUpdateEditQuestion,
-            removeAnswerOfQuestion
+            removeAnswerOfQuestion,
+            updateQuestion,
+            validateQuestionUpdateOrCreate,
+            validateCreateQuestions,
+            questionArray,
+            handleRemoveQuestion,
+            handleEditQuestion,
         }
     }
 })

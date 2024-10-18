@@ -302,13 +302,13 @@ export default defineComponent({
             let isPassvalidate: boolean = true;
             let errorMessagesValidate: string[] = [];
             if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
-                errorMessagesValidate.push(`Cấu hỏi phải có 2 đến 4 câu trả lời!`);
+                errorMessagesValidate.push(`Câu hỏi phải có 2 đến 4 câu trả lời!`);
                 isPassvalidate = false;
             }
 
             let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
             if (counAnswerCorrect == 0) {
-                errorMessagesValidate.push(`Cấu hỏi phải có ít nhất 1 đáp án đúng!`);
+                errorMessagesValidate.push(`Câu hỏi phải có ít nhất 1 đáp án đúng!`);
                 isPassvalidate = false;
             }
 
