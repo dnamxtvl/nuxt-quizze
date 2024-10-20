@@ -1,29 +1,52 @@
 <template>
     <div class="row position-relative body-admin-game w-full g-0">
-        <el-dialog v-model="showModalCongratulations" class="fw-bold" title="Xin chúc mừng!" width="500" :show-close="false" center>
+        <!-- start model -->
+        <el-dialog v-model="dialogVisible" class="expand_qr" width="600" background-color="rgba(9, 9, 9, 0.8)">
+            <div class="content px-4 pt-2 pb-2">
+                <div class="col-12 mt-4">
+                    <div class="col-12 text-white text-start mt-2 fs-5">Nhập mã tham gia</div>
+                    <div class="text-start row">
+                        <h1 class="col-7 text-white random-code">{{ code }}</h1>
+                        <div class="col-2 icon copy text-center d-flex align-items-center mb-3">
+                            <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 text-center d-flex align-items-center justify-content-center mt-3 mb-3">
+                    <img :src="qrImage" alt="qrCode" class="w-30 expand-qr_img" @click="expandQR">
+                    <i v-if="isHovered" class="ti ti-expand hover-icon"></i> <!-- Biểu tượng expand -->
+                </div>
+            </div>
+        </el-dialog>
+
+        <!--end model -->
+        <el-dialog v-model="showModalCongratulations" class="fw-bold" title="Xin chúc mừng!" width="500"
+            :show-close="false" center>
             <div class="row d-flex justify-content-center text-success fw-bold">
-                <RiCheckFill size="60"/>
+                <RiCheckFill size="60" />
             </div>
             <div class="row d-flex justify-content-center">
                 <h5 class="text-center">{{ currentCorrectAnswer }}</h5>
             </div>
         </el-dialog>
         <div class="row panel-wrapper d-flex rounded-4 justify-content-center prepare-join d-flex flex-col items-center ms-0 me-0"
-            v-if="showPrepare">
+            v-if="showPrepare && dialogVisible == false">
             <div
-                class="col-xxl-4 col-xl-6 col-lg-8 col-md-9 join-code header row d-flex justify-content-center p-4 gap-4 bg-ds-dark-500-900 rounded ms-0 me-0">
-                <div class="row d-flex justify-content-center join-code-body rounded">
-                    <div class="col-xxl-8 col-xl-8 col-lg-7 col-md-6 col-12 mt-4">
-                        <div class="col-xxl-5 col-lg-9 col-md-6 text-white text-center mt-2">Nhập mã tham gia</div>
-                        <div class="col-xxl-5 col-lg-9 col-md-6 text-center">
-                            <h1 class="text-white random-code">{{ code }}</h1>
+                class="col-xxl-5 col-xl-6 col-lg-7 col-md-9 col-10 join-code header row d-flex justify-content-center p-4 gap-4 bg-ds-dark-500-900 rounded ms-0 me-0">
+                <div class="row d-flex join-code-body rounded">
+                    <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-9 col-12 mt-4">
+                        <div class="text-white text-start mt-2 fs-5">Nhập mã tham gia</div>
+                        <div class="text-start row">
+                            <h1 class="col-xxl-9 col-xl-9 col-lg-9 col-md-8 text-white random-code">{{ code }}</h1>
+                            <div class="col-2 icon copy text-center d-flex align-items-center mb-3">
+                                <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-xxl-1 col-md-2 icon copy text-center mt-5 pe-4">
-                        <i class="ti ti-copy fs-2 text-white cursor-pointer" @click="copyCode"></i>
-                    </div>
-                    <div class="col-xxl-3 col-xl-4 col-lg-5 col-md-6 col-12 text-center">
-                        <img :src="qrImage" alt="qrCode" class="w-30 qr-code-join-room mt-4">
+                    <div
+                        class="col-xxl-4 col-xl-4 col-lg-4 col-md-3 col-12 text-center d-flex align-items-center justify-content-center position-relative">
+                        <img :src="qrImage" alt="qrCode" class="w-30 qr-code-join-room" @click="expandQR">
+                        <RiArrowRightUpLine size="30" />
                     </div>
                 </div>
                 <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
@@ -42,7 +65,7 @@
                     <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
                         <button class="btn btn-outline-secondary text-white w-full text-center">
                             <span class="text-primary text-break fs-5">
-                                {{ item.name ?? 'Sóc ẩn danh'}}
+                                {{ item.name ?? 'Sóc ẩn danh' }}
                             </span>
                         </button>
                     </div>
@@ -53,15 +76,15 @@
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1;">
                 <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id)
                     + 1 }}. {{ currentQuestion.title }}</p>
-                <h3 class="text-warning text-center fs-1">{{remainingTime }}</h3>
+                <h3 class="text-warning text-center fs-1">{{ remainingTime }}</h3>
             </div>
             <div class="row list-answer justify-content-center align-items-center mt-2" style="flex:1;">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0"
                     v-for="(item, index) in currentQuestion.answers" :key="index">
                     <div
                         class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative">
-                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
-                            1}}</span>
+                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{ index +
+                            1 }}</span>
                         <p class="text-white lh-base fs-2 pt-4 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
@@ -136,7 +159,7 @@
                         <div class="coccoc-alo-ph-img-circle"></div>
                     </div>
                     <span class="fs-4 text-primary text-center user-name-text me-3">
-                        {{ listUserJoined.length + ' user'}}
+                        {{ listUserJoined.length + ' user' }}
                         <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ code }}</div>
                     </span>
                     <div class="divider hidden sm:block"></div>
@@ -172,7 +195,7 @@ import { useRoute } from "vue-router";
 import api from "~/api/axios";
 import type { Answer, ErrorResponse, GamerAnswer, GamerResult, ItemQuestion } from "~/constants/type";
 import { HttpStatusCode } from "axios";
-import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
+import { RiUser2Fill, RiCheckFill, RiArrowRightUpLine } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
@@ -187,6 +210,7 @@ export default defineComponent({
     components: {
         RiUser2Fill,
         RiCheckFill,
+        RiArrowRightUpLine
     },
     setup() {
         const config = useRuntimeConfig();
@@ -229,6 +253,8 @@ export default defineComponent({
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
         }
+        const dialogVisible = ref<boolean>(false);
+        const hiddenIfDisplayModelExpand = ref<boolean>(true);
 
         let countReload = ref<number>(0);
 
@@ -248,7 +274,7 @@ export default defineComponent({
                         remainingTime.value = res.time_remaining;
                         if (countReload.value == 0) {
                             setShowResult(remainingTimeReload.value * 1000);
-                            countReload.value ++;
+                            countReload.value++;
                         }
                     }
                     if (res.gamers.length > 0) {
@@ -259,7 +285,7 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
                     ElLoading.service({ fullscreen: true }).close();
                     if (err.code === HttpStatusCode.NotFound) {
                         return navigateTo("/not-found");
@@ -285,7 +311,7 @@ export default defineComponent({
                     }, RoomSetting.TIME_REPLY * 1000);
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Warning", message: err.error.shift(), type: "warning"});
+                    ElNotification({ title: "Warning", message: err.error.shift(), type: "warning" });
                     ElLoading.service({ fullscreen: true }).close();
                 }
             )
@@ -298,9 +324,9 @@ export default defineComponent({
         const nextQuestion = async (id: string) => {
             let nextQuestionIndex = listQuestion.value.findIndex((item: ItemQuestion) => item.id == id) + 1;
             if (nextQuestionIndex == listQuestion.value.length) {
-                ElNotification({title: "Warming", message: "Bạn đã đi hết các câu hỏi", type: "warning"});
+                ElNotification({ title: "Warming", message: "Bạn đã đi hết các câu hỏi", type: "warning" });
 
-                return ;
+                return;
             }
             ElLoading.service({ fullscreen: true });
             showModalCongratulations.value = false;
@@ -320,7 +346,7 @@ export default defineComponent({
                         calculateTimeReply();
                         setTimeout(async () => {
                             if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
-                                await checkValidRoom();   
+                                await checkValidRoom();
                             }
                             showButtonNext.value = true;
                             showResult.value = true;
@@ -330,7 +356,7 @@ export default defineComponent({
                     }
                 },
                 (err: ErrorResponse) => {
-                    ElNotification({title: "Error", message: err.error.shift(), type: "error"});
+                    ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
                     ElLoading.service({ fullscreen: true }).close();
                 }
             )
@@ -342,7 +368,7 @@ export default defineComponent({
             calculateTimeReply();
             setTimeout(async () => {
                 if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
-                    await checkValidRoom();   
+                    await checkValidRoom();
                 }
                 showButtonNext.value = true;
                 showResult.value = true;
@@ -384,10 +410,10 @@ export default defineComponent({
             intervalId = setInterval(() => {
                 if (remainingTime.value > 0) {
                     remainingTime.value--;
-                    } else {
-                        clearInterval(intervalId);
-                    }
-                }, 1000 // 1 second
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 1000 // 1 second
             );
         }
 
@@ -398,7 +424,7 @@ export default defineComponent({
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
+            ElNotification({ title: "Success", message: "Sao chép mã code thành công!", type: "success" });
         };
 
         const generateQR = async (text: string) => {
@@ -428,8 +454,8 @@ export default defineComponent({
             await generateQR(config.public.FRONTEND_URL + 'user/join?gc=' + code.value);
             setRoomStatus();
             $echo.private('user.join-room.' + route.params.roomId.toString())
-                .listen('UserJoinRoomEvent', (e: {gamer: GamerInfo}) => {
-                console.log(e);
+                .listen('UserJoinRoomEvent', (e: { gamer: GamerInfo }) => {
+                    console.log(e);
                     listUserJoined.value.push(e.gamer);
                 });
         });
@@ -438,6 +464,11 @@ export default defineComponent({
             clearInterval(intervalId);
             showModalCongratulations.value = false;
         });
+
+        const expandQR = () => {
+            dialogVisible.value = true;
+        }
+
 
         return {
             showPrepare,
@@ -462,10 +493,39 @@ export default defineComponent({
             qrImage,
             showModalCongratulations,
             currentCorrectAnswer,
+            expandQR,
+            dialogVisible,
+            hiddenIfDisplayModelExpand
         }
     }
 })
 </script>
 <style scoped lang="scss">
 @import '~/assets/styles/admin/admin-game.scss';
+
+.expand-qr_img {
+    height: 350px;
+}
+
+.expand_qr .content {
+    background-color: #4CAF50 !important;
+}
+
+.expand_qr .el-dialog__header {
+    display: none !important;
+}
+
+.hover-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 30px;
+    color: white;
+    display: block;
+}
+
+.text-center:hover .hover-icon {
+    display: block;
+}
 </style>
