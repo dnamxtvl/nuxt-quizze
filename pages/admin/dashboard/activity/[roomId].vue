@@ -1,7 +1,8 @@
 <template>
     <div class="row position-relative body-admin-game w-full g-0">
         <!-- start model -->
-        <el-dialog v-model="dialogVisible" class="expand_qr" width="600" background-color="rgba(9, 9, 9, 0.8)">
+        <el-dialog v-model="dialogVisible" :show-close="false" class="expand_qr" width="600"
+            background-color="rgba(9, 9, 9, 0.8)">
             <div class="content px-4 pt-2 pb-2">
                 <div class="col-12 mt-4">
                     <div class="col-12 text-white text-start mt-2 fs-5">Nhập mã tham gia</div>
@@ -12,9 +13,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 text-center d-flex align-items-center justify-content-center mt-3 mb-3">
-                    <img :src="qrImage" alt="qrCode" class="w-30 expand-qr_img" @click="expandQR">
-                    <i v-if="isHovered" class="ti ti-expand hover-icon"></i> <!-- Biểu tượng expand -->
+                <div class="col-12 text-center d-flex align-items-center justify-content-center mt-3 mb-3 ">
+                    <div class="position-relative">
+                        <img :src="qrImage" alt="qrCode" class="w-30 expand-qr_img " @click="expandQR">
+                        <div class="icon-close-model" @click="closeModelQR">&#215;</div>
+                    </div>
+
                 </div>
             </div>
         </el-dialog>
@@ -46,7 +50,9 @@
                     <div
                         class="col-xxl-4 col-xl-4 col-lg-4 col-md-3 col-12 text-center d-flex align-items-center justify-content-center position-relative">
                         <img :src="qrImage" alt="qrCode" class="w-30 qr-code-join-room" @click="expandQR">
-                        <RiArrowRightUpLine size="30" />
+                        <!-- <div :class="{ 'show-hover-icon': true }" class="hover-icon">
+                            <RiArrowRightUpLine size="30" />
+                        </div> -->
                     </div>
                 </div>
                 <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
@@ -469,6 +475,10 @@ export default defineComponent({
             dialogVisible.value = true;
         }
 
+        const closeModelQR = () => {
+            dialogVisible.value = false;
+            hiddenIfDisplayModelExpand.value = true;
+        }
 
         return {
             showPrepare,
@@ -495,7 +505,9 @@ export default defineComponent({
             currentCorrectAnswer,
             expandQR,
             dialogVisible,
-            hiddenIfDisplayModelExpand
+            hiddenIfDisplayModelExpand,
+            isHovered: false,
+            closeModelQR
         }
     }
 })
@@ -511,21 +523,50 @@ export default defineComponent({
     background-color: #4CAF50 !important;
 }
 
-.expand_qr .el-dialog__header {
+// .hover-icon {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     font-size: 30px;
+//     color: #fff;
+//     display: none;
+//     background-color: #0e0b0b;
+//     border-radius: 50%;
+// }
+
+// .qr-code-join-room:hover .hover-icon {
+//     display: block;
+// }
+
+.qr-code-join-room:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.icon-close-model {
+        position: absolute;
+        font-size: 36px;
+        height: 40px;
+        width: 40px;
+        background: #2f2f2f;
+        border-radius: 50%;
+        text-align: center;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: -20px;
+        right: -20px;
+        opacity: 0.8;
+        color: #fff;
+}
+
+.icon-close-model:hover {
+    cursor: pointer;
+}
+
+.el-dialog__header{
     display: none !important;
-}
-
-.hover-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 30px;
-    color: white;
-    display: block;
-}
-
-.text-center:hover .hover-icon {
-    display: block;
 }
 </style>
