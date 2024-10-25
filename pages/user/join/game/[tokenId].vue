@@ -1,34 +1,58 @@
 <template>
     <div>
+        <el-dialog v-model="resultCurrentModel" fullscreen width="500"
+            class="align-center d-flex justify-content-center align-items-center result-current-model">
+            <p class="text-white fs-1 fw-bold text-center">{{ currentResult.title }}</p>
+            <div class="w-full d-flex justify-content-center mb-4 mt-3">
+                <div class="text-center justify-content-center text-white fw-bold  icon-result"
+                    :class="currentResult.bg_color">
+                    <RiCheckFill size="60" v-if="currentResult.type" />
+                    <RiCloseFill size="60" v-if="!currentResult.type" />
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center mb-2">
+                <p class="text-white fs-5 fw-bold text-center mb-0">Bạn đang ở vị trí thứ
+                </p>
+                <div class="order_number ms-2 d-flex justify-content-center align-items-center text-white fw-bold">
+                    <span>1</span>
+                </div>
+            </div>
+
+            <div class="score py-1">
+                <p class="mb-0">+ {{ currentResult.score }}</p>
+            </div>
+        </el-dialog>
         <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0">
-            <div v-if="showQuestion && currentRoomStatus > 0" class="row question-title d-flex flex-wrap justify-content-center align-items-center g-0" style="flex:1">
-                <p class="text-white text-center fs-2 lh-base p-3 mt-3">{{ currentQuestionIndex + 1 }}. {{ currentQuestion?.title }}
+            <div v-if="showQuestion && currentRoomStatus > 0"
+                class="row question-title d-flex flex-wrap justify-content-center g-0" style="flex:1">
+                <p class="text-dark text-center fs-2 lh-base p-3 mt-4 fw-bold">{{ currentQuestionIndex + 1 }}. {{
+                    currentQuestion?.title }}
                 </p>
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
-            <div v-if="showQuestion && currentRoomStatus > 0" class="row list-answer justify-content-center align-items-center me-0 mt-4" style="flex:1">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer pe-0"
+            <div v-if="showQuestion && currentRoomStatus > 0"
+                class="row list-answer justify-content-center align-items-center me-0 mt-4 px-3">
+                <div class="col-12 col-sm-6 col-md-6 col-lg-6 cursor-pointer pe-0 mb-2"
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
-                        :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)">
-                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{index +
+                        :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)"
+                        :style="{ background: backgroundColorAnswers[index] }">
+                        <span class="fs-3 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2 border-0"
+                            :style="{ background: backgroundColorAnswers[index] }">{{index +
                             1}}</span>
                         <p class="text-white fs-2 lh-base p-3 mt-4 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
             </div>
             <div v-if="showQuestion && currentRoomStatus > 0" class="control-center mt-auto">
-                <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
-                    <div class="ring d-flex">
-                        <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
-                        </div>
-                        <span class="fs-4 text-white text-center user-name-text me-3 text-primary">
+                <div class="control-center-container user-game-footer ps-5" translate="no" style="opacity: 1;">
+                    <div class="ring d-flex align-items-center">
+                        <span class="fs-4 text-white text-center me-3 text-primary">
                             {{ gamerInfo?.name }}
-                            <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ roomCode }}</div>
                         </span>
                         <div class="divider hidden sm:block"></div>
                         <div>
-                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{
+                            <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3">{{
                                 currentQuestionIndex + 1 }}/{{ listQuestion.length }}</button>
                         </div>
                     </div>
@@ -82,7 +106,9 @@
                                         <div class="question-answer-review px-4 pt-2 mb-2">
                                             <div class="form-check" v-for="(answer, index) in item.answers">
                                                 <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
-                                                <label :class="['form-check-label text-white ms-2', yourAnswerCorrect(gamerResult, answer.id)]" for="flexCheckDefault">
+                                                <label
+                                                    :class="['form-check-label text-white ms-2', yourAnswerCorrect(gamerResult, answer.id)]"
+                                                    for="flexCheckDefault">
                                                     {{ answer.answer }}
                                                 </label>
                                             </div>
@@ -95,7 +121,8 @@
                 </div>
             </div>
         </div>
-        <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning" width="500" align-center>
+        <el-dialog v-model="centerDialogVisible" close-icon="false" :close-on-click-modal="false" title="Warning"
+            width="500" align-center>
             <span class="text-center align-center">Admin đã kết thúc màn chơi này!</span>
             <template #footer>
                 <div class="dialog-footer">
@@ -119,7 +146,7 @@ import type { Answer, ErrorResponse, GamerResult, ItemQuestion } from "~/constan
 import { HttpStatusCode } from "axios";
 import { RoomSetting, RoomStatus, RoomType } from "~/constants/room";
 import type { TabsPaneContext } from 'element-plus';
-import { RiUser2Fill, RiCheckFill } from "@remixicon/vue";
+import { RiUser2Fill, RiCheckFill, RiCloseFill } from "@remixicon/vue";
 import type { GamerAnswer } from "~/constants/type";
 import helperApp from "~/utils/helper";
 import { CODE } from "~/constants/application";
@@ -134,10 +161,19 @@ interface GamerInfo {
     created_at: string
 }
 
+interface CurrentResult {
+    score: number,
+    order_number: number,
+    title: string,
+    bg_color: string,
+    type: boolean
+}
+
 export default defineComponent({
     components: {
         RiUser2Fill,
-        RiCheckFill
+        RiCheckFill,
+        RiCloseFill
     },
     setup() {
         const route = useRoute();
@@ -176,8 +212,23 @@ export default defineComponent({
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
         const selectedAnswerId = ref<number>(0);
-        const currentScoreAnswer = ref<number|null>(null);
-
+        const currentScoreAnswer = ref<number | null>(null);
+        const backgroundColorAnswers = ref<string[]>([
+            '#E21B3C',
+            '#D89E00',
+            '#1368CE',
+            '#26890C'
+        ]);
+        const resultCurrentModel = ref<boolean>(false);
+        const currentResult = ref<CurrentResult>(
+            {
+                score: 0,
+                order_number: 0,
+                title: 'warning',
+                bg_color: 'red',
+                type: false
+            }
+        );
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
                 let answer =  gamerResult.gamer_answers.find((item: GamerAnswer) => item.answer_id == answerId);
@@ -240,7 +291,8 @@ export default defineComponent({
                 ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 return ;
             }
-
+            ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
+            showQuestion.value = false;
             if (isSubmited.value) {
                 ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
                 return ;
@@ -261,6 +313,7 @@ export default defineComponent({
                 }
             )
             isSubmited.value = true;
+
         }
 
         let intervalId: any;
@@ -300,33 +353,80 @@ export default defineComponent({
         watch(timeReply, async (newValue, oldValue) => {
             if (oldValue == newValue + 1 && newValue == 0 &&
                 (currentRoomStatus.value == RoomStatus.HAPPING || currentRoomStatus.value == RoomStatus.PENDING)) {
-                    console.log('currentQuestionIndex' + currentQuestionIndex.value);
+                console.log('currentQuestionIndex' + currentQuestionIndex.value);
+                showQuestion.value = false;
+                ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' }).close();
+                resultCurrentModel.value = true;
                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                     await getListQuestion();
                     showQuestion.value = false;
                     showResult.value = true;
+                    resultCurrentModel.value = false;
                 }
 
                 if (currentScoreAnswer.value != null) {
                     if (currentScoreAnswer.value > 0) {
-                        ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
+                        currentResult.value.score = currentScoreAnswer.value;
+                        currentResult.value.title = 'ĐÚNG';
+                        currentResult.value.bg_color = 'bg-correct';
+                        currentResult.value.type = true;
+                        checkValidRoom();
+                        console.log(currentResult.value.order_number);
+                        // ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
                         return;
                     }
 
-                    ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
+                    currentResult.value.score = 0;
+                    currentResult.value.title = 'SAI';
+                    currentResult.value.bg_color = 'bg-incorrect';
+                    currentResult.value.type = false;
+                    checkValidRoom();
+                    // ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
                     return;
                 }
 
-                ElNotification({title: "Oh no!", message: "Đã hết thời gian trả lời!", type: "warning"});
+                currentResult.value.score = 0;
+                currentResult.value.title = 'HẾT THỜI GIAN';
+                currentResult.value.bg_color = 'bg-incorrect';
+                currentResult.value.type = false;
+                checkValidRoom();
+                console.log(currentResult.value.order_number);
+                // ElNotification({ title: "Oh no!", message: "Đã hết thời gian trả lời!", type: "warning" });
+                
+
             }
         });
+
+        const checkValidRoom = async () => {
+            // await api.room.checkValidRoom(
+            //     roomId.value,
+            //     (res: any) => {
+            //         if (res.gamers.length > 0) {
+            //             let userId = gamerInfo.value?.id;
+            //             for (let i = 0; i<res.gamers.length; i++) {
+            //                 if (res.gamers[i].id === userId) {
+            //                     currentResult.value.order_number = i + 1;
+            //                     break;
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     (err: ErrorResponse) => {
+            //         ElNotification({ title: "Error", message: err.error.shift(), type: "error" })
+            //         if (err.code === HttpStatusCode.NotFound) {
+            //             return navigateTo("/not-found");
+            //         }
+            //     }
+            // )
+        }
 
         onMounted(async () => {
             clearInterval(intervalId);
             const { $echo }: any = useNuxtApp();
             await getListQuestion();
             if (currentRoomStatus.value == 0) {
-                ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' });
+                ElLoading.service({ fullscreen: true, text: 'CHỜ MÀN CHƠI BẮT ĐẦU!' });
+
             }
             $echo.channel('admin.start-game.' + roomId.value)
                 .listen('StartGameEvent', (e: any) => {
@@ -335,9 +435,11 @@ export default defineComponent({
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
-                    ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+                    ElLoading.service({ fullscreen: true, text: 'CHỜ MÀN CHƠI BẮT ĐẦU!' }).close();
                 })
                 .listen('NextQuestionEvent', (e: any) => {
+                    resultCurrentModel.value = false;
+                    showQuestion.value = true;
                     currentQuestionIndex.value = currentQuestionIndex.value + 1;
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
                     timeReply.value = RoomSetting.TIME_REPLY;
@@ -346,7 +448,7 @@ export default defineComponent({
                     calculateTimeReply();
                 }).listen('AdminEndgameEvent', (e: any) => {
                     if (currentRoomStatus.value == RoomStatus.PREPARE) {
-                        ElLoading.service({ fullscreen: true, text: 'Chờ màn chơi bắt đầu!' }).close();
+                        ElLoading.service({ fullscreen: true, text: 'CHỜ MÀN CHƠI BẮT ĐẦU!' }).close();
                     }
                     isRoomRunning.value = false;
                     centerDialogVisible.value = true;
@@ -357,6 +459,7 @@ export default defineComponent({
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true }).close();
         });
+
 
         return {
             showQuestion,
@@ -380,6 +483,11 @@ export default defineComponent({
             currentRoomStatus,
             isSelectedAnswer,
             selectedAnswerId,
+            backgroundColorAnswers,
+            resultCurrentModel,
+            currentResult,
+            checkValidRoom
+
         }
     }
 })

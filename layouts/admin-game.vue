@@ -4,7 +4,7 @@
             <!-- <video autoplay="" loop="" muted><source src="https://namdv-storage.s3.ap-southeast-2.amazonaws.com/conversation/HAPPY.mp4" type="video/mp4">
                 Your browser does not support the video tag. 
             </video> -->
-            <img src="../public/kahoot-background.jpg" class="w-full" alt="background">
+            <img src="../public/kahoot-background.jpg"  alt="background" style="object-fit: cover">
         </div>
         <AdminGameHeader :code="code" class="position-absolute top-0 w-full" />
         <slot />

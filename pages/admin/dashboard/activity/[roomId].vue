@@ -24,7 +24,7 @@
         </el-dialog>
 
         <!--end model -->
-        <el-dialog v-model="showModalCongratulations" class="fw-bold" title="Xin chúc mừng!" width="500"
+        <el-dialog v-model="showModalCongratulations" class="fw-bold" title="CÂU TRẢ LỜI ĐÚNG!" width="500"
             :show-close="false" center>
             <div class="row d-flex justify-content-center text-success fw-bold">
                 <RiCheckFill size="60" />
@@ -57,7 +57,7 @@
                 </div>
                 <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
                     <div class="col-md-6">
-                        <button class="btn btn-light w-full fs-5">
+                        <button class="btn  w-full fs-5 btn-outline-secondary text-white">
                             Preview as a Student
                         </button>
                     </div>
@@ -69,8 +69,8 @@
                 </div>
                 <div class="row d-flex justify-content-between p-4 pt-0">
                     <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
-                        <button class="btn btn-outline-secondary text-white w-full text-center">
-                            <span class="text-primary text-break fs-5">
+                        <button class="btn  text-white w-full text-center btn-light">
+                            <span class="text-primary text-break fs-4 fw-bold">
                                 {{ item.name ?? 'Sóc ẩn danh' }}
                             </span>
                         </button>
@@ -78,18 +78,22 @@
                 </div>
             </div>
         </div>
-        <div class="w-full h-80-percent d-flex flex-column" v-if="showQuestion">
+        <div class="w-full d-flex flex-column" v-if="showQuestion">
             <div class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1;">
-                <p class="text-white text-center fs-2">{{ listQuestion.findIndex(item => item.id == currentQuestion.id)
+                <p class="text-dark text-center fs-2 py-4 question fw-bold">{{ listQuestion.findIndex(item => item.id ==
+                    currentQuestion.id)
                     + 1 }}. {{ currentQuestion.title }}</p>
-                <h3 class="text-warning text-center fs-1">{{ remainingTime }}</h3>
+                <h3 class="text-warning text-start fs-1 px-5">
+                    <span class="remaining_time">{{ remainingTime }}</span>
+                </h3>
             </div>
-            <div class="row list-answer justify-content-center align-items-center mt-2" style="flex:1;">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 cursor-pointer d-flex align-items-center pe-0 ps-0"
+            <div class="row list-answer justify-content-center align-items-center mt-2 px-3" style="flex:1;">
+                <div class="col-6 col-sm-6 col-md-6 col-lg-6 cursor-pointer d-flex align-items-center pe-0 ps-0 mb-2"
                     v-for="(item, index) in currentQuestion.answers" :key="index">
-                    <div
-                        class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative">
-                        <span class="fs-5 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2">{{ index +
+                    <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative"
+                        :style="{ background: backgroundColorAnswers[index] }">
+                        <span class="fs-3 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2 border-0"
+                            :style="{ background: backgroundColorAnswers[index] }">{{ index +
                             1 }}</span>
                         <p class="text-white lh-base fs-2 pt-4 text-center">{{ item.answer }}</p>
                     </div>
@@ -104,20 +108,22 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-white">#</th>
-                                        <th scope="col" class="fs-6 text-white">Tên</th>
-                                        <th scope="col" class="fs-6 text-white">Điểm</th>
-                                        <th scope="col" class="fs-6 text-white">Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white text-center">Chi tiết</th>
+                                        <th scope="col" class="text-white text-center">#</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Tên</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Điểm</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Câu đúng</th>
+                                        <th scope="col" class="fs-6 text-white text-center text-center">Chi tiết</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(item, index) in listGamerResult" :key="index">
-                                        <th scope="row" class="text-white">{{ index + 1 }}</th>
-                                        <td class="text-white">{{ item.name ?? 'Sóc ẩn danh' }}</td>
-                                        <td class="text-white">{{ item.gamer_answers_sum_score ?? 0 }}</td>
-                                        <td class="text-white">{{ countQuestionTrue(item) }}</td>
-                                        <td class="text-white text-center">
+                                        <th scope="col" class="text-white text-center">{{ index + 1 }}</th>
+                                        <td scope="col" class="text-white text-center">{{ item.name ?? 'Sóc ẩn danh' }}
+                                        </td>
+                                        <td scope="col"  class="text-white text-center">{{ item.gamer_answers_sum_score
+                                            ?? 0 }}</td>
+                                        <td scope="col" class="text-white text-center">{{ countQuestionTrue(item) }}</td>
+                                        <td scope="col" class="text-white text-center">
                                             <span
                                                 :class="'badge rounded-pill width-2 ms-1 ' + getResultQuestionColor(item.gamer_answers, question.id).class"
                                                 v-for="(question, key) in listQuestion" :key="key">
@@ -157,27 +163,24 @@
             </div>
         </div>
         <div class="control-center mt-auto" v-show="showQuestion || showResult">
-            <div class="control-center-container user-game-footer" translate="no" style="opacity: 1;">
-                <div class="ring d-flex">
-                    <div class="coccoc-alo-phone coccoc-alo-green coccoc-alo-show">
-                        <div class="coccoc-alo-ph-circle"></div>
-                        <div class="coccoc-alo-ph-circle-fill"></div>
-                        <div class="coccoc-alo-ph-img-circle"></div>
-                    </div>
-                    <span class="fs-4 text-primary text-center user-name-text me-3">
+            <div class="control-center-container user-game-footer d-flex " translate="no" style="opacity: 1;">
+                <div class="ring d-flex w-full justify-content-start align-items-center ps-5">
+                    <span class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">RoomID: {{ code }}</span>
+                    <div class="divider hidden sm:block"></div>
+                    <span class="fs-4 text-primary text-center user-name-text ">
                         {{ listUserJoined.length + ' user' }}
-                        <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ code }}</div>
+                        <!-- <div class="fs-4 text-white user-name-text pt-1 rounded-1 border-2">{{ code }}</div> -->
                     </span>
                     <div class="divider hidden sm:block"></div>
                     <div>
-                        <button class="btn btn-light fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">{{
+                        <button class="btn btn-light fs-5 fw-bold font-600 text-dark ">{{
                             (listQuestion.findIndex(item => item.id === currentQuestion.id) + 1) + "/" +
                             listQuestion.length }}
                         </button>
                     </div>
-                    <div>
+                    <div class="ms-auto">
                         <button @click="nextQuestion(currentQuestion.id)" v-if="showButtonNext"
-                            class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark ms-3 button-num-answer">
+                            class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark me-5">
                             Tiếp theo
                         </button>
                     </div>
@@ -257,10 +260,16 @@ export default defineComponent({
         const currentCorrectAnswer = ref<string>('');
         let intervalId: any;
         const handleClick = (tab: TabsPaneContext, event: Event) => {
-            console.log(tab, event)
+            
         }
         const dialogVisible = ref<boolean>(false);
         const hiddenIfDisplayModelExpand = ref<boolean>(true);
+        const backgroundColorAnswers = ref<string[]>([
+            '#E21B3C',
+            '#D89E00',
+            '#1368CE',
+            '#26890C'
+        ]);
 
         let countReload = ref<number>(0);
 
@@ -286,6 +295,7 @@ export default defineComponent({
                     if (res.gamers.length > 0) {
                         listGamerResult.value = res.gamers.filter(item => item.name != null);
                     }
+                    console.log(listGamerResult.value);
                     currentQuestion.value = res.room.current_question_id ?
                         res.questions.find((item: ItemQuestion) => item.id == res.room.current_question_id) : res.questions[0];
                     ElLoading.service({ fullscreen: true }).close();
@@ -308,6 +318,7 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
+                    // remainingTime.value = RoomSetting.TIME_REPLY;
                     remainingTime.value = RoomSetting.TIME_REPLY;
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
@@ -461,7 +472,7 @@ export default defineComponent({
             setRoomStatus();
             $echo.private('user.join-room.' + route.params.roomId.toString())
                 .listen('UserJoinRoomEvent', (e: { gamer: GamerInfo }) => {
-                    console.log(e);
+                    // console.log(e);
                     listUserJoined.value.push(e.gamer);
                 });
         });
@@ -507,7 +518,8 @@ export default defineComponent({
             dialogVisible,
             hiddenIfDisplayModelExpand,
             isHovered: false,
-            closeModelQR
+            closeModelQR,
+            backgroundColorAnswers
         }
     }
 })
