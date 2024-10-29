@@ -87,7 +87,7 @@
                     <span class="remaining_time">{{ remainingTime }}</span>
                 </h3>
             </div>
-            <div class="row list-answer justify-content-center align-items-center mt-2 px-3" style="flex:1;">
+            <div class="row list-answer align-items-center mt-2 px-3" style="flex:1;">
                 <div class="col-6 col-sm-6 col-md-6 col-lg-6 cursor-pointer d-flex align-items-center pe-0 ps-0 mb-2"
                     v-for="(item, index) in currentQuestion.answers" :key="index">
                     <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative"

@@ -14,7 +14,7 @@
                 <p class="text-white fs-5 fw-bold text-center mb-0">Bạn đang ở vị trí thứ
                 </p>
                 <div class="order_number ms-2 d-flex justify-content-center align-items-center text-white fw-bold">
-                    <span>1</span>
+                    <span>{{ currentResult.order_number }}</span>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
             <div v-if="showQuestion && currentRoomStatus > 0"
-                class="row list-answer justify-content-center align-items-center me-0 mt-4 px-3">
+                class="row list-answer  align-items-center me-0 mt-4 px-3">
                 <div class="col-12 col-sm-6 col-md-6 col-lg-6 cursor-pointer pe-0 mb-2"
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="showQuestion && currentRoomStatus > 0" class="control-center mt-auto">
+            <div v-if="currentRoomStatus > 0" class="control-center mt-auto">
                 <div class="control-center-container user-game-footer ps-5" translate="no" style="opacity: 1;">
                     <div class="ring d-flex align-items-center">
                         <span class="fs-4 text-white text-center me-3 text-primary">
@@ -63,32 +63,34 @@
         <div class="table-preview-result" v-if="showResult">
             <div class="row d-flex justify-content-center ms-0 me-0">
                 <div class="col-md-10 ms-0 me-0">
-                    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+                    <el-tabs v-model="activeName" class="demo-tabs  mt-5" @tab-click="handleClick">
                         <el-tab-pane label="Tổng Quan" name="first">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-white">#</th>
-                                        <th scope="col" class="fs-6 text-white">Tên</th>
-                                        <th scope="col" class="fs-6 text-white">Điểm</th>
-                                        <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th>
+                                        <th scope="col" class="text-white text-center">Xếp hạng</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Tên</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Tổng Điểm</th>
+                                        <!-- <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th> -->
+                                        <!-- <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <th scope="row" class="text-white">1</th>
-                                        <td class="text-white">{{ gamerResult?.name }}</td>
-                                        <td class="text-white">{{ gamerResult?.gamer_answers_sum_score ?? 0 }}</td>
-                                        <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
-                                        <td class="text-white detail-score text-center">
+                                        <th scope="row" class="text-white text-center">{{ currentResult.order_number }}
+                                        </th>
+                                        <td class="text-white text-center">{{ gamerResult?.name }}</td>
+                                        <td class="text-white text-center">{{ gamerResult?.gamer_answers_sum_score ?? 0
+                                            }}</td>
+                                        <!-- <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td> -->
+                                        <!-- <td class="text-white detail-score text-center">
                                             <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQuestionColor(gamerResult?.gamer_answers, question.id).class"
                                                 v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
                                                 <p>{{ getResultQuestionColor(gamerResult?.gamer_answers,
                                                     question.id).score }}</p>
                                             </div>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -229,6 +231,7 @@ export default defineComponent({
                 type: false
             }
         );
+
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
                 let answer =  gamerResult.gamer_answers.find((item: GamerAnswer) => item.answer_id == answerId);
@@ -263,7 +266,7 @@ export default defineComponent({
                     }
                     if (res.room.status == RoomStatus.PREPARE_FINISH) {
                         showQuestion.value = false;
-                        showResult.value = true;
+                        // showResult.value = true;
                     }
                     if (res.gamer?.gamer_answers.length > 0) {
                         let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
@@ -353,16 +356,14 @@ export default defineComponent({
         watch(timeReply, async (newValue, oldValue) => {
             if (oldValue == newValue + 1 && newValue == 0 &&
                 (currentRoomStatus.value == RoomStatus.HAPPING || currentRoomStatus.value == RoomStatus.PENDING)) {
-                console.log('currentQuestionIndex' + currentQuestionIndex.value);
                 showQuestion.value = false;
                 ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' }).close();
-                resultCurrentModel.value = true;
+                
                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                     await getListQuestion();
-                    showQuestion.value = false;
-                    showResult.value = true;
-                    resultCurrentModel.value = false;
                 }
+
+                
 
                 if (currentScoreAnswer.value != null) {
                     if (currentScoreAnswer.value > 0) {
@@ -370,8 +371,6 @@ export default defineComponent({
                         currentResult.value.title = 'ĐÚNG';
                         currentResult.value.bg_color = 'bg-correct';
                         currentResult.value.type = true;
-                        checkValidRoom();
-                        console.log(currentResult.value.order_number);
                         // ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
                         return;
                     }
@@ -380,7 +379,6 @@ export default defineComponent({
                     currentResult.value.title = 'SAI';
                     currentResult.value.bg_color = 'bg-incorrect';
                     currentResult.value.type = false;
-                    checkValidRoom();
                     // ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
                     return;
                 }
@@ -389,36 +387,9 @@ export default defineComponent({
                 currentResult.value.title = 'HẾT THỜI GIAN';
                 currentResult.value.bg_color = 'bg-incorrect';
                 currentResult.value.type = false;
-                checkValidRoom();
-                console.log(currentResult.value.order_number);
                 // ElNotification({ title: "Oh no!", message: "Đã hết thời gian trả lời!", type: "warning" });
-                
-
             }
         });
-
-        const checkValidRoom = async () => {
-            // await api.room.checkValidRoom(
-            //     roomId.value,
-            //     (res: any) => {
-            //         if (res.gamers.length > 0) {
-            //             let userId = gamerInfo.value?.id;
-            //             for (let i = 0; i<res.gamers.length; i++) {
-            //                 if (res.gamers[i].id === userId) {
-            //                     currentResult.value.order_number = i + 1;
-            //                     break;
-            //                 }
-            //             }
-            //         }
-            //     },
-            //     (err: ErrorResponse) => {
-            //         ElNotification({ title: "Error", message: err.error.shift(), type: "error" })
-            //         if (err.code === HttpStatusCode.NotFound) {
-            //             return navigateTo("/not-found");
-            //         }
-            //     }
-            // )
-        }
 
         onMounted(async () => {
             clearInterval(intervalId);
@@ -453,6 +424,26 @@ export default defineComponent({
                     isRoomRunning.value = false;
                     centerDialogVisible.value = true;
                 });
+                
+            $echo.channel('user.room.' + roomId.value)
+                .listen('GetGamerNumberEvent', (e: any) => {
+                    resultCurrentModel.value = true;
+                    let orderNumberGameArray = e.orderNumberGamers;
+                    orderNumberGameArray.forEach( (gamer: any) => {
+                        if (gamer.gamer_id === gamerInfo.value?.id) {
+                            currentResult.value.order_number = gamer.id;
+                            return;
+                        }
+                    });
+
+                    if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+                        setTimeout(() => {
+                            showQuestion.value = false;
+                            showResult.value = true;
+                            resultCurrentModel.value = false;
+                        }, 5000)
+                    }
+                });
         });
 
         onBeforeUnmount(() => {
@@ -486,7 +477,6 @@ export default defineComponent({
             backgroundColorAnswers,
             resultCurrentModel,
             currentResult,
-            checkValidRoom
 
         }
     }
