@@ -32,7 +32,7 @@
             </div>
             <div v-if="showQuestion && currentRoomStatus > 0"
                 class="row list-answer  align-items-center me-0 mt-4 px-3">
-                <div class="col-12 col-sm-6 col-md-6 col-lg-6 cursor-pointer pe-0 mb-2"
+                <div class="col-12 col-sm-6 col-md-6 col-lg-6 cursor-pointer pe-0 mb-2 "
                     v-for="(item, index) in currentQuestion?.answers" :key="index">
                     <div @click="submitAnswer(item.id)"
                         :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)"
@@ -231,6 +231,7 @@ export default defineComponent({
                 type: false
             }
         );
+        const loadingInstance: Ref<ReturnType<typeof ElLoading.service> | null> = ref(null);
 
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -294,7 +295,9 @@ export default defineComponent({
                 ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 return ;
             }
-            ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
+            if (!loadingInstance.value) { // Kiểm tra nếu loadingInstance chưa có giá trị
+                loadingInstance.value = ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
+            }
             showQuestion.value = false;
             if (isSubmited.value) {
                 ElNotification({title: "Oh no!", message: 'Bạn đã trả lời câu hỏi này rồi!', type: "error"});
@@ -357,8 +360,10 @@ export default defineComponent({
             if (oldValue == newValue + 1 && newValue == 0 &&
                 (currentRoomStatus.value == RoomStatus.HAPPING || currentRoomStatus.value == RoomStatus.PENDING)) {
                 showQuestion.value = false;
-                ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' }).close();
-                
+                if (loadingInstance.value) {
+                    loadingInstance.value.close();
+                    loadingInstance.value = null;
+                }
                 if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                     await getListQuestion();
                 }
@@ -484,4 +489,8 @@ export default defineComponent({
 </script>
 <style scoped>
 @import '~/assets/styles/user/user-game.scss';
+.answer-item {
+    /* border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px; */
+}
 </style>

@@ -307,3 +307,10 @@ html:not(.layout-menu-collapsed) .bg-menu-theme .menu-inner .menu-item:not(.acti
 .el-dialog.result-current-model {
   background-color: rgba(255,255,255,0.2);
 }
+
+#my-chart-id {
+    width: 80% !important;
+    margin: 0px auto 24px auto;
+    max-height: 300px !important;
+    max-width: 750px !important;
+}

@@ -79,23 +79,37 @@
             </div>
         </div>
         <div class="w-full d-flex flex-column" v-if="showQuestion">
-            <div class="row question-title d-flex flex-wrap justify-content-center align-items-center" style="flex:1;">
-                <p class="text-dark text-center fs-2 py-4 question fw-bold">{{ listQuestion.findIndex(item => item.id ==
+            <div class="row d-flex flex-wrap justify-content-center align-items-center" style="flex:1;"
+                :class="{ 'question-title': !displayChart }">
+                <p class="text-dark text-center fs-2 py-4 question fw-bold lh-base">{{ listQuestion.findIndex(item =>
+                    item.id ==
                     currentQuestion.id)
                     + 1 }}. {{ currentQuestion.title }}</p>
-                <h3 class="text-warning text-start fs-1 px-5">
+                <h3 v-if="displayTime" class="text-warning text-start fs-1 px-5">
                     <span class="remaining_time">{{ remainingTime }}</span>
                 </h3>
+            </div>
+            <div v-if="displayChart" style="background-color: rgba(0, 0, 0, 0.3);" class="pt-2">
+                <BarChart :getDataChart="getDataChart" />
             </div>
             <div class="row list-answer align-items-center mt-2 px-3" style="flex:1;">
                 <div class="col-6 col-sm-6 col-md-6 col-lg-6 cursor-pointer d-flex align-items-center pe-0 ps-0 mb-2"
                     v-for="(item, index) in currentQuestion.answers" :key="index">
                     <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative"
-                        :style="{ background: backgroundColorAnswers[index] }">
-                        <span class="fs-3 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2 border-0"
-                            :style="{ background: backgroundColorAnswers[index] }">{{ index +
+                        :style="{ background: backgroundColorAnswers[index] }"
+                        :class="{ 'opacity_5': !item.is_correct && displayChart }">
+                        <span class="fs-3 text-white position-absolute  btn btn-dark mt-2 me-2 border-0"
+                            :style="{ background: backgroundColorAnswers[index] }" style="left: 0; top: 0">{{ index +
                             1 }}</span>
                         <p class="text-white lh-base fs-2 pt-4 text-center">{{ item.answer }}</p>
+                        <span v-if="item.is_correct && displayChart"
+                            class="fs-3 text-white position-absolute me-4 border-0" style="right: 0;">
+                            <RiCheckFill size="40" class="fw-bold" />
+                        </span>
+                        <span v-if="!item.is_correct && displayChart"
+                            class="fs-3 text-white position-absolute me-4 border-0" style="right: 0;">
+                            <RiCloseFill size="40" class="fw-bold" />
+                        </span>
                     </div>
                 </div>
             </div>
@@ -108,11 +122,11 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-white text-center">#</th>
+                                        <th scope="col" class="text-white text-center">Xếp hạng</th>
                                         <th scope="col" class="fs-6 text-white text-center">Tên</th>
-                                        <th scope="col" class="fs-6 text-white text-center">Điểm</th>
-                                        <th scope="col" class="fs-6 text-white text-center">Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white text-center text-center">Chi tiết</th>
+                                        <th scope="col" class="fs-6 text-white text-center">Tổng Điểm</th>
+                                        <!-- <th scope="col" class="fs-6 text-white text-center">Số Câu đúng</th>
+                                        <th scope="col" class="fs-6 text-white text-center text-center">Chi tiết</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -120,9 +134,10 @@
                                         <th scope="col" class="text-white text-center">{{ index + 1 }}</th>
                                         <td scope="col" class="text-white text-center">{{ item.name ?? 'Sóc ẩn danh' }}
                                         </td>
-                                        <td scope="col"  class="text-white text-center">{{ item.gamer_answers_sum_score
+                                        <td scope="col" class="text-white text-center">{{ item.gamer_answers_sum_score
                                             ?? 0 }}</td>
-                                        <td scope="col" class="text-white text-center">{{ countQuestionTrue(item) }}</td>
+                                        <!-- <td scope="col" class="text-white text-center">{{ countQuestionTrue(item) }}
+                                        </td>
                                         <td scope="col" class="text-white text-center">
                                             <span
                                                 :class="'badge rounded-pill width-2 ms-1 ' + getResultQuestionColor(item.gamer_answers, question.id).class"
@@ -131,7 +146,7 @@
                                                 <p>{{ getResultQuestionColor(item.gamer_answers, question.id).score }}
                                                 </p>
                                             </span>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -183,6 +198,10 @@
                             class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark me-5">
                             Tiếp theo
                         </button>
+                        <button @click="displayResult()" v-if="showButtonDisplayResult"
+                            class="btn btn-primary text-white fs-5 fw-bold font-600 text-dark me-5">
+                            Tiếp theo
+                        </button>
                     </div>
                 </div>
                 <div class="control-center-actions"></div>
@@ -204,12 +223,13 @@ import { useRoute } from "vue-router";
 import api from "~/api/axios";
 import type { Answer, ErrorResponse, GamerAnswer, GamerResult, ItemQuestion } from "~/constants/type";
 import { HttpStatusCode } from "axios";
-import { RiUser2Fill, RiCheckFill, RiArrowRightUpLine } from "@remixicon/vue";
+import { RiUser2Fill, RiCheckFill, RiArrowRightUpLine, RiCloseFill, } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
 import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 import type Echo from "laravel-echo";
 import QRCode from 'qrcode';
+import BarChart from "./BarChart.vue";
 
 definePageMeta({
     layout: "admin-game",
@@ -219,7 +239,9 @@ export default defineComponent({
     components: {
         RiUser2Fill,
         RiCheckFill,
-        RiArrowRightUpLine
+        RiArrowRightUpLine,
+        BarChart,
+        RiCloseFill
     },
     setup() {
         const config = useRuntimeConfig();
@@ -272,15 +294,25 @@ export default defineComponent({
         ]);
 
         let countReload = ref<number>(0);
+        const displayTime = ref<boolean>(true);
+        const displayChart = ref<boolean>(false);
+        const showButtonDisplayResult = ref<boolean>(false);
+        const getDataChart = ref<Array<any>>([]);
 
         const checkValidRoom = async () => {
             let roomId: string = route.params.roomId.toString();
             await api.room.checkValidRoom(
                 roomId,
                 (res: any) => {
+                    console.log(res);
+                    if (res.list_current_answers.length !== 0) {
+                        getDataChart.value = res.list_current_answers.map((item: any, index : int) => {
+                            return item.gamer_answers_count;
+                        });
+                    }
                     code.value = res.room.code;
                     if (res.room.gamers.length > 0) {
-                        listUserJoined.value = res.room.gamers.filter(item => item.name != null)
+                        listUserJoined.value = res.room.gamers.filter( (item: any) => item.name != null)
                     }
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
@@ -293,9 +325,8 @@ export default defineComponent({
                         }
                     }
                     if (res.gamers.length > 0) {
-                        listGamerResult.value = res.gamers.filter(item => item.name != null);
+                        listGamerResult.value = res.gamers.filter((item: any) => item.name != null);
                     }
-                    console.log(listGamerResult.value);
                     currentQuestion.value = res.room.current_question_id ?
                         res.questions.find((item: ItemQuestion) => item.id == res.room.current_question_id) : res.questions[0];
                     ElLoading.service({ fullscreen: true }).close();
@@ -318,13 +349,14 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
-                    // remainingTime.value = RoomSetting.TIME_REPLY;
                     remainingTime.value = RoomSetting.TIME_REPLY;
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
+                    showButtonDisplayResult.value = false;
                     setShowResult(RoomSetting.TIME_REPLY * 1000);
                     setTimeout(() => {
-                        showButtonNext.value = true;
+                        // showButtonNext.value = true;
+                        showButtonDisplayResult.value = true;
                     }, RoomSetting.TIME_REPLY * 1000);
                 },
                 (err: ErrorResponse) => {
@@ -342,7 +374,7 @@ export default defineComponent({
             let nextQuestionIndex = listQuestion.value.findIndex((item: ItemQuestion) => item.id == id) + 1;
             if (nextQuestionIndex == listQuestion.value.length) {
                 ElNotification({ title: "Warming", message: "Bạn đã đi hết các câu hỏi", type: "warning" });
-
+                showButtonNext.value = false;
                 return;
             }
             ElLoading.service({ fullscreen: true });
@@ -360,15 +392,19 @@ export default defineComponent({
                         currentQuestion.value = listQuestion.value[nextQuestionIndex];
                         showResult.value = false;
                         showQuestion.value = true;
+                        displayTime.value = true;
                         calculateTimeReply();
                         setTimeout(async () => {
                             if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
                                 await checkValidRoom();
                             }
-                            showButtonNext.value = true;
-                            showResult.value = true;
-                            showQuestion.value = false;
-                            getCurrentCorrectAnswerText();
+                            displayChart.value = true;
+                            showButtonDisplayResult.value = true;
+                            displayTime.value = false;
+                            // showButtonNext.value = true;
+                            // showResult.value = true;
+                            // showQuestion.value = false;
+                            // getCurrentCorrectAnswerText();
                         }, RoomSetting.TIME_REPLY * 1000);
                     }
                 },
@@ -387,10 +423,13 @@ export default defineComponent({
                 if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
                     await checkValidRoom();
                 }
-                showButtonNext.value = true;
-                showResult.value = true;
-                showQuestion.value = false;
-                getCurrentCorrectAnswerText();
+                // showButtonNext.value = true;
+                // showResult.value = true;
+                // showQuestion.value = false;
+                // getCurrentCorrectAnswerText();
+                displayTime.value = false;
+                displayChart.value = true;
+                
             }, delay);
         }
 
@@ -430,7 +469,7 @@ export default defineComponent({
                 } else {
                     clearInterval(intervalId);
                 }
-            }, 1000 // 1 second
+            }, 1000
             );
         }
 
@@ -472,7 +511,6 @@ export default defineComponent({
             setRoomStatus();
             $echo.private('user.join-room.' + route.params.roomId.toString())
                 .listen('UserJoinRoomEvent', (e: { gamer: GamerInfo }) => {
-                    // console.log(e);
                     listUserJoined.value.push(e.gamer);
                 });
         });
@@ -489,6 +527,14 @@ export default defineComponent({
         const closeModelQR = () => {
             dialogVisible.value = false;
             hiddenIfDisplayModelExpand.value = true;
+        }
+
+        const displayResult = () => {
+            showButtonNext.value = true;
+            showResult.value = true;
+            showQuestion.value = false;
+            displayChart.value = false;
+            showButtonDisplayResult.value = false;
         }
 
         return {
@@ -519,7 +565,12 @@ export default defineComponent({
             hiddenIfDisplayModelExpand,
             isHovered: false,
             closeModelQR,
-            backgroundColorAnswers
+            backgroundColorAnswers,
+            displayTime,
+            displayChart,
+            showButtonDisplayResult,
+            displayResult,
+            getDataChart
         }
     }
 })
@@ -534,22 +585,6 @@ export default defineComponent({
 .expand_qr .content {
     background-color: #4CAF50 !important;
 }
-
-// .hover-icon {
-//     position: absolute;
-//     top: 50%;
-//     left: 50%;
-//     transform: translate(-50%, -50%);
-//     font-size: 30px;
-//     color: #fff;
-//     display: none;
-//     background-color: #0e0b0b;
-//     border-radius: 50%;
-// }
-
-// .qr-code-join-room:hover .hover-icon {
-//     display: block;
-// }
 
 .qr-code-join-room:hover {
     opacity: 0.8;
@@ -580,5 +615,32 @@ export default defineComponent({
 
 .el-dialog__header{
     display: none !important;
+}
+
+.score_list {
+    width: 80% ;
+    margin: 12px auto;
+    height: 350px;
+    max-width: 750px ;
+}
+.score_item {
+    width: 128px;
+}
+.content_item {
+    background-color: #e21b3c;
+    height: 230px;
+    width: 100%;
+}
+.footer_item {
+    background-color: #af152e;
+    height: 32px;
+    width: 100%;
+}
+.opacity_5 {
+    opacity: 0.5;
+}
+.list-answer-item {
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
 }
 </style>

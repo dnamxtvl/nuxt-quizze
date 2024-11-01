@@ -36,6 +36,7 @@ const API_CONST = {
         SUBMIT_ANSWER: 'user/gamer/submit-answer',
         OUT_GAME: 'user/gamer/out-game',
         SUBMIT_HOMEWORK: 'user/gamer/submit-homework',
+        GET_QUANTITY_GAMER_ANSWER: '/user/gamer/get_quantity_gamer_answer'
     },
     FRONT_END: {
         USER_GAME: '/user/join/game',
