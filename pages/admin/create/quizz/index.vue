@@ -18,13 +18,13 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center ms-1 me-1">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-5 mb-3">
                             <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Tiêu đề <span
                                     class="text-danger">*</span></label>
                             <input v-model="title" type="text" class="form-control col-md-6"
                                 placeholder="Câu hỏi tin học">
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-5 mb-3">
                             <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Chủ đề <span
                                     class="text-danger">*</span></label>
                             <select v-model="categoryId" type="text" class="form-control col-md-6"
@@ -33,6 +33,14 @@
                                 <option :value="item.id" v-if="listCategory.length > 0" v-for="(item,index) in listCategory" :key="index">
                                     {{ item.name }}
                                 </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-600 fs-5">Thời gian trả lời mỗi câu <span
+                                    class="text-danger">*</span></label>
+                            <select v-model="timeLimit" type="text" class="form-control col-md-6"
+                                placeholder="Chọn thời gian trả lời">
+                                <option v-for="(item, index) in quizTimeLimit" :label="item.text" :value="item.value"></option>
                             </select>
                         </div>
                     </div>
@@ -122,6 +130,7 @@ import type { TabsPaneContext } from 'element-plus'
 import { RiAddCircleFill, RiUploadLine, RiDownloadLine } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
+import { QUIZ_TIME_LIMIT } from "~/constants/quiz";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -162,6 +171,8 @@ export default defineComponent({
         const contentOfFile = ref<Array<ItemQuestion>>([]);
         const isValidQuestions = ref<boolean>(false);
         const listCategory = ref<Array<Category>>([]);
+        const timeLimit = ref<number>(QUIZ_TIME_LIMIT[2].value);
+        const quizTimeLimit = QUIZ_TIME_LIMIT;
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -196,12 +207,12 @@ export default defineComponent({
             let objectQuestions = {
                 quizze: {
                     title: title.value,
-                    category_id: categoryId.value
+                    category_id: categoryId.value,
+                    time_limit: timeLimit.value
                 },
                 questions: listQuestion
                 
             }
-
             await api.quizze.createQuizze(objectQuestions, (res: any) => {
                 ElNotification({title: "Success", message: "Tạo bộ câu hỏi thành công!", type: "success"});
                 return navigateTo("/admin/dashboard/my-library");
@@ -427,6 +438,8 @@ export default defineComponent({
             errorMessagesUpload,
             errorMessagesPasteListQuestion,
             listCategory,
+            quizTimeLimit,
+            timeLimit
         }
     }
 })
