@@ -304,7 +304,6 @@ export default defineComponent({
             await api.room.checkValidRoom(
                 roomId,
                 (res: any) => {
-                    console.log(res);
                     if (res.list_current_answers.length !== 0) {
                         getDataChart.value = res.list_current_answers.map((item: any, index : int) => {
                             return item.gamer_answers_count;
@@ -429,6 +428,7 @@ export default defineComponent({
                 // getCurrentCorrectAnswerText();
                 displayTime.value = false;
                 displayChart.value = true;
+                showButtonDisplayResult.value = true;
                 
             }, delay);
         }

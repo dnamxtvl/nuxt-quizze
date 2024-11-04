@@ -276,6 +276,17 @@ export default defineComponent({
                             currentScoreAnswer.value = currentQuestionSubmited.score;
                         }
                     }
+                    if (res.room.status == RoomStatus.PENDING) {
+                        showQuestion.value = false;
+                    }
+                    if (selectedAnswerId.value && res.room.status!=RoomStatus.PENDING) {
+                        if (!loadingInstance.value) { 
+                            loadingInstance.value = ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
+                            showResult.value = false;
+                        }
+                        showQuestion.value = false;
+                    }
+
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Error", message: err.error.shift(), type: "error"});
@@ -295,8 +306,9 @@ export default defineComponent({
                 ElNotification({title: "Warning", message: "Chưa đến thời gian submit câu hỏi!", type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
                 return ;
             }
-            if (!loadingInstance.value) { // Kiểm tra nếu loadingInstance chưa có giá trị
+            if (!loadingInstance.value) {
                 loadingInstance.value = ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
+                showResult.value = false;
             }
             showQuestion.value = false;
             if (isSubmited.value) {
@@ -368,31 +380,6 @@ export default defineComponent({
                     await getListQuestion();
                 }
 
-                
-
-                if (currentScoreAnswer.value != null) {
-                    if (currentScoreAnswer.value > 0) {
-                        currentResult.value.score = currentScoreAnswer.value;
-                        currentResult.value.title = 'ĐÚNG';
-                        currentResult.value.bg_color = 'bg-correct';
-                        currentResult.value.type = true;
-                        // ElNotification({title: "Chúc mừng!", message: "+" + currentScoreAnswer.value, type: "success"});
-                        return;
-                    }
-
-                    currentResult.value.score = 0;
-                    currentResult.value.title = 'SAI';
-                    currentResult.value.bg_color = 'bg-incorrect';
-                    currentResult.value.type = false;
-                    // ElNotification({title: "Bạn đã trả lời sai!", message: "Chúc bạn may mắn lần sau!", type: "error"});
-                    return;
-                }
-
-                currentResult.value.score = 0;
-                currentResult.value.title = 'HẾT THỜI GIAN';
-                currentResult.value.bg_color = 'bg-incorrect';
-                currentResult.value.type = false;
-                // ElNotification({ title: "Oh no!", message: "Đã hết thời gian trả lời!", type: "warning" });
             }
         });
 
@@ -432,7 +419,6 @@ export default defineComponent({
                 
             $echo.channel('user.room.' + roomId.value)
                 .listen('GetGamerNumberEvent', (e: any) => {
-                    resultCurrentModel.value = true;
                     let orderNumberGameArray = e.orderNumberGamers;
                     orderNumberGameArray.forEach( (gamer: any) => {
                         if (gamer.gamer_id === gamerInfo.value?.id) {
@@ -440,6 +426,27 @@ export default defineComponent({
                             return;
                         }
                     });
+                    if (currentScoreAnswer.value != null) {
+                        if (currentScoreAnswer.value > 0) {
+                            currentResult.value.score = currentScoreAnswer.value;
+                            currentResult.value.title = 'ĐÚNG';
+                            currentResult.value.bg_color = 'bg-correct';
+                            currentResult.value.type = true;
+                        } else {
+                            currentResult.value.score = 0;
+                            currentResult.value.title = 'SAI';
+                            currentResult.value.bg_color = 'bg-incorrect';
+                            currentResult.value.type = false;
+                        }   
+                    } else {
+                        currentResult.value.score = 0;
+                        currentResult.value.title = 'HẾT THỜI GIAN';
+                        currentResult.value.bg_color = 'bg-incorrect';
+                        currentResult.value.type = false;
+                    }
+                  
+
+                    resultCurrentModel.value = true;
 
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(() => {
