@@ -178,6 +178,7 @@ import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 import type Echo from "laravel-echo";
 import QRCode from 'qrcode';
+import { QUIZ_TIME_LIMIT } from "~/constants/quiz";
 
 definePageMeta({
     layout: "admin-game",
@@ -200,6 +201,7 @@ export default defineComponent({
             id: '',
             title: '',
             quizze_id: '',
+            time_limit: 0,
             answers: [],
             created_at: ''
         });
@@ -244,8 +246,8 @@ export default defineComponent({
                     listQuestion.value = res.questions;
                     roomStatus.value = res.room.status;
                     if (res.room.status == RoomStatus.HAPPING) {
-                        remainingTimeReload.value = res.time_remaining;
-                        remainingTime.value = res.time_remaining;
+                        remainingTimeReload.value = currentQuestion.value.time_limit;
+                        remainingTime.value = currentQuestion.value.time_limit;
                         if (countReload.value == 0) {
                             setShowResult(remainingTimeReload.value * 1000);
                             countReload.value ++;
@@ -276,13 +278,13 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
-                    remainingTime.value = RoomSetting.TIME_REPLY;
+                    remainingTime.value = currentQuestion.value.time_limit;
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
-                    setShowResult(RoomSetting.TIME_REPLY * 1000);
+                    setShowResult(currentQuestion.value.time_limit * 1000);
                     setTimeout(() => {
                         showButtonNext.value = true;
-                    }, RoomSetting.TIME_REPLY * 1000);
+                    }, currentQuestion.value.time_limit * 1000);
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Warning", message: err.error.shift(), type: "warning"});
@@ -313,8 +315,9 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     if (nextQuestionIndex < listQuestion.value.length) {
-                        remainingTime.value = RoomSetting.TIME_REPLY;
-                        currentQuestion.value = listQuestion.value[nextQuestionIndex];
+                        let nextQuestion = listQuestion.value[nextQuestionIndex];
+                        remainingTime.value = nextQuestion.time_limit;
+                        currentQuestion.value = nextQuestion;
                         showResult.value = false;
                         showQuestion.value = true;
                         calculateTimeReply();
@@ -326,7 +329,7 @@ export default defineComponent({
                             showResult.value = true;
                             showQuestion.value = false;
                             getCurrentCorrectAnswerText();
-                        }, RoomSetting.TIME_REPLY * 1000);
+                        }, currentQuestion.value.time_limit * 1000);
                     }
                 },
                 (err: ErrorResponse) => {

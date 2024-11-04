@@ -163,6 +163,7 @@ export default defineComponent({
             id: '',
             title: '',
             quizze_id: '',
+            time_limit: 0,
             answers: [],
             created_at: ''
         });
@@ -331,7 +332,7 @@ export default defineComponent({
             $echo.channel('admin.start-game.' + roomId.value)
                 .listen('StartGameEvent', (e: any) => {
                     currentRoomStatus.value = RoomStatus.HAPPING;
-                    timeReply.value = RoomSetting.TIME_REPLY;
+                    timeReply.value = currentQuestion.value.time_limit;
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
@@ -340,7 +341,7 @@ export default defineComponent({
                 .listen('NextQuestionEvent', (e: any) => {
                     currentQuestionIndex.value = currentQuestionIndex.value + 1;
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-                    timeReply.value = RoomSetting.TIME_REPLY;
+                    timeReply.value = currentQuestion.value.time_limit;
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
