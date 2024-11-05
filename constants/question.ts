@@ -1,0 +1,10 @@
+export const IMPORT_FILE_FORMAT = {
+    TITLE_COL: 0,
+    ANSWER_A_COL: 1,
+    ANSWER_B_COL: 2,
+    ANSWER_C_COL: 3,
+    ANSWER_D_COL: 4,
+    TIME_LIMIT_COL: 5
+};
+
+export const QUIZ_TIME_LIMIT_DEFAULT = 20;

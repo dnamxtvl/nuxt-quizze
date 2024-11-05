@@ -7,11 +7,8 @@
             </div>
             <label for="inputPassword6" class="col-form-label fw-bold">Câu hỏi</label>
             <input type="text" class="form-control" v-model="currentQuestion.title"/>
-            <label class="col-form-label fw-bold">Thời gian trả lời</label>
-            <select v-model="currentQuestion.time_limit" type="text" class="form-control col-md-6"
-                placeholder="Chọn thời gian trả lời">
-                <option v-for="(item, index) in quizTimeLimit" :label="item.text" :value="item.value"></option>
-            </select>
+            <label class="col-form-label fw-bold">Thời gian trả lời (giây)</label>
+            <input type="number" class="form-control" v-model="currentQuestion.time_limit" name="time_limit">
             <div class="row mt-3">
                 <span class="text-primary">
                     <label for="inputPassword6" class="col-form-label fw-bold">Câu trả lời</label>
@@ -129,11 +126,16 @@ import { ROOM_STATUS_TEXT } from "~/constants/room";
 import { RULES_VALIDATION } from "~/constants/application";
 import { useValidator } from "#imports";
 import { useMainStore } from "~/store";
-import { QUIZ_TIME_LIMIT } from "~/constants/quiz";
+import { QUIZ_TIME_LIMIT_DEFAULT } from "~/constants/question";
 
 definePageMeta({
     layout: "admin-dashboard",
 })
+
+interface ValidatorRes {
+    message: string,
+    status: boolean
+}
 
 interface GamerInfo {
     id: string;
@@ -187,7 +189,6 @@ export default defineComponent({
         const isUpdate = ref<boolean>(false);
         const showModalDeleteQuestion = ref<boolean>(false);
         const currentQuestionIdDelete = ref<string>('');
-        const quizTimeLimit = QUIZ_TIME_LIMIT;
         
         const getListQuestion = async () => {
             await api.quizze.listQuestion(
@@ -303,13 +304,13 @@ export default defineComponent({
                 title: '',
                 quizze_id: route.params.quizzId as string,
                 answers: [],
-                time_limit: QUIZ_TIME_LIMIT[2].value,
+                time_limit: QUIZ_TIME_LIMIT_DEFAULT,
                 created_at: ''
             }
         }
 
         const validateQuestionUpdateOrCreate = () => {
-            const validator = useValidator();
+            const validator = useValidator();            
             let isPassvalidate: boolean = true;
             let errorMessagesValidate: string[] = [];
             if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
@@ -339,6 +340,12 @@ export default defineComponent({
             
             if (isLengthTitleQuestion != true) {
                 errorMessagesValidate.push(isLengthTitleQuestion);
+                isPassvalidate = false;
+            }
+
+            const checkTimeLimit: ValidatorRes = validator.timeLimitValidator(currentQuestion.value.time_limit);
+            if (!checkTimeLimit.status) {
+                errorMessagesValidate.push(checkTimeLimit.message);
                 isPassvalidate = false;
             }
 
@@ -398,7 +405,6 @@ export default defineComponent({
             handleRemoveQuestion,
             removeQuestion,
             authId,
-            quizTimeLimit,
         }
     }
 })

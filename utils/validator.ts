@@ -64,6 +64,29 @@ export const useValidator = () => {
       }
 
       return code.length == RULES_VALIDATION.CODE.LENGTH;
+    },
+
+    timeLimitValidator: (timeLimit: any, questionNumber: string = '') => {
+      const checkTimeLimit = RULES_VALIDATION.NUMBER_ONLY.test(String(timeLimit).trim());
+      console.log(checkTimeLimit);
+      
+      if (!checkTimeLimit) {
+          return {
+            message: `Câu hỏi ${questionNumber} phải nhập thời gian trả lời là số!`,
+            status: false
+          };
+      }
+      if (Number(timeLimit) < RULES_VALIDATION.QUESTION.MIN_TIME_LIMIT || 
+          Number(timeLimit) > RULES_VALIDATION.QUESTION.MAX_TIME_LIMIT) {
+          return {
+            message: `Câu hỏi ${questionNumber} phải nhập thời gian nhỏ hơn 4 phút và ít nhất 1 giây!`,
+            status: false
+          };
+      }
+      return {
+        message: ``,
+        status: true
+      };
     }
   }
 }

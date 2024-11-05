@@ -18,13 +18,13 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center ms-1 me-1">
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Tiêu đề <span
                                     class="text-danger">*</span></label>
                             <input v-model="title" type="text" class="form-control col-md-6"
                                 placeholder="Câu hỏi tin học">
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="exampleInputEmail1" class="form-label fw-600 fs-5">Chủ đề <span
                                     class="text-danger">*</span></label>
                             <select v-model="categoryId" type="text" class="form-control col-md-6"
@@ -33,14 +33,6 @@
                                 <option :value="item.id" v-if="listCategory.length > 0" v-for="(item,index) in listCategory" :key="index">
                                     {{ item.name }}
                                 </option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-600 fs-5">Thời gian trả lời mỗi câu <span
-                                    class="text-danger">*</span></label>
-                            <select v-model="timeLimit" type="text" class="form-control col-md-6"
-                                placeholder="Chọn thời gian trả lời">
-                                <option v-for="(item, index) in quizTimeLimit" :label="item.text" :value="item.value"></option>
                             </select>
                         </div>
                     </div>
@@ -130,7 +122,8 @@ import type { TabsPaneContext } from 'element-plus'
 import { RiAddCircleFill, RiUploadLine, RiDownloadLine } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
-import { QUIZ_TIME_LIMIT } from "~/constants/quiz";
+import { IMPORT_FILE_FORMAT } from "~/constants/question";
+import { useValidator } from "#imports";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -143,13 +136,19 @@ interface ItemAnswer {
 
 interface ItemQuestion {
     title: string;
-    answers: ItemAnswer[]
+    answers: ItemAnswer[];
+    time_limit: number
 }
 
 interface Category {
     id: number;
     name: string,
     created_at: string
+}
+
+interface ValidatorRes {
+    message: string,
+    status: boolean
 }
 
 export default defineComponent({
@@ -171,8 +170,6 @@ export default defineComponent({
         const contentOfFile = ref<Array<ItemQuestion>>([]);
         const isValidQuestions = ref<boolean>(false);
         const listCategory = ref<Array<Category>>([]);
-        const timeLimit = ref<number>(QUIZ_TIME_LIMIT[2].value);
-        const quizTimeLimit = QUIZ_TIME_LIMIT;
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
@@ -207,8 +204,7 @@ export default defineComponent({
             let objectQuestions = {
                 quizze: {
                     title: title.value,
-                    category_id: categoryId.value,
-                    time_limit: timeLimit.value
+                    category_id: categoryId.value
                 },
                 questions: listQuestion
                 
@@ -301,6 +297,7 @@ export default defineComponent({
         };
 
         const validateRowOfFile = () => {
+            const validator = useValidator();
             let isPassValidate: boolean = true;
             let errorMessagesValidate: string[] = [];
             if (contentOfFile.value.length > RULES_VALIDATION.FILE.MAX_QUESTION) {
@@ -309,47 +306,65 @@ export default defineComponent({
             }
             const questionOfFile: Array<ItemQuestion> = [];
 
-            for (let i = 0; i < contentOfFile.value.length; i++) {
+            for (let i = 1; i < contentOfFile.value.length; i++) {
                 const row: any = contentOfFile.value[i];
-                const title = row.title?.trim() ?? '';
-                if (Object.keys(row).filter((key: string) => key == 'title').length != 1) {
-                    errorMessagesValidate.push("Format của file không hợp lệ!");
+                const rowDataFormatted = row.map((item: any) => String(item).trim());
+                const title = rowDataFormatted[IMPORT_FILE_FORMAT.TITLE_COL];
+                const timeLimit = rowDataFormatted[IMPORT_FILE_FORMAT.TIME_LIMIT_COL];
+                const answersArr = [
+                    rowDataFormatted[IMPORT_FILE_FORMAT.ANSWER_A_COL],
+                    rowDataFormatted[IMPORT_FILE_FORMAT.ANSWER_B_COL],
+                    rowDataFormatted[IMPORT_FILE_FORMAT.ANSWER_C_COL],
+                    rowDataFormatted[IMPORT_FILE_FORMAT.ANSWER_D_COL],
+                ];
+
+                if (row.length !== RULES_VALIDATION.FILE.TOTAL_HEADER_REQUIRE) {
+                    errorMessagesValidate.push("Format của file không hợp lệ! File phải bao gồm các cột Title, Answer A, Answer B, Answer C, Answer D, Time Limit");
                     isPassValidate = false;
                     break;
                 }
 
-                let otherColumn = Object.keys(row).filter((key: string) => key != 'title');
-                if (otherColumn.length > RULES_VALIDATION.QUESTION.MAX_ANSWER || otherColumn.length < RULES_VALIDATION.QUESTION.MIN_ANSWER) {
+                const numberAnswers = answersArr.filter(item => item.length > 0).length;
+                if (numberAnswers > RULES_VALIDATION.QUESTION.MAX_ANSWER || numberAnswers < RULES_VALIDATION.QUESTION.MIN_ANSWER) {
                     errorMessagesValidate.push(`Format file ở từng câu phải có từ 2 đến 4 câu trả lời!`);
                     isPassValidate = false;
                     break;
                 };
 
                 if (title.length > RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH || title.length < RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH) {
-                    errorMessagesValidate.push(`Câu hỏi ${i + 1} phải có 6 đến 255 ký tự!`);
+                    errorMessagesValidate.push(`Câu hỏi ${i} phải có 6 đến 255 ký tự!`);
                     isPassValidate = false;
                 }
 
-                const countAnswerCorrect = Object.keys(row).filter((key: string) => key !== 'title').filter((key: string) => /\(true\)/.test(row[key])).length;
+                const countAnswerCorrect = answersArr.filter((item: string) => /\(true\)/.test(item)).length;
                 if (countAnswerCorrect == 0) {
-                    errorMessagesValidate.push(`Câu hỏi ${i + 1} phải có 1 đáp án đúng!`);
+                    errorMessagesValidate.push(`Câu hỏi ${i} phải có 1 đáp án đúng!`);
                     isPassValidate = false;
                 }
 
                 if (countAnswerCorrect > 1) {
-                    errorMessagesValidate.push(`Câu hỏi ${i + 1} chỉ được có 1 đáp án đúng!`);
+                    errorMessagesValidate.push(`Câu hỏi ${i} chỉ được có 1 đáp án đúng!`);
                     isPassValidate = false;
                 }
 
-                const answers = Object.keys(row).filter((key: string) => key !== 'title').map((key: string) => {
+                const checkTimeLimit: ValidatorRes = validator.timeLimitValidator(timeLimit, `${i}`);
+                if (!checkTimeLimit.status) {
+                    errorMessagesValidate.push(checkTimeLimit.message);
+                    isPassValidate = false;
+                }
+
+                const answers = answersArr.map((item: string) => {
                     return {
-                        answer: /\(true\)/.test(row[key]) ?
-                            row[key].replace(/\(true\)/, '').trim() : row[key],
-                        is_correct: /\(true\)/.test(row[key])
+                        answer: /\(true\)/.test(item) ?
+                        item.replace(/\(true\)/, '').trim() : item,
+                        is_correct: /\(true\)/.test(item)
                     }
                 })
 
-                questionOfFile.push({title, answers});
+                console.log(answers);
+                
+
+                questionOfFile.push({title, answers, time_limit: timeLimit});
             }
 
             errorMessagesUpload.value = errorMessagesValidate;
@@ -366,7 +381,7 @@ export default defineComponent({
             if (!validateFileQuestion()) return ;
 
             await Papa.parse(fileListQuestion.value, {
-                header: true,
+                header: false,
                 skipEmptyLines: true,
                 complete: async function(results: any) {
                     contentOfFile.value = results.data;
@@ -438,8 +453,6 @@ export default defineComponent({
             errorMessagesUpload,
             errorMessagesPasteListQuestion,
             listCategory,
-            quizTimeLimit,
-            timeLimit
         }
     }
 })

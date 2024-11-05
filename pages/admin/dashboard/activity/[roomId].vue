@@ -178,7 +178,6 @@ import { RoomSetting, RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 import type Echo from "laravel-echo";
 import QRCode from 'qrcode';
-import { QUIZ_TIME_LIMIT } from "~/constants/quiz";
 
 definePageMeta({
     layout: "admin-game",
@@ -315,9 +314,9 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     if (nextQuestionIndex < listQuestion.value.length) {
-                        let nextQuestion = listQuestion.value[nextQuestionIndex];
-                        remainingTime.value = nextQuestion.time_limit;
-                        currentQuestion.value = nextQuestion;
+                        const nextQuestionObj = listQuestion.value[nextQuestionIndex];
+                        remainingTime.value = nextQuestionObj.time_limit;
+                        currentQuestion.value = nextQuestionObj;
                         showResult.value = false;
                         showQuestion.value = true;
                         calculateTimeReply();

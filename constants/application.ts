@@ -3,6 +3,7 @@ export const VN_LOCALE = 'vi';
 export const RULES_VALIDATION = {
     EMAIL_FORMAT: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
     PHONE_FORMAT: /^[0-9-]{12,13}$|^[0-9-]{12}$/,
+    NUMBER_ONLY: /^[0-9]+$/,
     ZIP_CODE: /^[0-9]{3}-?[0-9]{4}$/,
     VALID_TIME: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g,
     USERNAME_LENGTH: {
@@ -47,8 +48,10 @@ export const RULES_VALIDATION = {
             MIN_LENGTH: 1,
             MAX_LENGTH: 255
         },
+        MIN_TIME_LIMIT: 1,
         MIN_ANSWER: 2,
-        MAX_ANSWER: 4
+        MAX_TIME_LIMIT: 240,
+        MAX_ANSWER: 4,
     },
     ROOM: {
         MIN_RANGLE_TIME: 1,
@@ -57,6 +60,7 @@ export const RULES_VALIDATION = {
     FILE: {
         MAX_SIZE_UPLOAD: 5242880,
         MAX_QUESTION: 100,
+        TOTAL_HEADER_REQUIRE: 6
     }
 }
 
