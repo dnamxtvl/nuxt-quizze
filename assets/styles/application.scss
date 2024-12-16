@@ -285,3 +285,32 @@ html, body {
 html:not(.layout-menu-collapsed) .bg-menu-theme .menu-inner .menu-item:not(.active) .menu-link:hover, .layout-menu-hover.layout-menu-collapsed .bg-menu-theme .menu-inner .menu-item:not(.active) .menu-link:hover {
   background: #0e009b;
 }
+
+.el-loading-mask .el-loading-text {
+  color: #fff !important;
+  font-size: 24px !important;
+  font-weight: 900;
+  margin-top: 18px !important;
+}
+
+.el-loading-mask .el-loading-spinner .path {
+  stroke: #fff !important;
+  font-size: 12px !important;
+  stroke-width: 10;
+  stroke-linecap: square !important;
+}
+
+.result-current-model header {
+  display: none !important;
+}
+
+.el-dialog.result-current-model {
+  background-color: rgba(255,255,255,0.2);
+}
+
+#my-chart-id {
+    width: 80% !important;
+    margin: 0px auto 24px auto;
+    max-height: 300px !important;
+    max-width: 750px !important;
+}

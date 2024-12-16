@@ -104,7 +104,7 @@
                             <ul class="list-unstyled m-0">
                                 <div class="email-list-item" data-starred="true" data-bs-toggle="sidebar"
                                     data-target="#app-email-view">
-                                    <div v-if="listQuizzes.length > 0" class="d-flex align-items-center cursor-pointer"
+                                    <div v-if="listQuizzes.length > 0" class="d-flex align-items-center cursor-pointer border-custom"
                                         v-for="(item, index) in listQuizzes" :key="index">
                                         <div :class='"flex flex-col items-center " + (index % 2 == 0 ? "bg-primary" : "bg-success")'>
                                             <div class="h-18 w-18 relative rounded-sm overflow-hidden bg-lilac">
@@ -120,22 +120,6 @@
                                                 <div class="row justify-content-between">
                                                     <div @click="navigateTo('/admin/dashboard/my-library/' + item.id)" class="col-md-9 title-content-list-answer ms-3 mb-0 mt-2 cursor-pointer">
                                                         <p class="text-start fs-5 fw-bold mb-0">{{ item.title }}</p>
-                                                    </div>
-                                                    <div class="col-md-2 title-content-list-answer ms-3 mb-0 mt-2">
-                                                        <el-dropdown class="float-end">
-                                                            <span class="el-dropdown-link">
-                                                                <RiMore2Fill class="more-icon" />
-                                                            </span>
-                                                            <template #dropdown>
-                                                                <el-dropdown-menu>
-                                                                    <el-dropdown-item
-                                                                        @click="showModalDeleteQuizz(item.id)">
-                                                                        <RiDeleteBin7Fill size="15" /><span
-                                                                            class="mt-1"> Xóa</span>
-                                                                    </el-dropdown-item>
-                                                                </el-dropdown-menu>
-                                                            </template>
-                                                        </el-dropdown>
                                                     </div>
                                                 </div>
                                                 <div
@@ -154,7 +138,7 @@
                                                                 getRangeTimeCreateQuizz(item)
                                                                 }}</p>
                                                         </div>
-                                                        <div class="col-md-6 d-flex justify-content-end pe-4">
+                                                        <div class="col-md-6 d-flex justify-content-end pe-4 btn">
                                                             <button @click="handleShowModalShare(item.id)" class="btn btn-link">
                                                                 Chia sẻ
                                                             </button>
@@ -162,23 +146,39 @@
                                                                 @click="handleModalCreateRoom(item.id)">
                                                                 Chơi ngay
                                                             </button>
+                                                            <div class=" title-content-list-answer ms-3 mb-0 mt-2">
+                                                        <el-dropdown class="float-end">
+                                                            <span class="el-dropdown-link">
+                                                                <RiMore2Fill class="more-icon" />
+                                                            </span>
+                                                            <template #dropdown>
+                                                                <el-dropdown-menu>
+                                                                    <el-dropdown-item
+                                                                        @click="showModalDeleteQuizz(item.id)">
+                                                                        <RiDeleteBin7Fill size="15" /><span
+                                                                            class="mt-1"> Xóa</span>
+                                                                    </el-dropdown-item>
+                                                                </el-dropdown-menu>
+                                                            </template>
+                                                        </el-dropdown>
+                                                    </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 1">
+                                    <div class="row pagination d-flex justify-content-center mt-3" v-if="listQuizzes.length > 0 && defaultTypeQuiz == 1">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeSharedWithMe">
+                                    <div class="row pagination d-flex justify-content-center mt-3" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeSharedWithMe">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
                                     </div>
-                                    <div class="row pagination d-flex justify-content-center" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeCreatedByMe">
+                                    <div class="row pagination d-flex justify-content-center mt-3" v-if="listQuizzes.length > 0 && defaultTypeQuiz == typeCreatedByMe">
                                         <el-pagination class="d-flex justify-content-center" :page-size="perpage"
                                             @change="handleCurrentChangeQuizze" background
                                             layout="prev, pager, next" :total="totalPageQuizzes" />
@@ -495,4 +495,14 @@ export default defineComponent({
 })
 </script>
 <style scoped>
+    .app-emails-list {
+        background: #EFF4FB;
+        padding: 0px 14px;
+    }
+
+    .border-custom {
+        margin-top: 1rem;
+        background: #fff;
+        border-radius: 14px;
+    }
 </style>

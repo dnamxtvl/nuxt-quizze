@@ -2,6 +2,48 @@
     <div class="row ms-4 me-4">
         <div class="app-email card h-100-vh">
             <div class="row g-0 h-100-vh">
+                <el-dialog v-model="showModalCreateOrUpdateEditQuestion" close-icon="false"
+                    :close-on-click-modal="false" :title="isUpdate ? 'Cập nhật' : 'Tạo mới'" width="500" align-center>
+                    <div v-for="(error, index) in errorMessageUpdateQuestions" :key="index" class="text-danger"
+                        v-show="errorMessageUpdateQuestions.length > 0">
+                        {{ error }}
+                    </div>
+                    <label for="inputPassword6" class="col-form-label fw-bold">Câu hỏi</label>
+                    <input type="text" class="form-control" v-model="currentQuestion.title" />
+                    <div class="row mt-3">
+                        <span class="text-primary">
+                            <label for="inputPassword6" class="col-form-label fw-bold">Câu trả lời</label>
+                            
+                            <span v-if="currentQuestion.answers.length < maxAnswerOFQuestion" class="cursor-pointer"
+                                @click="addAnswerOfQuestion">
+                                <RiAddCircleLine size="18" class="mb-1 ms-1" />
+                            </span>
+                        </span>
+                        <div v-for="(checkbox, index) in currentQuestion.answers" :key="index"
+                            class="d-flex form-check mb-3 ms-2 pe-4">
+                            <input class="form-check-input mt-2" type="checkbox" :id="'checkbox-' + index"
+                                v-model="checkbox.is_correct">
+                            <input class="form-control form-check-label ms-1" :for="'checkbox-' + index"
+                                v-model="checkbox.answer">
+                            <span v-if="currentQuestion.answers.length > minAnswerOFQuestion"
+                                class="text-danger cursor-pointer mt-2">
+                                <RiCloseLine size="18" class="mb-1 ms-1" @click="removeAnswerOfQuestion(checkbox.id)" />
+                            </span>
+                        </div>
+                    </div>
+                    <template #footer>
+                        <div class="dialog-footer">
+                            <el-button @click="showModalCreateOrUpdateEditQuestion = false">
+                                <RiCloseLine size="18" />
+                                Hủy
+                            </el-button>
+                            <el-button type="primary" @click="updateQuestion">
+                                <RiEditFill size="18" />
+                                Xác nhận
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dialog>
                 <!-- Create Quizz -->
                 <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                     <div class="row d-flex align-items-center ms-1 me-1 mb-1" v-if="errorMessagesUpload.length > 0">
@@ -30,13 +72,66 @@
                             <select v-model="categoryId" type="text" class="form-control col-md-6"
                                 placeholder="Câu hỏi tin học">
                                 <option value="">Chọn chủ đề</option>
-                                <option :value="item.id" v-if="listCategory.length > 0" v-for="(item,index) in listCategory" :key="index">
+                                <option :value="item.id" v-if="listCategory.length > 0"
+                                    v-for="(item,index) in listCategory" :key="index">
                                     {{ item.name }}
                                 </option>
                             </select>
                         </div>
                     </div>
-                    <el-tab-pane label="Dán câu hỏi" name="first">
+                    <el-tab-pane label="Tạo câu hỏi" name="first">
+                        <div class="flex flex-col w-full gap-6">
+                            <button @click="handleAddQuestion" class="btn btn-primary me-3 mt-3 mb-2 ps-2 ms-3">
+                                <RiAddCircleFill size="18"/> Tạo câu hỏi
+                            </button>
+                            <div class="players-card main-card">
+                                <div class="row pt-2 rounded rounded-5">
+                                    <div class="col-lg-12 px-4 mb-2">
+                                        <div v-for="(item, index) in questionArray"
+                                            class="question-preview-content border rounded rounded-3 pl-2 mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="col-md-9 d-flex justify-content-start mt-2">
+                                                    <span
+                                                        class="text-black fw-normal fs-5 pt-2 px-4 text-start font-bold">
+                                                        {{ (index + 1) + ". " + item.title }}
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-3 d-flex justify-content-end mt-2">
+                                                    <!-- <span @click="handleEditQuestion(item)"
+                                                        class="text-primary text-white me-2 mt-2 cursor-pointer">
+                                                        <RiEditFill size="18" class="mb-1" />
+                                                    </span> -->
+                                                    <span @click="handleRemoveQuestion(index)"
+                                                        class="text-danger me-2 mt-2 cursor-pointer">
+                                                        <RiDeleteBin2Fill size="18" class="mb-1" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            </hr>
+                                            <div
+                                                class="d-flex justify-content-between question-answer-review px-4 pt-2 mb-2">
+                                                <div class="col-xl-9 col-lg-9 col-md-8 col-sm-6">
+                                                    <div class="form-check" v-for="(answer, index) in item.answers">
+                                                        <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
+                                                        <label class="form-check-label ms-2" for="flexCheckDefault">
+                                                            {{ answer.answer }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="p-3" @submit="createQuizz" >
+                                <button v-if="questionArray.length > 0" type="submit" class="btn btn-primary  float-end">
+                                    <RiAddCircleFill size="18" /> Tạo quizz
+                                </button>
+                            </form>
+                        </div>
+                    </el-tab-pane>
+                    <!-- <el-tab-pane label="Dán câu hỏi" name="third">
                         <div class="flex flex-col w-full gap-6">
                             <span class="fw-500 fs-5 ms-3 mb-0">Sao chép và dán văn bản câu hỏi để tạo bài kiểm tra từ
                                 đó <span class="text-danger">*</span></span>
@@ -49,7 +144,7 @@
                                 </button>
                             </form>
                         </div>
-                    </el-tab-pane>
+                    </el-tab-pane> -->
                     <el-tab-pane label="Import" name="second">
                         <div class="flex flex-col w-full gap-6 rounded-pill">
                             <form @submit="uploadFileListQuestion"
@@ -88,7 +183,8 @@
                                     </div>
                                     <div class="footer-form row d-flex justify-content-center">
                                         <div class="col-md-4">
-                                            <a :href="useRuntimeConfig().public.BACKEND_URL + 'format_import_question.csv'" class="btn btn-success w-100 mt-3 upload-button text-white">
+                                            <a :href="useRuntimeConfig().public.BACKEND_URL + 'format_import_question.csv'"
+                                                class="btn btn-success w-100 mt-3 upload-button text-white">
                                                 <RiDownloadLine size="18" class="me-1" />Tải xuống format
                                             </a>
                                         </div>
@@ -115,11 +211,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { ErrorResponse } from "~/constants/type";
+import type { Answer, ErrorResponse, ItemQuestion as ItemQuestionDetail } from "~/constants/type";
 import { ElNotification } from "element-plus";
 import api from "~/api/axios";
 import type { TabsPaneContext } from 'element-plus'
-import { RiAddCircleFill, RiUploadLine, RiDownloadLine } from "@remixicon/vue";
+import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill, RiDeleteBin2Fill, RiCheckFill } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
 
@@ -148,12 +244,17 @@ export default defineComponent({
         RiAddCircleFill,
         RiUploadLine,
         RiDownloadLine,
+        RiCloseLine,
+        RiAddCircleLine,
+        RiEditFill,
+        RiDeleteBin2Fill,
+        RiCheckFill,
     },
     setup() {
         const activeName = ref<string>('first')
         const defaultPlaceholder = ref<string>("Question 1 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true) \n \n Question 2 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true)");
         const listQuizzText = ref<string>('');
-        const questionArray = ref([]);
+        const questionArray = ref<Array<ItemQuestion>>([]);;
         const title = ref<string>('');
         const categoryId = ref<number | "">("");
         const fileListQuestion = ref<File | null>(null);
@@ -162,27 +263,42 @@ export default defineComponent({
         const contentOfFile = ref<Array<ItemQuestion>>([]);
         const isValidQuestions = ref<boolean>(false);
         const listCategory = ref<Array<Category>>([]);
+        const errorMessageUpdateQuestions = ref<string[]>([]);
+        const isUpdate = ref<boolean>(false);
+        const showModalDeleteQuestion = ref<boolean>(false);
+        const currentQuestionIdDelete = ref<string>('');
+        const currentQuestion = ref<ItemQuestionDetail>({
+            id: '',
+            title: '',
+            quizze_id: '',
+            answers: [],
+            created_at: ''
+        });
+        const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
+        const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
+        const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
         }
 
-        const createQuizz = async (e: SubmitEvent) => {
-            e.preventDefault();
-            errorMessagesPasteListQuestion.value = [];
-            errorMessagesUpload.value = [];
-            if (listQuizzText.value.trim() === '') {
-                errorMessagesPasteListQuestion.value.push("Vui lòng nhập danh sách câu hỏi!");
-                return ;          
-            }
-            const blockQuestions = listQuizzText.value.trim().split(/\n\s*\n/);
-            const validateResult = validateQuestions(blockQuestions);
-            if (validateResult) {
-                convertTextToQuestions();
-                submitQuestions(questionArray.value);
-            }
+        // const createQuizz = async (e: SubmitEvent) => {
+        //     e.preventDefault();
+        //     errorMessagesPasteListQuestion.value = [];
+        //     errorMessagesUpload.value = [];
+        //     if (listQuizzText.value.trim() === '') {
+        //         errorMessagesPasteListQuestion.value.push("Vui lòng nhập danh sách câu hỏi!");
+        //         return ;          
+        //     }
+        //     const blockQuestions = listQuizzText.value.trim().split(/\n\s*\n/);
+        //     const validateResult = validateQuestions(blockQuestions);
+        //     if (validateResult) {
+        //         convertTextToQuestions();
+        //         console.log(questionArray.value);
+        //         // submitQuestions(questionArray.value);
+        //     }
             
-        }
+        // }
 
         const getCatogory = async () => {
             await api.quizze.listCategory((res: any) => {
@@ -231,7 +347,7 @@ export default defineComponent({
             for (let i = 0; i < blocks.length; i++) {
                 const lines = blocks[i].trim().split('\n');
                 const title = lines[0].trim();
-                if (lines.length < RULES_VALIDATION.QUESTION.MIN_ANSWER || lines.length > RULES_VALIDATION.QUESTION.MAX_ANSWER) {
+                if (lines.length - 1 < RULES_VALIDATION.QUESTION.MIN_ANSWER || lines.length - 1 > RULES_VALIDATION.QUESTION.MAX_ANSWER) {
                     errorMessagesValidateFail.push(`Question "${title}" phải có từ 2 đến 4 câu trả lời!`);
                     isPassAllValidate = false;
                 }
@@ -240,7 +356,7 @@ export default defineComponent({
 
                 for (let j = 1; j < lines.length; j++) {
                     const line = lines[j];
-                    if (!answerRegex.test(line)) {
+                    if (!answerRegex.test(line.trim())) {
                         errorMessagesValidateFail.push(`Câu trả lời ${j} in "${title}" không đúng định dạng nhập.Phải là number) answer"!`);
                         isPassAllValidate = false;
                     }
@@ -413,6 +529,201 @@ export default defineComponent({
             await getCatogory();
         })
 
+        const handleAddQuestion = () => {
+            isUpdate.value = false;
+            showModalCreateOrUpdateEditQuestion.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
+                id: '',
+                title: '',
+                quizze_id: '',
+                answers: [],
+                created_at: ''
+            };
+            for (let i = 0; i < RULES_VALIDATION.QUESTION.MAX_ANSWER; i++) {
+                addAnswerOfQuestion();
+            }
+        }
+
+        const addAnswerOfQuestion = () => {
+            currentQuestion.value.answers.push({
+                id: currentQuestion.value.answers.length > 0 ? currentQuestion.value.answers[currentQuestion.value.answers.length - 1].id + 1 : 1,
+                answer: '',
+                is_correct: false,
+                created_at: '',
+            });
+        }
+
+        const removeAnswerOfQuestion = (answerId: number) => {
+            currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
+        }
+
+        const updateQuestion = async () => {
+            const resultValidate = validateQuestionUpdateOrCreate();
+            if (!resultValidate) {
+                return;
+            }
+
+            questionArray.value.push(
+                {
+                    title: currentQuestion.value.title,
+                    answers: currentQuestion.value.answers.map(answer => ({
+                        answer: answer.answer,
+                        is_correct: answer.is_correct
+                    }) )
+                }
+            );
+
+            console.log(questionArray.value);
+
+            showModalCreateOrUpdateEditQuestion.value = false;
+            // if (isUpdate.value) {
+            //     await api.quizze.updateQuestion(
+            //         currentQuestion.value.id,
+            //         currentQuestion.value,
+            //         (res: any) => {
+            //             showModalCreateOrUpdateEditQuestion.value = false;
+            //             ElNotification({ title: "Success", message: "Cập nhật câu hỏi thành công!", type: "success" });
+            //             // getListQuestion();
+            //         },
+            //         (err: ErrorResponse) => {
+            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            //         }
+            //     )
+            // }
+            // else {
+            //     await api.quizze.createQuestion(
+            //         route.params.quizzId as string,
+            //         currentQuestion.value,
+            //         (res: any) => {
+            //             showModalCreateOrUpdateEditQuestion.value = false;
+            //             ElNotification({ title: "Success", message: "Thêm câu hỏi thành công!", type: "success" });
+            //             getListQuestion();
+            //         },
+            //         (err: ErrorResponse) => {
+            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            //         }
+            //     )
+            // }
+        }
+
+
+
+        const validateQuestionUpdateOrCreate = () => {
+            const validator = useValidator();
+            let isPassvalidate: boolean = true;
+            let errorMessagesValidate: string[] = [];
+            if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
+                errorMessagesValidate.push(`Câu hỏi phải có 2 đến 4 câu trả lời!`);
+                isPassvalidate = false;
+            }
+
+            let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
+            if (counAnswerCorrect == 0) {
+                errorMessagesValidate.push(`Câu hỏi phải có ít nhất 1 đáp án đúng!`);
+                isPassvalidate = false;
+            }
+
+            let requiredQuestionTitle = validator.required(currentQuestion.value.title.trim(), "Câu hỏi");
+            let isLengthTitleQuestion = validator.isLength(
+                currentQuestion.value.title,
+                "Câu hỏi",
+                RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH,
+                RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH,
+                true,
+            );
+
+            if (requiredQuestionTitle != true) {
+                errorMessagesValidate.push(requiredQuestionTitle);
+                isPassvalidate = false;
+            }
+
+            if (isLengthTitleQuestion != true) {
+                errorMessagesValidate.push(isLengthTitleQuestion);
+                isPassvalidate = false;
+            }
+
+            let defaultStringAnwser = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            currentQuestion.value.answers.forEach((answer: Answer, index: number) => {
+                let requiredAnswer = validator.required(answer.answer.trim(), "Đáp án " + defaultStringAnwser[index]);
+                let isLengthAnswer = validator.isLength(
+                    answer.answer.trim(),
+                    "Đáp án " + defaultStringAnwser[index],
+                    RULES_VALIDATION.QUESTION.ANSWER.MIN_LENGTH,
+                    RULES_VALIDATION.QUESTION.ANSWER.MAX_LENGTH,
+                    true,
+                );
+                if (requiredAnswer != true) {
+                    errorMessagesValidate.push(requiredAnswer);
+                    isPassvalidate = false;
+                }
+
+                if (isLengthAnswer != true) {
+                    errorMessagesValidate.push(isLengthAnswer);
+                    isPassvalidate = false;
+                }
+            })
+
+            errorMessageUpdateQuestions.value = errorMessagesValidate;
+
+            return isPassvalidate;
+        }
+
+        const createQuizz = async (e: SubmitEvent) => {
+            e.preventDefault();
+            errorMessagesPasteListQuestion.value = [];
+            errorMessagesUpload.value = [];
+            if (questionArray.value.length < 1) {
+                errorMessagesPasteListQuestion.value.push("Vui lòng tạo câu hỏi!");
+                return;
+            }
+
+            const validateResult = validateCreateQuestions();
+            if (validateResult) {
+                submitQuestions(questionArray.value);
+            }
+
+        }
+
+        const validateCreateQuestions = () => {
+            let isPassAllValidate: boolean = true;
+            let errorMessagesValidateFail: string[] = [];
+            if (title.value.trim() === '') {
+                errorMessagesValidateFail.push("Tiêu đề đang để trống!");
+                isPassAllValidate = false;
+            }
+
+            if (title.value.length > RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH || title.value.length < RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH) {
+                errorMessagesValidateFail.push(`Tiêu đề  phải có 6 đến 255 ký tự!`);
+                isPassAllValidate = false;
+            }
+
+            if (!categoryId.value) {
+                errorMessagesValidateFail.push("Vui lòng chọn chủ đề!");
+                isPassAllValidate = false;
+            }
+            errorMessagesPasteListQuestion.value = errorMessagesValidateFail;
+
+            return isPassAllValidate;
+        };
+
+        const handleRemoveQuestion = (index: number) => {
+            questionArray.value.splice(index, 1);
+        };
+
+        const handleEditQuestion = (item: ItemQuestion) => {
+            showModalCreateOrUpdateEditQuestion.value = true;
+            isUpdate.value = true;
+            errorMessageUpdateQuestions.value = [];
+            currentQuestion.value = {
+                ...item,
+                answers: item.answers.map(answer => ({
+                    ...answer,
+                    is_correct: !!answer.is_correct
+                }))
+            };
+        } 
+
         return {
             activeName,
             handleClick,
@@ -427,6 +738,23 @@ export default defineComponent({
             errorMessagesUpload,
             errorMessagesPasteListQuestion,
             listCategory,
+            isUpdate,
+            errorMessageUpdateQuestions,
+            showModalDeleteQuestion,
+            currentQuestionIdDelete,
+            currentQuestion,
+            maxAnswerOFQuestion,
+            minAnswerOFQuestion,
+            handleAddQuestion,
+            addAnswerOfQuestion,
+            showModalCreateOrUpdateEditQuestion,
+            removeAnswerOfQuestion,
+            updateQuestion,
+            validateQuestionUpdateOrCreate,
+            validateCreateQuestions,
+            questionArray,
+            handleRemoveQuestion,
+            handleEditQuestion,
         }
     }
 })

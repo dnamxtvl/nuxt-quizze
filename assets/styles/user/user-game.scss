@@ -5,11 +5,10 @@
 }
 .question-title {
     min-height: 320px;
-    background-color: #00000080;
 }
 .list-answer-item {
-    min-height: 320px;
-    background-color: #00000080;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
 }
 .user-name-text {
     padding-top: 50px;
@@ -436,3 +435,48 @@
     background-color: rgba(9, 9, 9, 0.8);
 }
 
+.score {
+        display: flex;
+            flex-direction: column;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            font-family: Montserrat, "Noto Sans Arabic", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: rgb(255, 255, 255);
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 2.625rem;
+            width: 280px;
+}
+
+.icon-result {
+    background-color: #fff;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    border: 4px solid white;
+}
+
+.bg-correct {
+    background-color: rgb(102, 191, 57);
+}
+
+.bg-incorrect {
+    background-color: #ff3355;
+}
+
+.order_number {
+    background-color: rgb(235, 103, 15);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
