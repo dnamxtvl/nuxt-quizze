@@ -389,7 +389,6 @@ export default defineComponent({
             id: '',
             title: '',
             quizze_id: '',
-            time_limit: 0,
             answers: [],
             created_at: '',
         })
@@ -489,7 +488,7 @@ export default defineComponent({
             const countAnswerSubmit = getCountAnswerFailOfQuestion(questionId) + getCountAnswerCorrectOfQuestion(questionId);
 
             return countAnswerSubmit > 0 ?
-                Math.round((currentShowQuestion.value.time_limit * 1000 * countAnswerSubmit - totalTime) / countAnswerSubmit) : 0;
+                Math.round((RoomSetting.TIME_REPLY * 1000 * countAnswerSubmit - totalTime) / countAnswerSubmit) : 0;
         }
 
         const countQuestionTrue = (item: GamerInfo) => {

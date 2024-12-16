@@ -51,7 +51,6 @@ export interface ItemQuestion {
     id: string;
     title: string;
     quizze_id: string;
-    time_limit: number;
     answers: Array<Answer>;
     created_at: string;
 }

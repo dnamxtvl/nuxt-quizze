@@ -156,7 +156,6 @@ export default defineComponent({
             id: '',
             title: '',
             quizze_id: '',
-            time_limit: 0,
             answers: [],
             created_at: ''
         });
