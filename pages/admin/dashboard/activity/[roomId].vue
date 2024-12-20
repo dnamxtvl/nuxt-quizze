@@ -513,6 +513,11 @@ export default defineComponent({
                 .listen('UserJoinRoomEvent', (e: { gamer: GamerInfo }) => {
                     listUserJoined.value.push(e.gamer);
                 });
+                
+            const { $bus }: any = useNuxtApp();
+            $bus.$on('lostConnection', (data: {}) => {
+                alert("Mat ket noi");
+            });
         });
 
         onBeforeUnmount(() => {

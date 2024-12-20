@@ -97,8 +97,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   echo.connector.pusher.connection.bind('state_change', (states) => {
     console.log(`State changed from ${states.previous} to ${states.current}`)
     if (states.previous == 'connected' && states.current === 'connecting') {
-      
+      nuxtApp.$bus.$emit("lostConnection", {});
     }
+
     if (states.current === 'unavailable') {
       clearInterval(retryInterval);
       echo.connector.pusher.disconnect();
