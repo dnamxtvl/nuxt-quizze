@@ -125,8 +125,8 @@
                                         <th scope="col" class="text-white text-center">Xếp hạng</th>
                                         <th scope="col" class="fs-6 text-white text-center">Tên</th>
                                         <th scope="col" class="fs-6 text-white text-center">Tổng Điểm</th>
-                                        <!-- <th scope="col" class="fs-6 text-white text-center">Số Câu đúng</th>
-                                        <th scope="col" class="fs-6 text-white text-center text-center">Chi tiết</th> -->
+                                        <th scope="col" class="fs-6 text-white text-center">Số Câu đúng</th>
+                                        <th scope="col" class="fs-6 text-white text-center text-center">Chi tiết</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -136,7 +136,7 @@
                                         </td>
                                         <td scope="col" class="text-white text-center">{{ item.gamer_answers_sum_score
                                             ?? 0 }}</td>
-                                        <!-- <td scope="col" class="text-white text-center">{{ countQuestionTrue(item) }}
+                                        <td scope="col" class="text-white text-center">{{ countQuestionTrue(item) }}
                                         </td>
                                         <td scope="col" class="text-white text-center">
                                             <span
@@ -146,7 +146,7 @@
                                                 <p>{{ getResultQuestionColor(item.gamer_answers, question.id).score }}
                                                 </p>
                                             </span>
-                                        </td> -->
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -422,10 +422,6 @@ export default defineComponent({
                 if (route.path.includes(API_CONST.FRONT_END.ADMIN_GAME)) {
                     await checkValidRoom();
                 }
-                // showButtonNext.value = true;
-                // showResult.value = true;
-                // showQuestion.value = false;
-                // getCurrentCorrectAnswerText();
                 displayTime.value = false;
                 displayChart.value = true;
                 showButtonDisplayResult.value = true;
@@ -513,10 +509,16 @@ export default defineComponent({
                 .listen('UserJoinRoomEvent', (e: { gamer: GamerInfo }) => {
                     listUserJoined.value.push(e.gamer);
                 });
-                
+
             const { $bus }: any = useNuxtApp();
             $bus.$on('lostConnection', (data: {}) => {
-                alert("Mat ket noi");
+                ElNotification({ title: "Error", message: "Bạn đang offline!", type: "error", duration: 0 });
+            });
+
+            $bus.$on('reconnected', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Reconected", message: "Đã khôi phục kết nối!", type: "success", duration: 3000 });
+                checkValidRoom();
             });
         });
 

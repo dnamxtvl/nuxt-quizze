@@ -71,8 +71,8 @@
                                         <th scope="col" class="text-white text-center">Xếp hạng</th>
                                         <th scope="col" class="fs-6 text-white text-center">Tên</th>
                                         <th scope="col" class="fs-6 text-white text-center">Tổng Điểm</th>
-                                        <!-- <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th> -->
-                                        <!-- <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th> -->
+                                        <th scope="col" class="fs-6 text-white mw-20">Câu đúng</th>
+                                        <th scope="col" class="fs-6 text-white text-center mw-140">Chi tiết</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -82,15 +82,15 @@
                                         <td class="text-white text-center">{{ gamerResult?.name }}</td>
                                         <td class="text-white text-center">{{ gamerResult?.gamer_answers_sum_score ?? 0
                                             }}</td>
-                                        <!-- <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td> -->
-                                        <!-- <td class="text-white detail-score text-center">
+                                        <td class="text-white">{{ countQuestionTrue(gamerResult) }}</td>
+                                        <td class="text-white detail-score text-center">
                                             <div :class="'badge question-result-review rounded-pill ms-1 ' + getResultQuestionColor(gamerResult?.gamer_answers, question.id).class"
                                                 v-for="(question, key) in listQuestion" :key="key">
                                                 <p>{{ 'Q' + (key + 1) }}</p>
                                                 <p>{{ getResultQuestionColor(gamerResult?.gamer_answers,
                                                     question.id).score }}</p>
                                             </div>
-                                        </td> -->
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -255,19 +255,23 @@ export default defineComponent({
                     listQuestion.value = res.questions;
                     currentQuestionIndex.value = res.room.status != RoomStatus.PREPARE ?
                         listQuestion.value.findIndex((item: ItemQuestion) => item.id == res.room.current_question_id) : 0;
+
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
                     gamerInfo.value = res.gamer;
                     gamerResult.value = res.gamer;
                     roomId.value = res.room.id;
                     roomCode.value = res.room.code;
                     currentRoomStatus.value = res.room.status;
+                    currentResult.value.order_number = res.order_result_gamers.find((item: any) => item.gamer_id == gamerInfo.value?.id)?.index;
+
                     if (res.room.status == RoomStatus.HAPPING) {
                         timeReply.value = res.time_remaining;
                         calculateTimeReply();
                     }
                     if (res.room.status == RoomStatus.PREPARE_FINISH) {
                         showQuestion.value = false;
-                        // showResult.value = true;
+                        showResult.value = true;
+                        loadingInstance.value = null;
                     }
                     if (res.gamer?.gamer_answers.length > 0) {
                         let currentQuestionSubmited = res.gamer?.gamer_answers.find((item: GamerAnswer) => item.question_id == currentQuestion.value.id);
@@ -278,8 +282,11 @@ export default defineComponent({
                     }
                     if (res.room.status == RoomStatus.PENDING) {
                         showQuestion.value = false;
+                        resultCurrentModel.value = true;
+                        currentResult.value.bg_color = currentScore.value > 0 ? 'bg-correct' : 'bg-incorrect';
+                        getCurrentResultOrder();
                     }
-                    if (selectedAnswerId.value && res.room.status!=RoomStatus.PENDING) {
+                    if (selectedAnswerId.value && res.room.status != RoomStatus.PENDING && res.room.status != RoomStatus.PREPARE_FINISH) {
                         if (!loadingInstance.value) { 
                             loadingInstance.value = ElLoading.service({ fullscreen: true, text: 'BẠN ĐÃ CHỌN ĐÁP ÁN' });
                             showResult.value = false;
@@ -331,7 +338,6 @@ export default defineComponent({
                 }
             )
             isSubmited.value = true;
-
         }
 
         let intervalId: any;
@@ -383,6 +389,27 @@ export default defineComponent({
             }
         });
 
+        const getCurrentResultOrder = () => {
+            if (currentScoreAnswer.value != null) {
+                if (currentScoreAnswer.value > 0) {
+                    currentResult.value.score = currentScoreAnswer.value;
+                    currentResult.value.title = 'ĐÚNG';
+                    currentResult.value.bg_color = 'bg-correct';
+                    currentResult.value.type = true;
+                } else {
+                    currentResult.value.score = 0;
+                    currentResult.value.title = 'SAI';
+                    currentResult.value.bg_color = 'bg-incorrect';
+                    currentResult.value.type = false;
+                }   
+            } else {
+                currentResult.value.score = 0;
+                currentResult.value.title = 'HẾT THỜI GIAN';
+                currentResult.value.bg_color = 'bg-incorrect';
+                currentResult.value.type = false;
+            }
+        }
+
         onMounted(async () => {
             clearInterval(intervalId);
             const { $echo }: any = useNuxtApp();
@@ -426,26 +453,8 @@ export default defineComponent({
                             return;
                         }
                     });
-                    if (currentScoreAnswer.value != null) {
-                        if (currentScoreAnswer.value > 0) {
-                            currentResult.value.score = currentScoreAnswer.value;
-                            currentResult.value.title = 'ĐÚNG';
-                            currentResult.value.bg_color = 'bg-correct';
-                            currentResult.value.type = true;
-                        } else {
-                            currentResult.value.score = 0;
-                            currentResult.value.title = 'SAI';
-                            currentResult.value.bg_color = 'bg-incorrect';
-                            currentResult.value.type = false;
-                        }   
-                    } else {
-                        currentResult.value.score = 0;
-                        currentResult.value.title = 'HẾT THỜI GIAN';
-                        currentResult.value.bg_color = 'bg-incorrect';
-                        currentResult.value.type = false;
-                    }
-                  
 
+                    getCurrentResultOrder();
                     resultCurrentModel.value = true;
 
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
@@ -453,9 +462,22 @@ export default defineComponent({
                             showQuestion.value = false;
                             showResult.value = true;
                             resultCurrentModel.value = false;
-                        }, 5000)
+                            loadingInstance.value = null;
+                        }, 4000)
                     }
                 });
+
+            const { $bus }: any = useNuxtApp();
+            $bus.$on('lostConnection', (data: {}) => {
+                ElNotification({ title: "Error", message: "Bạn đang offline!", type: "error", duration: 0 });
+            });
+
+            $bus.$on('reconnected', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Reconected", message: "Đã khôi phục kết nối!", type: "success", duration: 3000 });
+                getListQuestion();
+            });
+                
         });
 
         onBeforeUnmount(() => {
@@ -496,8 +518,4 @@ export default defineComponent({
 </script>
 <style scoped>
 @import '~/assets/styles/user/user-game.scss';
-.answer-item {
-    /* border: 5px solid rgba(0, 0, 0, 0.1);
-    border-radius: 5px; */
-}
 </style>

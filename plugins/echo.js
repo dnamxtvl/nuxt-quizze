@@ -7,9 +7,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
   const store = useMainStore();
   let echo;
-  const RECONNECT_TIMEOUT = 4000;
+  const RECONNECT_TIMEOUT = 5000;
   const RECONNECT_MAX_ATTEMPTS = 5;
-
+  console.log(config.public);
   const initializeEcho = () => {
     echo = new Echo({
       broadcaster: "reverb",
@@ -19,7 +19,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           authorize: (socketId, callback) => {
             axios
               .post(
-                "http://192.168.0.99/" + "broadcasting/auth",
+                config.public.BACKEND_HOST + "broadcasting/auth",
                 {
                   socket_id: socketId,
                   channel_name: channel.name,
@@ -39,7 +39,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           },
         };
       },
-      wsHost: '192.168.0.99',
+      wsHost: config.public.BACKEND_HOST,
       wsPort: 8080,
       forceTLS: false,
       enabledTransports: ["ws", "wss"],
@@ -66,6 +66,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
 
     retryAttempts = 0;
+
+    if (!store.$state.isOnline) {
+      store.changeStateOnline(store.$state, true);
+      nuxtApp.$bus.$emit("reconnected", {});
+    }
   })
 
   echo.connector.pusher.connection.bind('disconnected', () => {
@@ -97,6 +102,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   echo.connector.pusher.connection.bind('state_change', (states) => {
     console.log(`State changed from ${states.previous} to ${states.current}`)
     if (states.previous == 'connected' && states.current === 'connecting') {
+      store.changeStateOnline(store.$state, false);
       nuxtApp.$bus.$emit("lostConnection", {});
     }
 

@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      BACKEND_URL: process.env.BACKEND_URl,
+      BACKEND_URL: process.env.BACKEND_URL,
       REVERB_KEY: process.env.REVERB_KEY,
       BACKEND_HOST: process.env.BACKEND_HOST,
     }
