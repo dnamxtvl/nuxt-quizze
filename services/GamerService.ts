@@ -14,4 +14,7 @@ export default class GamerService extends BaseService {
     submitHomework = async (token: string, params: Object, success: any, error: any) => {
         await this.post(API_CONST.GAMER.SUBMIT_HOMEWORK + '/' + token, params, success, error);
     };
+    getQuantityGamerAnswer = async (params: Object, success: any, error: any) => {
+        await this.get(API_CONST.GAMER.GET_QUANTITY_GAMER_ANSWER, params, success, error);
+    };
 }

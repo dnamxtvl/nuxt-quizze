@@ -41,7 +41,9 @@
 }
 
 .random-code {
-    font-size: 4rem;
+    font-size: 3.5rem;
+    font-family: sans-serif;
+    font-weight: 900;
 }
 
 .count-member {
@@ -52,15 +54,11 @@
 
 .question-title {
     min-height: 20rem;
-    background-color: #00000080;
 }
 .list-answer-item {
-    min-height: 320px;
     background-color: #00000080;
 }
-.user-name-text {
-    padding-top: 50px;
-}
+
 .button-num-answer {
     margin-top: 55px;
 }
@@ -74,7 +72,7 @@
     flex-shrink: 0;
     width: 2px;
     height: 70px;
-    margin: auto 8px;
+    margin: auto 24px;
 }
 .show-meme {
     min-height: 800px;
@@ -456,5 +454,21 @@
 }
 
 .qr-code-join-room {
-    max-width: 100px;
+    max-width: 120px;
+}
+
+.question {
+    width: 80%;
+}
+
+.remaining_time {
+    display: inline-flex;
+    height: 100px;
+    width: 100px;
+    background: blueviolet;
+    color: white;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
 }

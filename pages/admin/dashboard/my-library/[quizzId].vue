@@ -79,12 +79,6 @@
                                 </span>
                             </div>
                             <div class="col-md-3 d-flex justify-content-end mt-2">
-                                <!-- <span class="text-success me-2 mt-2 cursor-pointer">
-                                    <RiArrowUpLine size="20" class="mb-1" />
-                                </span>
-                                <span class="text-dark me-2 mt-2 cursor-pointer">
-                                    <RiArrowDownLine size="20" class="mb-1" />
-                                </span> -->
                                 <span v-if="authId == quizDetail.user_id" @click="handleEditQuestion(item)" class="text-primary text-white me-2 mt-2 cursor-pointer">
                                     <RiEditFill size="18" class="mb-1" />
                                 </span>
@@ -249,6 +243,7 @@ export default defineComponent({
                 is_correct: false,
                 created_at: '',
             });
+            console.log(currentQuestion.value.answers);
         }
 
         const updateQuestion = async () => {
@@ -296,6 +291,9 @@ export default defineComponent({
                 quizze_id: route.params.quizzId as string,
                 answers: [],
                 created_at: ''
+            };
+            for (let i = 0; i < 4; i++) {
+                 addAnswerOfQuestion();
             }
         }
 
@@ -304,13 +302,13 @@ export default defineComponent({
             let isPassvalidate: boolean = true;
             let errorMessagesValidate: string[] = [];
             if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
-                errorMessagesValidate.push(`Cấu hỏi phải có 2 đến 4 câu trả lời!`);
+                errorMessagesValidate.push(`Câu hỏi phải có 2 đến 4 câu trả lời!`);
                 isPassvalidate = false;
             }
 
             let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
             if (counAnswerCorrect == 0) {
-                errorMessagesValidate.push(`Cấu hỏi phải có ít nhất 1 đáp án đúng!`);
+                errorMessagesValidate.push(`Câu hỏi phải có ít nhất 1 đáp án đúng!`);
                 isPassvalidate = false;
             }
 

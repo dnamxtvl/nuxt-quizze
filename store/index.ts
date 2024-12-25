@@ -11,13 +11,15 @@ export const useMainStore = defineStore({
     isLoggedIn: LocalStorageManager.getItemWithKey('isLoggedIn') ?? false,
     user: LocalStorageManager.getItemWithKey(USER_PROFILE_KEY_NAME) ?? null,
     token: CookieManager.getCookie(JWT_KEY_ACEESS_TOKEN_NAME) ?? null,
-    gamerId: CookieManager.getCookie('gamerId'+ JWT_KEY_ACEESS_TOKEN_NAME) ?? null
+    gamerId: CookieManager.getCookie('gamerId'+ JWT_KEY_ACEESS_TOKEN_NAME) ?? null,
+    isOnline: LocalStorageManager.getItemWithKey('isOnline') ?? true,
   }),
   getters: {
     isLoggedIn: (state: any) => state.isLoggedIn,
     user: (state: any) => state.user,
     token: (state: any) => state.token,
     gamerId: (state: any) => state.gamerId,
+    isOnline: (state: any) => state.isOnline,
   },
   actions: {
     login(state: any, user: UserInfo, token: string){
@@ -34,6 +36,10 @@ export const useMainStore = defineStore({
 
     saveGamerId(state: any, id: string) {
       state.gamerId = id
+    },
+
+    changeStateOnline(state: any, isOnline: boolean) {
+      state.isOnline = isOnline
     }
   },
 });
