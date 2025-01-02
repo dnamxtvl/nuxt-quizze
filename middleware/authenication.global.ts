@@ -1,3 +1,4 @@
+import { USER_TYPE_ENUM } from "~/constants/user";
 import { useMainStore } from "~/store";
 
 export default defineNuxtRouteMiddleware((to, from) => {
@@ -11,6 +12,10 @@ export default defineNuxtRouteMiddleware((to, from) => {
     }
 
     if (to.path === '/admin/login' || to.path.includes('/user')) {
-        return navigateTo('/admin/dashboard/my-library');
+        if (store.$state.user.type === USER_TYPE_ENUM.USER) {
+            return navigateTo('/admin/dashboard/my-library');
+        }
+
+        return navigateTo("/admin/dashboard/quizzes");
     }
 });

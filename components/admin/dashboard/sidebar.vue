@@ -38,11 +38,11 @@
                     <div class="badge bg-label-primary rounded-pill ms-auto">2</div>
                 </a>
                 <ul class="menu-sub">
-                    <!-- <li class="menu-item">
-                        <a href="index.html" class="menu-link">
-                            <div data-i18n="Analytics">Khám phá</div>
-                        </a>
-                    </li> -->
+                    <li class="menu-item">
+                        <nuxt-link to="/admin/dashboard/quizzes" :class="'menu-link ' + (useRoute().path.includes(detailQuizzRoutePath) ? 'active' : '')" exact-active-class="active">
+                            <div data-i18n="CRM">Bộ câu hỏi</div>
+                        </nuxt-link>
+                    </li>
                     <li class="menu-item">
                         <nuxt-link to="/admin/dashboard/my-library" :class="'menu-link ' + (useRoute().path.includes(detailQuizzRoutePath) ? 'active' : '')" exact-active-class="active">
                             <div data-i18n="CRM">Thư viện của tôi</div>
@@ -53,11 +53,11 @@
                             <div data-i18n="CRM">Báo cáo</div>
                         </nuxt-link>
                     </li>
-                    <!-- <li class="menu-item">
-                        <a href="dashboards-crm.html" class="menu-link">
-                            <div data-i18n="CRM">Cài đặt</div>
-                        </a>
-                    </li> -->
+                    <li class="menu-item">
+                        <nuxt-link to="/admin/dashboard/list-user" :class="'menu-link ' + (useRoute().path.includes(userDetailRoutePath) ? 'active' : '')" exact-active-class="active">
+                            <div data-i18n="CRM">Danh sách user</div>
+                        </nuxt-link>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -76,6 +76,7 @@ export default defineComponent({
   setup() {
     const detailReportRoutePath = API_CONST.FRONT_END.REPORT_DETAIL;
     const detailQuizzRoutePath = API_CONST.FRONT_END.DETAIL_QUIZ;
+    const userDetailRoutePath = API_CONST.FRONT_END.USER_DETAIL;
 
     onMounted(() => {
         
@@ -84,6 +85,7 @@ export default defineComponent({
     return {
         detailReportRoutePath,
         detailQuizzRoutePath,
+        userDetailRoutePath,
     }
   }
 });

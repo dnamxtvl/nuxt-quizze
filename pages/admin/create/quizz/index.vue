@@ -131,20 +131,6 @@
                             </form>
                         </div>
                     </el-tab-pane>
-                    <!-- <el-tab-pane label="Dán câu hỏi" name="third">
-                        <div class="flex flex-col w-full gap-6">
-                            <span class="fw-500 fs-5 ms-3 mb-0">Sao chép và dán văn bản câu hỏi để tạo bài kiểm tra từ
-                                đó <span class="text-danger">*</span></span>
-                            <form class="p-3" @submit="createQuizz">
-                                <textarea v-model="listQuizzText" :placeholder="'' + defaultPlaceholder"
-                                    class="form-control list-question-textarea" name="" id="" cols="30"
-                                    rows="22"></textarea>
-                                <button type="submit" class="btn btn-primary mt-3 float-end">
-                                    <RiAddCircleFill size="18" /> Tạo quizz
-                                </button>
-                            </form>
-                        </div>
-                    </el-tab-pane> -->
                     <el-tab-pane label="Import" name="second">
                         <div class="flex flex-col w-full gap-6 rounded-pill">
                             <form @submit="uploadFileListQuestion"
@@ -211,7 +197,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { Answer, ErrorResponse, ItemQuestion as ItemQuestionDetail } from "~/constants/type";
+import type { Answer, ErrorResponse, ItemQuestion as ItemQuestionDetail, Category } from "~/constants/type";
 import { ElNotification } from "element-plus";
 import api from "~/api/axios";
 import type { TabsPaneContext } from 'element-plus'
@@ -233,12 +219,6 @@ interface ItemQuestion {
     answers: ItemAnswer[]
 }
 
-interface Category {
-    id: number;
-    name: string,
-    created_at: string
-}
-
 export default defineComponent({
     components: {
         RiAddCircleFill,
@@ -252,7 +232,6 @@ export default defineComponent({
     },
     setup() {
         const activeName = ref<string>('first')
-        const defaultPlaceholder = ref<string>("Question 1 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true) \n \n Question 2 \n 1) answer 1 \n 2) answer 2 \n 3) answer 3 \n 4) answer 4 (true)");
         const listQuizzText = ref<string>('');
         const questionArray = ref<Array<ItemQuestion>>([]);;
         const title = ref<string>('');
@@ -282,24 +261,6 @@ export default defineComponent({
             console.log(tab, event)
         }
 
-        // const createQuizz = async (e: SubmitEvent) => {
-        //     e.preventDefault();
-        //     errorMessagesPasteListQuestion.value = [];
-        //     errorMessagesUpload.value = [];
-        //     if (listQuizzText.value.trim() === '') {
-        //         errorMessagesPasteListQuestion.value.push("Vui lòng nhập danh sách câu hỏi!");
-        //         return ;          
-        //     }
-        //     const blockQuestions = listQuizzText.value.trim().split(/\n\s*\n/);
-        //     const validateResult = validateQuestions(blockQuestions);
-        //     if (validateResult) {
-        //         convertTextToQuestions();
-        //         console.log(questionArray.value);
-        //         // submitQuestions(questionArray.value);
-        //     }
-            
-        // }
-
         const getCatogory = async () => {
             await api.quizze.listCategory((res: any) => {
                 listCategory.value = res;
@@ -325,78 +286,6 @@ export default defineComponent({
                 ElNotification({title: "Error", message: err.error.shift(), type: "error"});
             })
         }
-
-        const validateQuestions = (blocks: any) => {
-            let isPassAllValidate: boolean = true;
-            let errorMessagesValidateFail: string[] = [];
-            if (title.value.trim() === '') {
-                errorMessagesValidateFail.push("Tiêu đề đang để trống!");
-                isPassAllValidate = false;
-            }
-
-            if (title.value.length > RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH || title.value.length < RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH) {
-                errorMessagesValidateFail.push(`Tiêu đề  phải có 6 đến 255 ký tự!`);
-                isPassAllValidate = false;
-            }
-
-            if (!categoryId.value) {
-                errorMessagesValidateFail.push("Vui lòng chọn chủ đề!");
-                isPassAllValidate = false;
-            }
-
-            for (let i = 0; i < blocks.length; i++) {
-                const lines = blocks[i].trim().split('\n');
-                const title = lines[0].trim();
-                if (lines.length - 1 < RULES_VALIDATION.QUESTION.MIN_ANSWER || lines.length - 1 > RULES_VALIDATION.QUESTION.MAX_ANSWER) {
-                    errorMessagesValidateFail.push(`Question "${title}" phải có từ 2 đến 4 câu trả lời!`);
-                    isPassAllValidate = false;
-                }
-                const answerRegex = /^\d\)\s.+/;
-                let correctAnswerCount = 0;
-
-                for (let j = 1; j < lines.length; j++) {
-                    const line = lines[j];
-                    if (!answerRegex.test(line.trim())) {
-                        errorMessagesValidateFail.push(`Câu trả lời ${j} in "${title}" không đúng định dạng nhập.Phải là number) answer"!`);
-                        isPassAllValidate = false;
-                    }
-                    if (/\(true\)/.test(line)) {
-                        correctAnswerCount++;
-                    }
-                }
-                if (correctAnswerCount !== 1) {
-                    errorMessagesValidateFail.push(`Question "${title}" phải có 1 đáp án đúng!`);
-                    isPassAllValidate =  false;
-                }
-            }
-
-            errorMessagesPasteListQuestion.value = errorMessagesValidateFail;
-
-            return isPassAllValidate;
-        };
-
-        const convertTextToQuestions = () => {
-            const blocks = listQuizzText.value.trim().split(/\n\s*\n/); // Tách từng câu hỏi thành khối
-            questionArray.value = blocks.map((block) => {
-                const lines = block.trim().split('\n');
-                
-                const title = lines[0].trim(); // Câu hỏi là dòng đầu tiên
-                const answers = lines.slice(1).map((line) => {
-                    const isCorrect = /\(true\)/.test(line); // Kiểm tra câu trả lời đúng
-                    const answer = line.replace(/\(true\)/, '').trim().split(') ')[1]; // Lấy phần trả lời sau số thứ tự
-
-                    return {
-                        answer,
-                        is_correct: isCorrect,
-                    };
-                });
-
-                return {
-                    title,
-                    answers,
-                };
-            });
-        };
 
         const onFileChange = (e: any) => {
             const file = e.target.files[0];
@@ -574,37 +463,7 @@ export default defineComponent({
                 }
             );
 
-            console.log(questionArray.value);
-
             showModalCreateOrUpdateEditQuestion.value = false;
-            // if (isUpdate.value) {
-            //     await api.quizze.updateQuestion(
-            //         currentQuestion.value.id,
-            //         currentQuestion.value,
-            //         (res: any) => {
-            //             showModalCreateOrUpdateEditQuestion.value = false;
-            //             ElNotification({ title: "Success", message: "Cập nhật câu hỏi thành công!", type: "success" });
-            //             // getListQuestion();
-            //         },
-            //         (err: ErrorResponse) => {
-            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
-            //         }
-            //     )
-            // }
-            // else {
-            //     await api.quizze.createQuestion(
-            //         route.params.quizzId as string,
-            //         currentQuestion.value,
-            //         (res: any) => {
-            //             showModalCreateOrUpdateEditQuestion.value = false;
-            //             ElNotification({ title: "Success", message: "Thêm câu hỏi thành công!", type: "success" });
-            //             getListQuestion();
-            //         },
-            //         (err: ErrorResponse) => {
-            //             ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
-            //         }
-            //     )
-            // }
         }
 
 
@@ -727,7 +586,6 @@ export default defineComponent({
         return {
             activeName,
             handleClick,
-            defaultPlaceholder,
             createQuizz,
             listQuizzText,
             title,

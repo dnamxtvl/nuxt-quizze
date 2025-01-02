@@ -336,6 +336,9 @@ export default defineComponent({
                     if (err.code === HttpStatusCode.NotFound) {
                         return navigateTo("/not-found");
                     }
+                    if (err.code === HttpStatusCode.Forbidden) {
+                        return navigateTo("/error/unauthorized");
+                    }
                 }
             )
         }

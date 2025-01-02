@@ -143,6 +143,10 @@ export default defineComponent({
 
                         return navigateTo("/admin/dashboard/my-library/");
                     }
+
+                    if (err.code == CODE.UNAUTHORIZED) {
+                        return navigateTo("/error/unauthorized");
+                    }
                 }
             )
         }

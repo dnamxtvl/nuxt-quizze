@@ -1,7 +1,7 @@
 <template>
     <div class="row ms-4 me-4">
         <div class="">
-            <div class="row g-0 h-100-vh">
+            <div class="row g-0">
                 <el-dialog v-model="showModalDelete" :show-close="false" title="Warning" width="500" align-center>
                     <span>Bạn có chắc chắn muốn xóa room này?</span>
                     <template #footer>
@@ -45,15 +45,17 @@
                                     </option>
                                 </select>
                             </div>
-                            <el-form-item class="col-xxl-4 col-xl-6 col-lg-6 col-md-6 mt-2 pt-2 align-items-center">
+                            <el-form-item class="col-xxl-3 col-xl-6 col-lg-6 col-md-6 mt-2 pt-2 align-items-center">
                                 <label for="inputPassword6" class="col-form-label">Thời gian</label>
                                 <el-date-picker style="height: 38px;" class="w-full" v-model="filterParams.time_report"
                                     type="datetimerange" start-placeholder="Start Date" end-placeholder="End Date"
                                     :default-time="defaultTime" />
                             </el-form-item>
-                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6 mt-4 pt-1">
-                                <button type="button" @click="getListRoomReport" class="btn btn-primary mt-4">Tìm kiếm</button>
-                                <span @click="resetFilter" class="ms-1 mt-4 pt-4"><RiRefreshLine size="20" class="text-danger cursor-pointer mt-4" /></span>
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6 mt-4 pt-1 d-flex">
+                                <div @click="getListRoomReport" class="cursor-pointer mt-4">
+                                    <RiSearchLine class="text-primary pt-0 pb-0" />
+                                </div>
+                                <span @click="resetFilter" class="ms-1 mt-4"><RiRefreshLine size="20" class="text-danger cursor-pointer" /></span>
                             </div>
                         </div>
                         <table class="table" v-if="listRoom.length > 0">
@@ -144,7 +146,7 @@ import { defineComponent, ref } from "vue";
 import type { ErrorResponse } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine, RiEyeCloseFill } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiRefreshLine, RiEyeCloseFill, RiSearchLine } from "@remixicon/vue";
 import { RoomSetting, RoomStatus, RoomType } from "~/constants/room";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
 import moment from "moment";
@@ -177,6 +179,7 @@ export default defineComponent({
         RiDeleteBin7Fill,
         RiRefreshLine,
         RiEyeCloseFill,
+        RiSearchLine,
     },
     setup() {
         const currentPage = ref<number>(1);
@@ -201,8 +204,8 @@ export default defineComponent({
                 type: filterParams.value.type,
                 code: filterParams.value.code,
                 status: filterParams.value.status,
-                start_time: filterParams.value.time_report[0] ? moment(filterParams.value.time_report[0]).format("YYYY-MM-DD HH:mm:ss") : '',
-                end_time: filterParams.value.time_report[1] ? moment(filterParams.value.time_report[1]).format("YYYY-MM-DD HH:mm:ss") : '',
+                start_time: filterParams.value.time_report[0] ? moment(new Date(filterParams.value.time_report[0])).format("YYYY-MM-DD HH:mm:ss") : '',
+                end_time: filterParams.value.time_report[1] ? moment(new Date(filterParams.value.time_report[1])).format("YYYY-MM-DD HH:mm:ss") : '',
             };
 
             await api.room.getListRoomReport(

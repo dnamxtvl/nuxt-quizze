@@ -6,6 +6,7 @@ export interface LoginInfo {
 export interface UserInfo {
     email: string;
     name: string;
+    type: number;
 }
 
 export interface ItemQuizze {
@@ -13,6 +14,7 @@ export interface ItemQuizze {
     title: string;
     category_id: number;
     user_id: string;
+    code: string;
     questions_count: number;
     rooms_count: number;
     category?: {
@@ -22,7 +24,8 @@ export interface ItemQuizze {
     user: {
         id: string;
         name: string;
-    }
+        email: string;
+    },
     created_at: string;
     updated_at: string;
     deleted_at?: string;
@@ -76,7 +79,7 @@ export interface GamerToken {
 export interface Quizz {
     id: string;
     title: string;
-    user_id?: string;
+    code: string;
     category_id: number;
     created_at: string
     updated_at: string
@@ -86,4 +89,10 @@ export interface ErrorResponse {
     code: number;
     error: string[];
     responseCode: number;
+}
+
+export interface Category {
+    id: number;
+    name: string,
+    created_at: string
 }

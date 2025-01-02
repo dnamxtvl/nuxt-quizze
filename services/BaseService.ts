@@ -1,7 +1,7 @@
 import helperApp from "~/utils/helper";
 import { useMainStore } from "~/store";
 import axios from 'axios';
-import { CALL_AXIOS_TIMEOUT, CODE } from "~/constants/application";
+import { CODE } from "~/constants/application";
 
 interface ResponseData {
     data: any;

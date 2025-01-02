@@ -2,6 +2,7 @@ const API_CONST = {
     AUTH: {
         LOGIN: 'admin/login',
         LOGOUT: 'admin/logout',
+        VERIFY_OTP_AFTER_LOGIN: 'auth/email/verify-login',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
@@ -15,6 +16,7 @@ const API_CONST = {
         DETAIL_SHARE_QUIZZE: 'admin/quizzes/detail-share',
         ACCEPT_SHARE_QUIZZE: 'admin/quizzes/accept-share',
         REJECT_SHARE_QUIZZE: 'admin/quizzes/reject-share',
+        SEARCH_QUIZZE: 'admin/quizzes/search',
     },
     CATEGORY: {
         LIST_CATEGORY: 'admin/category/list',
@@ -44,10 +46,17 @@ const API_CONST = {
         HOMEWORK: '/user/join/homework',
         REPORT_DETAIL: '/admin/dashboard/reports',
         DETAIL_QUIZ: '/admin/dashboard/my-library',
+        USER_DETAIL: '/admin/dashboard/users/detail',
     },
     NOTIFICATION: {
         LIST_NOTIFICATION: 'admin/notification/list',
         DELETE_NOTIFICATION: 'admin/notification/delete',
+    },
+    USER: {
+        LIST_USER: 'admin/user/search',
+        DELETE_USER: 'admin/user/delete',
+        DISABLE_USER: 'admin/user/disable',
+        ACTIVE_USER: 'admin/user/active',
     }
 };
 

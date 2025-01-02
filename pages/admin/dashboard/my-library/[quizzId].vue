@@ -50,9 +50,15 @@
         </el-dialog>
         <!-- Show modal delete question -->
         <!-- Header Section -->
-        <div class="header">
+        <div class="header d-flex justify-content-between">
             <div class="d-flex justify-content-start">
                 <h4 class="text-dark">{{ quizDetail.title }}</h4>
+            </div>
+            <div class="d-flex justify-content-start">
+                <span @click="copyCode">
+                    <RiFileCopyLine class="ms-3 cursor-pointer" />
+                </span>
+                <h4 class="text-success ms-2">{{ quizDetail.code }}</h4>
             </div>
         </div>
         <!-- Invite Section -->
@@ -111,7 +117,7 @@ import { defineComponent, ref } from "vue";
 import type { Answer, ErrorResponse, GamerAnswer, GamerToken, ItemQuestion, Quizz } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiDeleteBin2Fill, RiEditFill, RiCheckFill, RiCheckboxCircleLine, RiQuestionLine, RiAddLine, RiCloseLine, RiAddCircleLine, RiArrowDownLine, RiArrowUpLine } from "@remixicon/vue";
+import { RiDeleteBin2Fill, RiEditFill, RiCheckFill, RiCheckboxCircleLine, RiQuestionLine, RiAddLine, RiCloseLine, RiAddCircleLine, RiArrowDownLine, RiArrowUpLine, RiFileCopyLine } from "@remixicon/vue";
 import moment from "moment";
 import { useRoute } from "vue-router";
 import { ROOM_STATUS_TEXT } from "~/constants/room";
@@ -144,6 +150,7 @@ export default defineComponent({
         RiAddCircleLine,
         RiArrowDownLine,
         RiArrowUpLine,
+        RiFileCopyLine,
     },
     setup() {
         const store = useMainStore();
@@ -156,6 +163,7 @@ export default defineComponent({
             id: '',
             title: '',
             user_id: '',
+            code: '',
             category_id: 0,
             created_at: '',
             updated_at: ''
@@ -356,6 +364,16 @@ export default defineComponent({
 
             return isPassvalidate;
         }
+
+        const copyCode = () => {
+            const textArea = document.createElement("textarea");
+            textArea.value = quizDetail.value.code.toString();
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
+        };
         
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
@@ -387,6 +405,7 @@ export default defineComponent({
             handleRemoveQuestion,
             removeQuestion,
             authId,
+            copyCode,
         }
     }
 })
