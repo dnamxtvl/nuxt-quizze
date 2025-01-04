@@ -9,7 +9,22 @@ export default class AuthService extends BaseService {
     logout = async (params: {}, success: any, error: any) => {
         await this.post(API_CONST.AUTH.LOGOUT, params, success, error);
     };
+    register = async (params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.REGISTER, params, success, error);
+    }
     verifyOTPAfterLogin = async (params: {}, success: any, error: any) => {
         await this.post(API_CONST.AUTH.VERIFY_OTP_AFTER_LOGIN, params, success, error);
+    };
+    verifyOTPAfterRegister = async (params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.VERiFY_OTP_AFTER_REGISTER, params, success, error);
+    };
+    resendVerifyEmail = async (otpId: string, success: any, error: any) => {
+        await this.get(API_CONST.AUTH.RESEND_VERIFY_EMAIL + '/' + otpId, {}, success, error);
+    };
+    forgotPassword = async (params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.FORGOT_PASSWORD, params, success, error);
+    };
+    resetPassword = async (params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.RESET_PASSWORD, params, success, error);
     };
 }

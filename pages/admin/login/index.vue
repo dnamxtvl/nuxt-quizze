@@ -129,9 +129,9 @@
             <div class="mb-1 mt-2 form-password-toggle">
               <div class="d-flex justify-content-between">
                 <label class="form-label" for="password">Password</label>
-                <a href="auth-forgot-password-cover.html">
+                <nuxt-link to="/auth/forgot-password">
                   <small>Quên mật khẩu?</small>
-                </a>
+                </nuxt-link>
               </div>
               <div class="input-group input-group-merge">
                 <input
@@ -163,9 +163,9 @@
 
           <p class="text-center">
             <span>Bạn chưa có tài khoản?</span>
-            <a href="auth-register-cover.html">
+            <nuxt-link to="/auth/register">
               <span>Đăng ký mới</span>
-            </a>
+            </nuxt-link>
           </p>
 
           <div class="divider my-4">
@@ -187,16 +187,10 @@
 import { defineComponent, ref } from "vue";
 import api from "~/api/axios";
 import { ElLoading, ElNotification } from "element-plus";
-import LocalStorageManager from "~/utils/localStorage";
-import CookieManager from "~/utils/cookies";
-import {
-  JWT_KEY_ACEESS_TOKEN_NAME,
-  USER_PROFILE_KEY_NAME,
-} from "~/constants/application";
 import { useMainStore } from "~/store";
 import { useValidator } from "#imports";
 import { RULES_VALIDATION, ERROR_CODE, CODE } from "~/constants/application";
-import { USER_TYPE_ENUM } from "~/constants/user";
+import helperApp from "~/utils/helper";
 
 export default defineComponent({
   setup() {
@@ -221,9 +215,9 @@ export default defineComponent({
       await api.auth.login(
         userInfo,
         (res: any) => {
-          setValueStoreLogin(res);
+          helperApp.setValueStoreLogin(res);
           ElLoading.service({ fullscreen: true }).close();
-          redirectToHome(res.user.type);
+          helperApp.redirectToHome(res.user.type);
         },
         (err: any) => {
           ElLoading.service({ fullscreen: true }).close();
@@ -238,42 +232,21 @@ export default defineComponent({
       );
     };
 
-    const redirectToHome = (type: number) => {
-      if (type == USER_TYPE_ENUM.USER) {
-        return navigateTo("/admin/dashboard/my-library");
-      } else {
-        return navigateTo("/admin/dashboard/quizzes");
-      }
-    };
-
-    const setValueStoreLogin = async (data: any) => {
-      const userInfo = {
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.name,
-        type: data.user.type,
-      };
-      await LocalStorageManager.setItemWithKey("isLoggedIn", true);
-      await CookieManager.setCookie(JWT_KEY_ACEESS_TOKEN_NAME, data.token);
-      await LocalStorageManager.setItemWithKey(USER_PROFILE_KEY_NAME, userInfo);
-      store.login(store.$state, userInfo, data.token);
-    };
-
     const verifyOTP = () => {
       if (validateOTP()) {
         ElLoading.service({ fullscreen: true });
         api.auth.verifyOTPAfterLogin(
           { verify_code: otp.value, email: email.value },
           (res: any) => {
-            setValueStoreLogin(res);
+            helperApp.setValueStoreLogin(res);
             ElLoading.service({ fullscreen: true }).close();
             showModalOTPConfirm.value = false;
             ElNotification({
               title: "Success",
-              message: 'Xác thực email thành công',
+              message: "Xác thực email thành công",
               type: "success",
-            })
-            redirectToHome(res.user.type);
+            });
+            helperApp.redirectToHome(res.user.type);
           },
           (err: any) => {
             ElLoading.service({ fullscreen: true }).close();
@@ -281,7 +254,7 @@ export default defineComponent({
               title: "Error",
               message: err.error.shift(),
               type: "error",
-            })
+            });
           }
         );
       }

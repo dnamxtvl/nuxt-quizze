@@ -6,8 +6,8 @@ export const RULES_VALIDATION = {
     ZIP_CODE: /^[0-9]{3}-?[0-9]{4}$/,
     VALID_TIME: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/g,
     USERNAME_LENGTH: {
-        MIN: 2,
-        MAX: 30
+        MIN: 6,
+        MAX: 50
     },
     FULLNAME_LENGTH: {
         MIN: 2,

@@ -3,6 +3,12 @@ import LocalStorageManager from "./localStorage";
 import { useMainStore } from "~/store";
 import moment from "moment";
 import type { GamerAnswer } from "~/constants/type";
+import { USER_TYPE_ENUM } from "~/constants/user";
+import {
+  JWT_KEY_ACEESS_TOKEN_NAME,
+  USER_PROFILE_KEY_NAME,
+} from "~/constants/application";
+import CookieManager from "~/utils/cookies";
 
 export default class helperApp {
   static getErrorMessage = (error: unknown): string => {
@@ -118,4 +124,26 @@ export default class helperApp {
         class: "bg-warning"
     };
   }
+
+  static redirectToHome = (type: number) => {
+    if (type == USER_TYPE_ENUM.USER) {
+      return navigateTo("/admin/dashboard/my-library");
+    } else {
+      return navigateTo("/admin/dashboard/quizzes");
+    }
+  };
+
+  static setValueStoreLogin = async (data: any) => {
+    let store = useMainStore();
+    const userInfo = {
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name,
+      type: data.user.type,
+    };
+    await LocalStorageManager.setItemWithKey("isLoggedIn", true);
+    await CookieManager.setCookie(JWT_KEY_ACEESS_TOKEN_NAME, data.token);
+    await LocalStorageManager.setItemWithKey(USER_PROFILE_KEY_NAME, userInfo);
+    store.login(store.$state, userInfo, data.token);
+  };
 };

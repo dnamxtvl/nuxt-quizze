@@ -1,3 +1,5 @@
+import VOtpInput from "vue3-otp-input";
+
 export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: false,

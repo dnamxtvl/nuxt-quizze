@@ -255,7 +255,7 @@ export default defineComponent({
 
 
     const notifySuccessAndRemoveTokenJwt = () => {
-      ElNotification({ title: "Success", type: "success", showClose: false });
+      ElNotification({ title: "Success", message: "Đăng xuất thành công!", type: "success", showClose: false });
       CookieManager.removeCookie(JWT_KEY_ACEESS_TOKEN_NAME);
       LocalStorageManager.setItemWithKey("isLoggedIn", false);
       store.logout(store.$state);

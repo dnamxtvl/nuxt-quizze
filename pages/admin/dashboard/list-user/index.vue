@@ -284,7 +284,6 @@ export default defineComponent({
     });
 
     const getListUser = async () => {
-      console.log(filterParams.value.created_at);
       let paramsFilter = {
         page: currentPage.value,
         role: filterParams.value.created_by,

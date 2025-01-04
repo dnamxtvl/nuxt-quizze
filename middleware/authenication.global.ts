@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
         return;
     }
 
-    if (to.path === '/admin/login' || to.path.includes('/user')) {
+    if (to.path === '/admin/login' || to.path.includes('/user') || to.path.includes('/auth')) {
         if (store.$state.user.type === USER_TYPE_ENUM.USER) {
             return navigateTo('/admin/dashboard/my-library');
         }

@@ -251,7 +251,6 @@ export default defineComponent({
                 is_correct: false,
                 created_at: '',
             });
-            console.log(currentQuestion.value.answers);
         }
 
         const updateQuestion = async () => {

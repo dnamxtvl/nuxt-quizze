@@ -2,7 +2,12 @@ const API_CONST = {
     AUTH: {
         LOGIN: 'admin/login',
         LOGOUT: 'admin/logout',
+        REGISTER: 'auth/register',
         VERIFY_OTP_AFTER_LOGIN: 'auth/email/verify-login',
+        VERiFY_OTP_AFTER_REGISTER: 'auth/email/verify-register',
+        RESEND_VERIFY_EMAIL: 'auth/email/resend-verify-email',
+        FORGOT_PASSWORD: 'auth/forgot-password',
+        RESET_PASSWORD: 'auth/reset-password',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',

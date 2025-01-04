@@ -258,7 +258,6 @@ export default defineComponent({
         (res: any) => {
           listQuizzes.value = res.data;
           totalPageQuizzes.value = res.total;
-          console.log(listQuizzes.value);
         },
         (err: ErrorResponse) => {
           ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
