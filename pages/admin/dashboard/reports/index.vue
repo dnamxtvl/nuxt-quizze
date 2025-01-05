@@ -17,7 +17,7 @@
 
                 <!--/ Quiz Sidebar -->
                 <!-- Room List -->
-                <div class="col overflow-scroll app-emails-list">
+                <div class="col app-emails-list">
                     <div class="shadow-none border-0">
                         <hr class="container-m-nx m-0" />
                         <!-- Email List: Items -->
@@ -32,8 +32,13 @@
                                 </select>
                             </div>
                             <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
-                                <label for="inputPassword6" class="col-form-label">Mã code</label>
-                                <input type="text" v-model="filterParams.code" placeholder="Nhập mã code"
+                                <label for="inputPassword6" class="col-form-label">Mã bộ câu hỏi</label>
+                                <input type="text" v-model="filterParams.code_quiz" placeholder="Nhập code"
+                                    class="form-control" aria-describedby="passwordHelpInline">
+                            </div>
+                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
+                                <label for="inputPassword6" class="col-form-label">Mã phòng</label>
+                                <input type="text" v-model="filterParams.code" placeholder="Nhập code"
                                     class="form-control" aria-describedby="passwordHelpInline">
                             </div>
                             <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
@@ -51,7 +56,7 @@
                                     type="datetimerange" start-placeholder="Start Date" end-placeholder="End Date"
                                     :default-time="defaultTime" />
                             </el-form-item>
-                            <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6 mt-4 pt-1 d-flex">
+                            <div class="col-xxl-1 col-xl-2 col-lg-4 col-md-6 mt-4 pt-1 d-flex">
                                 <div @click="getListRoomReport" class="cursor-pointer mt-4">
                                     <RiSearchLine class="text-primary pt-0 pb-0" />
                                 </div>
@@ -66,7 +71,7 @@
                                     <th scope="col" class="fs-6 text-dark">Tên Quizz</th>
                                     <th scope="col" class="fs-6 text-dark text-center">Số người tham gia</th>
                                     <th scope="col" class="fs-6 text-dark">Câu đúng</th>
-                                    <th scope="col" class="fs-6 text-dark text-center">Mã code</th>
+                                    <th scope="col" class="fs-6 text-dark text-center">Mã phòng</th>
                                     <th scope="col" class="fs-6 text-dark text-center">Trạng thái</th>
                                     <th scope="col" class="fs-6 text-dark text-center">Ngày tạo</th>
                                     <th scope="col" class="fs-6 text-dark text-end">Hành động</th>
@@ -194,6 +199,7 @@ export default defineComponent({
         const filterParams = ref({
             type: '',
             code: '',
+            code_quiz: '',
             status: '',
             time_report: []
         })
@@ -203,6 +209,7 @@ export default defineComponent({
                 page: currentPage.value,
                 type: filterParams.value.type,
                 code: filterParams.value.code,
+                code_quiz: filterParams.value.code_quiz,
                 status: filterParams.value.status,
                 start_time: filterParams.value.time_report[0] ? moment(new Date(filterParams.value.time_report[0])).format("YYYY-MM-DD HH:mm:ss") : '',
                 end_time: filterParams.value.time_report[1] ? moment(new Date(filterParams.value.time_report[1])).format("YYYY-MM-DD HH:mm:ss") : '',

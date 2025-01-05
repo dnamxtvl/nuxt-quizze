@@ -14,4 +14,7 @@ export default class UserService extends BaseService {
     active = async (userId: string, success: any, error: any) => {
         await this.post(API_CONST.USER.ACTIVE_USER + '/' + userId, {}, success, error);
     };
+    searchELK = async (keyword: string, success: any, error: any) => {
+        await this.get(API_CONST.USER.SEARCH_ELK + '/' + keyword, {}, success, error);
+    };
 }

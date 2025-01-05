@@ -38,7 +38,11 @@ export default defineNuxtConfig({
   modules: [
     '@element-plus/nuxt',
     '@pinia/nuxt',
+    'nuxt-vue3-google-signin',
   ],
+  googleSignIn: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+  },
   elementPlus: {
     icon: 'ElIcon',
     importStyle: 'scss',

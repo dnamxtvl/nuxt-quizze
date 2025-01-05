@@ -172,9 +172,10 @@
             <div class="divider-text">or</div>
           </div>
           <div class="d-flex justify-content-center">
-            <a href="javascript:;" class="btn btn-icon btn-label-google-plus">
-              <i class="tf-icons fa-brands fa-google fs-5"></i>
-            </a>
+            <GoogleSignInButton
+              @success="handleLoginSuccess"
+              @error="handleLoginError"
+            ></GoogleSignInButton>
           </div>
         </div>
       </div>
@@ -187,12 +188,18 @@
 import { defineComponent, ref } from "vue";
 import api from "~/api/axios";
 import { ElLoading, ElNotification } from "element-plus";
-import { useMainStore } from "~/store";
 import { useValidator } from "#imports";
 import { RULES_VALIDATION, ERROR_CODE, CODE } from "~/constants/application";
 import helperApp from "~/utils/helper";
+import {
+  GoogleSignInButton,
+  type CredentialResponse,
+} from "vue3-google-signin";
 
 export default defineComponent({
+  components: {
+    GoogleSignInButton,
+  },
   setup() {
     const email = ref<string>("");
     const password = ref<string>("");
@@ -201,7 +208,7 @@ export default defineComponent({
     const validateMessagePasswordBeforeSubmit = ref<string>("");
     const showModalOTPConfirm = ref<boolean>(false);
     const otp = ref<string>("");
-    const store = useMainStore();
+    const token = ref<string>("");
 
     const login: Function = async (e: SubmitEvent) => {
       e.preventDefault();
@@ -311,6 +318,50 @@ export default defineComponent({
       return isPassAllValidate;
     };
 
+    const loginWithGoogle = async () => {
+      ElLoading.service({ fullscreen: true });
+      await api.auth.signInCallback(
+        { credentials: token.value },
+        (res: any) => {
+          helperApp.setValueStoreLogin(res);
+          ElLoading.service({ fullscreen: true }).close();
+          helperApp.redirectToHome(res.user.type);
+        },
+        (err: any) => {
+          ElLoading.service({ fullscreen: true }).close();
+          ElNotification({
+            title: "Error",
+            message: err.error.shift(),
+            type: "error",
+          });
+        }
+      );
+    }
+
+    const handleLoginSuccess = (response: CredentialResponse) => {
+      const { credential } = response;
+      console.log(credential);
+      if (!credential) {
+        ElNotification({
+          title: "Error",
+          message: "Đã xảy ra lỗi!",
+          type: "error",
+        });
+
+        return ;
+      }
+      token.value = credential as string;
+      loginWithGoogle();
+    };
+    
+    const handleLoginError = () => {
+      ElNotification({
+        title: "Error",
+        message: "Đã xảy ra lỗi!",
+        type: "error",
+      });
+    };
+
     onMounted(async () => {});
 
     return {
@@ -323,6 +374,9 @@ export default defineComponent({
       showModalOTPConfirm,
       otp,
       verifyOTP,
+      loginWithGoogle,
+      handleLoginSuccess,
+      handleLoginError,
     };
   },
 });

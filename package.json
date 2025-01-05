@@ -22,6 +22,7 @@
     "mitt": "^3.0.1",
     "moment": "^2.30.1",
     "nuxt": "^3.12.4",
+    "nuxt-vue3-google-signin": "^0.0.11",
     "papaparse": "^5.4.1",
     "pinia": "^2.2.1",
     "qrcode": "^1.5.4",

@@ -65,7 +65,7 @@
         </el-dialog>
         <!-- End show modal share-->
         <!-- Quiz List -->
-        <div class="col overflow-scroll app-emails-list">
+        <div class="col app-emails-list">
           <div class="shadow-none border-0">
             <hr class="container-m-nx m-0" />
             <!-- Email List: Items -->
@@ -81,11 +81,25 @@
                         </select>
                     </div>
                     <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
-                        <label for="inputPassword6" class="col-form-label">User</label>
-                        <select class="form-control">
-                            <option value="">Tất cả</option>
-                            
-                        </select>
+                      <label for="inputPassword6" class="col-form-label">User</label>
+                      <el-select
+                        v-model="filterParams.user_ids"
+                        multiple
+                        filterable
+                        remote
+                        reserve-keyword
+                        placeholder="Nhập từ khóa tìm kiếm"
+                        remote-show-suffix
+                        :remote-method="remoteMethod"
+                        :loading="loading"
+                      >
+                        <el-option
+                          v-for="item in options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        />
+                      </el-select>
                     </div>
                     <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
                         <label for="inputPassword6" class="col-form-label">Phân loại</label>
@@ -126,15 +140,15 @@
                 <table class="table" v-if="listQuizzes.length > 0">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-dark">#</th>
+                            <th scope="col-3 w-5" class="text-dark">#</th>
                             <th scope="col" class="fs-6 text-dark">Tên Quizz</th>
-                            <th scope="col" class="fs-6 text-dark text-center">Số câu hỏi</th>
-                            <th scope="col" class="fs-6 text-dark text-center">Lượt chơi</th>
+                            <th scope="col" class="fs-6 text-dark text-center text-nowrap">Số câu hỏi</th>
+                            <th scope="col" class="fs-6 text-dark text-center text-nowrap">Lượt chơi</th>
                             <th scope="col" class="fs-6 text-dark text-center">Mã code</th>
                             <th scope="col" class="fs-6 text-dark">Người tạo</th>
-                            <th scope="col" class="fs-6 text-dark">Danh mục</th>
+                            <th scope="col" class="fs-6 text-dark text-nowrap">Danh mục</th>
                             <th scope="col" class="fs-6 text-dark text-center">Ngày tạo</th>
-                            <th scope="col" class="fs-6 text-dark text-end">Hành động</th>
+                            <th scope="col" class="fs-6 text-dark text-end text-nowrap">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,8 +159,15 @@
                             <td class="text-dark text-center">{{ item.questions_count }}</td>
                             <td class="text-dark text-center">{{ item.rooms_count }}</td>
                             <td class="text-center">{{ item.code }}</td>
-                            <td :class="getCreatedBy().find((type) => type.id == item.user?.type)?.color">
-                                {{ item.user?.email }}
+                            <td>
+                                <span
+                                  :class="
+                                    'badge text-white ' +
+                                    getCreatedBy().find((type) => type.id == item.user?.type)?.bg_color
+                                  "
+                                >
+                                  {{ item.user?.email }}
+                                </span>
                             </td>
                             <td class="text-dark">
                                 {{ item.category?.name }}
@@ -207,6 +228,11 @@ definePageMeta({
   layout: "admin-dashboard",
 });
 
+interface ListItem {
+  value: string
+  label: string
+}
+
 export default defineComponent({
   components: {
     RiMore2Fill,
@@ -243,6 +269,8 @@ export default defineComponent({
     const emailShare = ref<string>("");
     const validateMessageEmailBeforeShare = ref<string[]>([]);
     const listCategory = ref<Array<Category>>([]);
+    const options = ref<ListItem[]>([]);
+    const loading = ref(false);
 
     const searchQuizzes = async () => {
       await api.quizze.search(
@@ -397,6 +425,28 @@ export default defineComponent({
       await searchQuizzes();
     }
 
+    const remoteMethod = async (query: string) => {
+      if (query) {
+        loading.value = true
+        setTimeout(async () => {
+          loading.value = false
+          await api.user.searchELK(
+            query,
+            (res: any) => {
+              options.value = res.map((item: any) => {
+                return { value: item.id, label: item.name + ':' + item.email }
+              })
+            },
+            (err: ErrorResponse) => {
+              ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            }
+          )
+        }, 500)
+      } else {
+        options.value = []
+      }
+    }
+
     onMounted(async () => {
       ElLoading.service({ fullscreen: true });
       await getCatogory();
@@ -412,6 +462,7 @@ export default defineComponent({
       shareQuiz,
       getCreatedBy,
       resetFilter,
+      remoteMethod,
       listQuizzes,
       listCategory,
       totalPageQuizzes,
@@ -429,6 +480,8 @@ export default defineComponent({
       currentPageCreatedByMe,
       filterParams,
       CREATED_BY,
+      loading,
+      options,
     };
   },
 });

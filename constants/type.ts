@@ -4,6 +4,7 @@ export interface LoginInfo {
 }
 
 export interface UserInfo {
+    id: string;
     email: string;
     name: string;
     type: number;
@@ -95,4 +96,23 @@ export interface Category {
     id: number;
     name: string,
     created_at: string
+}
+
+export interface GamerInfo {
+    id: string;
+    name: string;
+    gamer_answers_sum_score: number;
+    gamer_answers: Array<GamerAnswer> | [];
+    gamer_token: GamerToken;
+    created_at: string;
+}
+
+export interface UserProfile extends UserInfo {
+    avatar: string;
+    latest_login: Date;
+    latest_ip_login: string;
+    disabled: boolean;
+    type: number;
+    created_at: Date;
+    updated_at: Date;
 }

@@ -8,6 +8,9 @@ const API_CONST = {
         RESEND_VERIFY_EMAIL: 'auth/email/resend-verify-email',
         FORGOT_PASSWORD: 'auth/forgot-password',
         RESET_PASSWORD: 'auth/reset-password',
+        SIGN_IN_GOOGLE_URL: 'auth/google-sign-in-url',
+        SIGN_IN_CALLBACK: 'auth/google-callback',
+        GET_PROFILE: 'admin/get-profile',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
@@ -51,7 +54,7 @@ const API_CONST = {
         HOMEWORK: '/user/join/homework',
         REPORT_DETAIL: '/admin/dashboard/reports',
         DETAIL_QUIZ: '/admin/dashboard/my-library',
-        USER_DETAIL: '/admin/dashboard/users/detail',
+        USER_DETAIL: '/admin/account',
     },
     NOTIFICATION: {
         LIST_NOTIFICATION: 'admin/notification/list',
@@ -62,6 +65,7 @@ const API_CONST = {
         DELETE_USER: 'admin/user/delete',
         DISABLE_USER: 'admin/user/disable',
         ACTIVE_USER: 'admin/user/active',
+        SEARCH_ELK: 'admin/user/search-elk',
     }
 };
 

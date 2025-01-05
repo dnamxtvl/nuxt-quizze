@@ -49,7 +49,7 @@
         </el-dialog>
         <!--/ Quiz Sidebar -->
         <!-- Room List -->
-        <div class="col overflow-scroll app-emails-list">
+        <div class="col app-emails-list">
           <div class="shadow-none border-0">
             <hr class="container-m-nx m-0" />
             <!-- Email List: Items -->
@@ -69,10 +69,25 @@
                 </select>
               </div>
               <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
-                <label for="inputPassword6" class="col-form-label">User</label>
-                <select class="form-control" v-model="filterParams.disabled">
-                  <option value="">Chọn trạng thái</option>
-                </select>
+                <label for="inputPassword6" class="col-form-label">Tên/Email</label>
+                <el-select
+                  v-model="filterParams.user_ids"
+                  multiple
+                  filterable
+                  remote
+                  reserve-keyword
+                  placeholder="Nhập từ khóa tìm kiếm"
+                  remote-show-suffix
+                  :remote-method="remoteMethod"
+                  :loading="loading"
+                >
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
               </div>
               <div class="col-xxl-2 col-xl-4 col-lg-6 col-md-6">
                 <label for="inputPassword6" class="col-form-label">Trạng thái</label>
@@ -125,8 +140,6 @@
               </thead>
               <tbody>
                 <tr
-                  class="cursor-pointer"
-                  @click="navigateTo(`/admin/dashboard/reports/${item.id}`)"
                   v-for="(item, index) in listUser"
                   :key="index"
                 >
@@ -141,7 +154,7 @@
                       {{ getCreatedBy().find((type) => type.id == item.type)?.text }}
                     </span>
                   </td>
-                  <td class="text-dark">{{ item.name }}</td>
+                  <td class="text-primary">{{ item.name }}</td>
                   <td class="text-dark">{{ item.email }}</td>
                   <td class="text-dark text-center">{{ item.quizzes_count }}</td>
                   <td class="text-white text-center">
@@ -189,7 +202,7 @@
                             >
                           </el-dropdown-item>
                           <nuxt-link
-                            :to="'/admin/dashboard/my-library/' + item.quizze?.id"
+                            :to="'/admin/account/' + item.id"
                           >
                             <el-dropdown-item>
                               <RiEyeCloseFill size="15" class="me-1" /><span class="mt-1">
@@ -206,7 +219,7 @@
             </table>
           </div>
           <div class="empty-section mt-4" v-if="listUser.length == 0">
-            <h4 class="text-center">Không tìm thấy room nào!</h4>
+            <h4 class="text-center">Không tìm thấy User nào!</h4>
           </div>
           <div class="row pagination mt-1" v-if="listUser.length > 0">
             <el-pagination
@@ -257,6 +270,11 @@ interface UserDetail {
   updated_at: string;
 }
 
+interface ListItem {
+  value: string
+  label: string
+}
+
 export default defineComponent({
   components: {
     RiMore2Fill,
@@ -278,10 +296,12 @@ export default defineComponent({
     const defaultTime = new Date();
     const filterParams = ref({
       created_by: "",
-      user_ids: "",
+      user_ids: [],
       disabled: "",
       created_at: [],
     });
+    const options = ref<ListItem[]>([]);
+    const loading = ref(false);
 
     const getListUser = async () => {
       let paramsFilter = {
@@ -416,6 +436,28 @@ export default defineComponent({
       return USER_STATUS_ENUM;
     };
 
+    const remoteMethod = async (query: string) => {
+      if (query) {
+        loading.value = true
+        setTimeout(async () => {
+          loading.value = false
+          await api.user.searchELK(
+            query,
+            (res: any) => {
+              options.value = res.map((item: any) => {
+                return { value: item.id, label: item.name + ':' + item.email }
+              })
+            },
+            (err: ErrorResponse) => {
+              ElNotification({ title: "Error", message: err.error.shift(), type: "error" });
+            }
+          )
+        }, 500)
+      } else {
+        options.value = []
+      }
+    }
+
     onMounted(async () => {
       ElLoading.service({ fullscreen: true });
       await getListUser();
@@ -442,6 +484,9 @@ export default defineComponent({
       defaultTime,
       filterParams,
       defalutPerpage,
+      loading,
+      remoteMethod,
+      options,
     };
   },
 });
