@@ -19,17 +19,48 @@
             <div class="card mb-4">
               <h5 class="card-header">Đổi mật khẩu</h5>
                   <div class="card-body">
-                    <form id="formAccountSettings" method="POST" onsubmit="return false">
+                    <form method="POST" onsubmit="return false">
                       <div class="row">
                         <div class="mb-3 col-md-6 form-password-toggle">
+                          <div
+                            class="valiate-message-error col-12 mb-3 ms-0"
+                            v-if="validateMessageCurrentPassword"
+                          >
+                            <el-alert
+                              :title="validateMessageCurrentPassword"
+                              type="error"
+                              :closable="false"
+                            />
+                          </div>
+                          <div
+                            class="row valiate-message-error col-12 mb-3 ms-0"
+                            v-if="validateMessageConfirmPassword"
+                          >
+                            <el-alert
+                              :title="validateMessageConfirmPassword"
+                              type="error"
+                              :closable="false"
+                            />
+                          </div>
+                          <div
+                            class="valiate-message-error col-12 mb-3"
+                            v-if="validateMessageNewPassword"
+                          >
+                            <el-alert
+                              :title="validateMessageNewPassword"
+                              type="error"
+                              :closable="false"
+                            />
+                          </div>
                           <label class="form-label" for="currentPassword">Mật khẩu hiện tại</label>
                           <div class="input-group input-group-merge">
                             <input
                               class="form-control"
                               type="password"
-                              name="currentPassword"
-                              id="currentPassword"
-                              placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                              v-model="currentPassword"
+                              placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" 
+                              :disabled="disabledCurrentPassword()"
+                              />
                           </div>
                         </div>
                       </div>
@@ -40,19 +71,18 @@
                             <input
                               class="form-control"
                               type="password"
-                              id="newPassword"
+                              v-model="newPassword"
                               name="newPassword"
                               placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                           </div>
                         </div>
-                        <div class="mb-3 col-md-6 form-password-toggle">
+                        <div class="mb-3 col-md-6 form-password-toggle pe-0">
                           <label class="form-label" for="confirmPassword">Xâc nhận lại mật khẩu</label>
                           <div class="input-group input-group-merge">
                             <input
                               class="form-control"
                               type="password"
-                              name="confirmPassword"
-                              id="confirmPassword"
+                              v-model="passwordConfirm"
                               placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
                           </div>
                         </div>
@@ -63,8 +93,7 @@
                           </ul>
                         </div>
                         <div>
-                          <button type="submit" class="btn btn-primary me-2">Lưu thay đổi</button>
-                          <button type="reset" class="btn btn-label-secondary">Hủy</button>
+                          <button type="submit" @click="changePassword()" class="btn btn-primary me-2">Lưu thay đổi</button>
                         </div>
                       </div>
                     </form>
@@ -79,301 +108,170 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import type { Answer, ErrorResponse, GamerAnswer, GamerToken, ItemQuestion, Quizz } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiDeleteBin2Fill, RiEditFill, RiCheckFill, RiCheckboxCircleLine, RiQuestionLine, RiAddLine, RiCloseLine, RiAddCircleLine, RiArrowDownLine, RiArrowUpLine, RiFileCopyLine } from "@remixicon/vue";
-import moment from "moment";
 import { useRoute } from "vue-router";
-import { ROOM_STATUS_TEXT } from "~/constants/room";
 import { RULES_VALIDATION } from "~/constants/application";
 import { useValidator } from "#imports";
 import { useMainStore } from "~/store";
+import { USER_TYPE_ENUM } from "~/constants/user";
 
 definePageMeta({
     layout: "admin-dashboard",
 })
 
-interface GamerInfo {
-    id: string;
-    name: string;
-    gamer_answers_sum_score: number;
-    gamer_answers: Array<GamerAnswer> | [];
-    gamer_token: GamerToken;
-    created_at: string
-}
-
 export default defineComponent({
     components: {
-        RiCheckboxCircleLine,
-        RiQuestionLine,
-        RiCheckFill,
-        RiEditFill,
-        RiDeleteBin2Fill,
-        RiAddLine,
-        RiCloseLine,
-        RiAddCircleLine,
-        RiArrowDownLine,
-        RiArrowUpLine,
-        RiFileCopyLine,
     },
     setup() {
         const store = useMainStore();
+        const userRole = ref<number>(store.$state.user?.type as number);
         const authId = ref<string>(store.$state.user?.id as string);
         const route = useRoute();
         const showModelEndGame = ref<boolean>(false);
-        const listQuestions = ref<ItemQuestion[]>([]);
-        const defaultStringSort = ref<string>('ABCDEFGH');
-        const quizDetail = ref<Quizz>({
-            id: '',
-            title: '',
-            user_id: '',
-            code: '',
-            category_id: 0,
-            created_at: '',
-            updated_at: ''
-        });
-        const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
-        const currentQuestion = ref<ItemQuestion>({
-            id: '',
-            title: '',
-            quizze_id: '',
-            answers: [],
-            created_at: ''
-        });
-        const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
-        const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
-        const errorMessageUpdateQuestions = ref<string[]>([]);
-        const isUpdate = ref<boolean>(false);
-        const showModalDeleteQuestion = ref<boolean>(false);
-        const currentQuestionIdDelete = ref<string>('');
+        const currentPassword = ref<string>("");
+        const validateMessageCurrentPassword = ref<string>("");
+        const newPassword = ref<string>("");
+        const validateMessageNewPassword = ref<string>("");
+        const passwordConfirm = ref<string>("");
+        const validateMessageConfirmPassword = ref<string>("");
 
-        const getListQuestion = async () => {
-            await api.quizze.listQuestion(
-                route.params.quizzId as string,
-                (res: any) => {
-                    quizDetail.value = res[0].quizze;
-                    listQuestions.value = res;
-                },
-                (err: ErrorResponse) => {
-                    ElNotification({title: "Error",message: err.error.shift(),type: "error"});
-                }
-            )
+        const disabledCurrentPassword = () => {
+          let disabled = false;
 
-            ElLoading.service({ fullscreen: true }).close();
+          if (userRole.value == USER_TYPE_ENUM.SYSTEM) {
+            disabled = authId.value != route.params.userId;
+          } else {
+            disabled = true;
+          }
+
+          return disabled;
         }
 
-        const countQuestionTrue = (item: GamerInfo) => {
-            return item.gamer_answers.length > 0 ? item.gamer_answers.filter((answer: GamerAnswer) => answer.score > 0).length : 0;
+        const validateCurrentPassword = () => {
+          const validateHelper = useValidator();
+          let isPassAllValidate = true;
+          let requiredCurrentPassword = validateHelper.required(currentPassword.value, "Mật khẩu cũ");
+          let isLengthCurrentPassword = validateHelper.isLength(
+            currentPassword.value,
+            "Mật khẩu cũ",
+            RULES_VALIDATION.PASSWORD_LENGTH.MIN,
+            RULES_VALIDATION.PASSWORD_LENGTH.MAX
+          );
+
+          validateMessageCurrentPassword.value =
+            requiredCurrentPassword === true ? "" : requiredCurrentPassword;
+          isPassAllValidate = isPassAllValidate && requiredCurrentPassword === true;
+
+          validateMessageCurrentPassword.value =
+            isLengthCurrentPassword === true ? "" : isLengthCurrentPassword;
+          isPassAllValidate = isPassAllValidate && isLengthCurrentPassword === true;
+
+          return isPassAllValidate;
         }
 
-        const handleEditQuestion = (item: ItemQuestion) => {
-            showModalCreateOrUpdateEditQuestion.value = true;
-            isUpdate.value = true;
-            errorMessageUpdateQuestions.value = [];
-            currentQuestion.value = {
-                ...item,
-                answers: item.answers.map(answer => ({
-                    ...answer,
-                    is_correct: !!answer.is_correct
-                }))
-            };
-        }
+        const validatePassword = () => {
+          let isPassAllValidate = true;
+          if (!disabledCurrentPassword()) {
+            isPassAllValidate = validateCurrentPassword();
+          }
 
-        const handleRemoveQuestion = (questionId: string) => {
-            currentQuestionIdDelete.value = questionId;
-            showModalDeleteQuestion.value = true;
-        }
+          const validateHelper = useValidator();
+          let requiredNewPassword = validateHelper.required(newPassword.value, "Mật khẩu mới");
+          let isLengthPassword = validateHelper.isLength(
+            newPassword.value,
+            "Mật khẩu mới",
+            RULES_VALIDATION.PASSWORD_LENGTH.MIN,
+            RULES_VALIDATION.PASSWORD_LENGTH.MAX
+          );
 
-        const removeQuestion  = async () => {
-            await api.quizze.deleteQuestion(currentQuestionIdDelete.value, (res: any) => {
-                ElNotification({title: "Success",message: "Xóa câu hỏi thành công!",type: "success"});
-                getListQuestion();
-            }, (err: ErrorResponse) => {
-                ElLoading.service({ fullscreen: true }).close();
-                ElNotification({title: "Error", message: err.error.shift(),type: "error"});
-            })
-            
-            showModalDeleteQuestion.value = false;
-        }
+          let requiredPasswordConfirm = validateHelper.required(
+            passwordConfirm.value,
+            "Nhập lại mật khẩu"
+          );
+          let isLengthPasswordConfirm = validateHelper.isLength(
+            passwordConfirm.value,
+            "Mật khẩu nhập lại ",
+            RULES_VALIDATION.PASSWORD_LENGTH.MIN,
+            RULES_VALIDATION.PASSWORD_LENGTH.MAX,
+          );
 
-        const formatDate = (date: string) => {
-            return moment(date).format("DD/MM/YYYY HH:mm:ss");
-        }
+          validateMessageNewPassword.value =
+            requiredNewPassword === true ? "" : requiredNewPassword;
+          isPassAllValidate = isPassAllValidate && requiredNewPassword === true;
 
-        const getStatusText = (status: number) => {
-            return ROOM_STATUS_TEXT[status];
-        }
+          validateMessageNewPassword.value =
+            isLengthPassword === true ? "" : isLengthPassword;
+          isPassAllValidate = isPassAllValidate && isLengthPassword === true;
 
-        const removeAnswerOfQuestion = (answerId: number) => {
-            currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
-        }
+          validateMessageConfirmPassword.value =
+            requiredPasswordConfirm === true ? "" : requiredPasswordConfirm;
+          isPassAllValidate = isPassAllValidate && requiredPasswordConfirm === true;
 
-        const addAnswerOfQuestion = () => {
-            currentQuestion.value.answers.push({
-                id: currentQuestion.value.answers.length > 0 ? currentQuestion.value.answers[currentQuestion.value.answers.length - 1].id + 1 : 1,
-                answer: '',
-                is_correct: false,
-                created_at: '',
-            });
-        }
+          validateMessageConfirmPassword.value =
+            isLengthPasswordConfirm === true ? "" : isLengthPasswordConfirm;
+          isPassAllValidate = isPassAllValidate && isLengthPasswordConfirm === true;
+          console.log(passwordConfirm.value)
 
-        const updateQuestion = async () => {
-            const resultValidate = validateQuestionUpdateOrCreate();
-            if (!resultValidate) {
-                return;
-            }
+          if (passwordConfirm.value.length > 0 && newPassword.value !== passwordConfirm.value) {
+            isPassAllValidate = false;
+            validateMessageConfirmPassword.value =
+              "Mật khẩu nhập lại không trùng";
+          }
 
-            if (isUpdate.value) {
-                await api.quizze.updateQuestion(
-                    currentQuestion.value.id,
-                    currentQuestion.value,
-                    (res: any) => {
-                        showModalCreateOrUpdateEditQuestion.value = false;
-                        ElNotification({title: "Success",message: "Cập nhật câu hỏi thành công!",type: "success"});
-                        getListQuestion();
-                    },
-                    (err: ErrorResponse) => {
-                        ElNotification({title: "Error",message: err.error.shift(),type: "error"});
-                    }
-                )
-            } else {
-                await api.quizze.createQuestion(
-                    route.params.quizzId as string,
-                    currentQuestion.value,
-                    (res: any) => {
-                        showModalCreateOrUpdateEditQuestion.value = false;
-                        ElNotification({title: "Success",message: "Thêm câu hỏi thành công!",type: "success"});
-                        getListQuestion();
-                    },
-                    (err: ErrorResponse) => {
-                        ElNotification({title: "Error",message: err.error.shift(),type: "error"});
-                    }
-                )
-            }
-        }
-
-        const handleAddQuestion = () => {
-            isUpdate.value = false;
-            showModalCreateOrUpdateEditQuestion.value = true;
-            errorMessageUpdateQuestions.value = [];
-            currentQuestion.value = {
-                id: '',
-                title: '',
-                quizze_id: route.params.quizzId as string,
-                answers: [],
-                created_at: ''
-            };
-            for (let i = 0; i < 4; i++) {
-                 addAnswerOfQuestion();
-            }
-        }
-
-        const validateQuestionUpdateOrCreate = () => {
-            const validator = useValidator();
-            let isPassvalidate: boolean = true;
-            let errorMessagesValidate: string[] = [];
-            if (currentQuestion.value.answers.length < minAnswerOFQuestion || currentQuestion.value.answers.length > maxAnswerOFQuestion) {
-                errorMessagesValidate.push(`Câu hỏi phải có 2 đến 4 câu trả lời!`);
-                isPassvalidate = false;
-            }
-
-            let counAnswerCorrect = currentQuestion.value.answers.filter((answer: Answer) => answer.is_correct).length;
-            if (counAnswerCorrect == 0) {
-                errorMessagesValidate.push(`Câu hỏi phải có ít nhất 1 đáp án đúng!`);
-                isPassvalidate = false;
-            }
-
-            let requiredQuestionTitle = validator.required(currentQuestion.value.title.trim(), "Câu hỏi");
-            let isLengthTitleQuestion = validator.isLength(
-                currentQuestion.value.title,
-                "Câu hỏi",
-                RULES_VALIDATION.QUESTION.TITLE.MIN_LENGTH,
-                RULES_VALIDATION.QUESTION.TITLE.MAX_LENGTH,
-                true,
-            );
-
-            if (requiredQuestionTitle != true) {
-                errorMessagesValidate.push(requiredQuestionTitle);
-                isPassvalidate = false;
-            }
-            
-            if (isLengthTitleQuestion != true) {
-                errorMessagesValidate.push(isLengthTitleQuestion);
-                isPassvalidate = false;
-            }
-
-            let defaultStringAnwser = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            currentQuestion.value.answers.forEach((answer: Answer, index: number) => {
-                let requiredAnswer = validator.required(answer.answer.trim(), "Đáp án " + defaultStringAnwser[index]);
-                let isLengthAnswer = validator.isLength(
-                    answer.answer.trim(),
-                    "Đáp án " + defaultStringAnwser[index],
-                    RULES_VALIDATION.QUESTION.ANSWER.MIN_LENGTH,
-                    RULES_VALIDATION.QUESTION.ANSWER.MAX_LENGTH,
-                    true,
-                );
-                if (requiredAnswer != true) {
-                    errorMessagesValidate.push(requiredAnswer);
-                    isPassvalidate = false;
-                }
-                
-                if (isLengthAnswer != true) {
-                    errorMessagesValidate.push(isLengthAnswer);
-                    isPassvalidate = false;
-                }
-            })
-            
-            errorMessageUpdateQuestions.value = errorMessagesValidate;
-
-            return isPassvalidate;
-        }
-
-        const copyCode = () => {
-            const textArea = document.createElement("textarea");
-            textArea.value = quizDetail.value.code.toString();
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            ElNotification({title: "Success", message: "Sao chép mã code thành công!", type: "success"});
+          return isPassAllValidate;
         };
+
+        const changePassword = async () => {
+          if (!validatePassword()) return ;
+
+          ElLoading.service({ fullscreen: true })
+          await api.user.changePassword(
+            route.params.userId as string,
+            {
+              old_password: currentPassword.value,
+              new_password: newPassword.value,
+            },
+            (res: any) => {
+              ElNotification({
+                title: "Success",
+                message: "Đổi mật khẩu thành công!",
+                type: "success",
+              });
+
+              navigateTo("/admin/dashboard/list-user");
+            },
+            (err: any) => {
+              ElNotification({
+                title: "Error",
+                message: err.error.shift(),
+                type: "error",
+              });
+            }
+          );
+
+          ElLoading.service({ fullscreen: true }).close();
+        }
         
         onMounted(async () => {
-            ElLoading.service({ fullscreen: true });
-            await getListQuestion();
         });
 
         return {
             showModelEndGame,
-            getListQuestion,
-            formatDate,
-            getStatusText,
-            listQuestions,
-            countQuestionTrue,
-            defaultStringSort,
-            quizDetail,
-            showModalCreateOrUpdateEditQuestion,
-            handleEditQuestion,
-            currentQuestion,
-            validateQuestionUpdateOrCreate,
-            addAnswerOfQuestion,
-            maxAnswerOFQuestion,
-            minAnswerOFQuestion,
-            removeAnswerOfQuestion,
-            errorMessageUpdateQuestions,
-            updateQuestion,
-            handleAddQuestion,
-            isUpdate,
-            showModalDeleteQuestion,
-            handleRemoveQuestion,
-            removeQuestion,
             authId,
-            copyCode,
+            userRole,
+            USER_TYPE_ENUM,
+            disabledCurrentPassword,
+            changePassword,
+            validateMessageCurrentPassword,
+            validateMessageNewPassword,
+            validateMessageConfirmPassword,
+            currentPassword,
+            newPassword,
+            passwordConfirm
         }
     }
 })
 </script>
 <style scoped>
-@import '~/assets/styles/admin/admin-report-detail.scss';
 </style>

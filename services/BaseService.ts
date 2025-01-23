@@ -152,9 +152,9 @@ export default class BaseService {
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
-        instance.defaults.headers.post['Content-Type'] = 'application/json';
+        instance.defaults.headers.post['Content-Type'] = 'multipart/form-data';
         instance.defaults.headers.get['Content-Type'] = 'application/json';
-        instance.defaults.headers.put['Content-Type'] = 'application/json';
+        instance.defaults.headers.put['Content-Type'] = 'multipart/form-data';
         instance.defaults.headers.delete['Content-Type'] = 'application/json';
         instance.defaults.headers.delete['Content-Type'] = 'application/json';
 

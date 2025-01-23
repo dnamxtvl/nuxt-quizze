@@ -33,7 +33,10 @@ export default class AuthService extends BaseService {
     signInCallback = async (params: {}, success: any, error: any) => {
         await this.get(API_CONST.AUTH.SIGN_IN_CALLBACK, params, success, error);
     };
-    getProfile = async (userId: {}, success: any, error: any) => {
+    getProfile = async (userId: string, success: any, error: any) => {
         await this.get(API_CONST.AUTH.GET_PROFILE + '/' + userId, {}, success, error);
+    };
+    updateProfile = async (userId: string, params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.UPDATE_PROFILE + '/' + userId, params, success, error);
     };
 }

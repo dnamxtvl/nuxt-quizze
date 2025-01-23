@@ -165,10 +165,13 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <!-- <el-dropdown-item>
-                                <RiUser2Line size="18px" class="me-1" />
-                                Profile
-                            </el-dropdown-item> -->
+              <nuxt-link :to="'/admin/account/' + authId">
+                <el-dropdown-item>
+                  <RiEyeCloseFill size="18px" class="me-1" /><span class="mt-1">
+                    Profile</span
+                  >
+                </el-dropdown-item>
+              </nuxt-link>
               <el-dropdown-item @click="logout">
                 <RiLogoutCircleFill size="18px" class="me-1" />
                 Đăng xuất
@@ -192,7 +195,7 @@
   </nav>
 </template>
 <script lang="ts">
-import { RiUser2Line, RiLogoutCircleFill } from "@remixicon/vue";
+import { RiUser2Line, RiLogoutCircleFill, RiEyeCloseFill } from "@remixicon/vue";
 import api from "~/api/axios";
 import { ElLoading, ElNotification } from "element-plus";
 import CookieManager from "~/utils/cookies";
@@ -219,11 +222,13 @@ export default defineComponent({
   components: {
     RiUser2Line,
     RiLogoutCircleFill,
+    RiEyeCloseFill,
   },
 
   setup() {
     const store = useMainStore();
     const adminName = store.$state.user?.name;
+    const authId = ref<string>(store.$state.user?.id as string);
     const currentSkipNotify = ref<number>(0);
     const listNotify = ref<ItemNotify[]>([]);
     const totalUnreadNotify = ref<number>(0);
@@ -366,6 +371,7 @@ export default defineComponent({
       firstPage,
       disabledLoadMore,
       deleteNotify,
+      authId,
     };
   },
 });

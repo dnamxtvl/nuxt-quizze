@@ -11,6 +11,7 @@ const API_CONST = {
         SIGN_IN_GOOGLE_URL: 'auth/google-sign-in-url',
         SIGN_IN_CALLBACK: 'auth/google-callback',
         GET_PROFILE: 'admin/get-profile',
+        UPDATE_PROFILE: 'admin/update-profile',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
@@ -66,6 +67,7 @@ const API_CONST = {
         DISABLE_USER: 'admin/user/disable',
         ACTIVE_USER: 'admin/user/active',
         SEARCH_ELK: 'admin/user/search-elk',
+        CHANGE_PASSWORD: 'admin/change-password',
     }
 };
 

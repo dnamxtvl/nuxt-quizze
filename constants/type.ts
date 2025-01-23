@@ -112,6 +112,7 @@ export interface UserProfile extends UserInfo {
     latest_login: Date;
     latest_ip_login: string;
     disabled: boolean;
+    email_verified_at: Date|null;
     type: number;
     created_at: Date;
     updated_at: Date;

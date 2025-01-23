@@ -17,4 +17,7 @@ export default class UserService extends BaseService {
     searchELK = async (keyword: string, success: any, error: any) => {
         await this.get(API_CONST.USER.SEARCH_ELK + '/' + keyword, {}, success, error);
     };
+    changePassword = async (userId: string, params: Object, success: any, error: any) => {
+        await this.post(API_CONST.USER.CHANGE_PASSWORD + '/' + userId, params, success, error);
+    };
 }

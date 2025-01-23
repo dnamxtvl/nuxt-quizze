@@ -57,6 +57,10 @@ export const RULES_VALIDATION = {
     FILE: {
         MAX_SIZE_UPLOAD: 5242880,
         MAX_QUESTION: 100,
+    },
+    AVATAR: {
+        MAX_SIZE_UPLOAD: 2048000,
+        FILE_TYPES: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'],
     }
 }
 
