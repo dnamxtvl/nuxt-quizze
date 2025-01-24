@@ -83,7 +83,13 @@
                             <button @click="handleAddQuestion" class="btn btn-primary me-3 mt-3 mb-2 ps-2 ms-3">
                                 <RiAddCircleFill size="18"/> Tạo câu hỏi
                             </button>
-                            <ckeditor />
+                            <ClientOnly>
+                                <mathToMage />
+                                <p>FAFA</p><math-field read-only style="display:inline-block; border: none">\sqrt2</math-field>
+                                <QuillEditor theme="snow" v-model:content="latexInput" contentType="html"/>
+                            </ClientOnly>
+                            <math-field ref="mathfield" style="width: 20%; height: 50px;"></math-field>
+                            <button @click="getLatex">Get LaTeX</button>
                             <div class="players-card main-card">
                                 <div class="row pt-2 rounded rounded-5">
                                     <div class="col-lg-12 px-4 mb-2">
@@ -200,7 +206,9 @@ import type { TabsPaneContext } from 'element-plus'
 import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill, RiDeleteBin2Fill, RiCheckFill } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
-import ckeditor from "~/components/admin/dashboard/ckeditor.vue";
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { useHead } from "@unhead/vue";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -216,6 +224,12 @@ interface ItemQuestion {
     answers: ItemAnswer[]
 }
 
+declare global {
+  interface Window {
+    MathJax: any;
+  }
+}
+
 export default defineComponent({
     components: {
         RiAddCircleFill,
@@ -226,9 +240,17 @@ export default defineComponent({
         RiEditFill,
         RiDeleteBin2Fill,
         RiCheckFill,
-        ckeditor,
+        QuillEditor,
     },
     setup() {
+        useHead({
+      script: [
+        {
+          src: "https://cdn.mathjax.org/mathjax/latest/MathJax.js",
+          async: false,
+        },
+      ],
+    });
         const activeName = ref<string>('first')
         const listQuizzText = ref<string>('');
         const questionArray = ref<Array<ItemQuestion>>([]);;
@@ -255,10 +277,25 @@ export default defineComponent({
         const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
         const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
         const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
+        const mathfield = ref(null);
+
+        const getLatex = () => {
+            latexInput.value = mathfield.value?.getValue();
+            convertToImage();
+        };
 
         const handleClick = (tab: TabsPaneContext, event: Event) => {
             console.log(tab, event)
         }
+
+        useHead({
+            script: [
+                {
+                    src: "https://cdn.mathjax.org/mathjax/latest/MathJax.js",
+                    async: false,
+                },
+            ],
+        });
 
         const getCatogory = async () => {
             await api.quizze.listCategory((res: any) => {
@@ -413,24 +450,78 @@ export default defineComponent({
             return isPassValidateFile;
         }
 
-        onMounted(async () => {
-            await getCatogory();
-        })
+    const latexInput = ref(""); // Công thức LaTeX từ input
+    const image = ref(null); // Ảnh PNG được sinh ra
+
+    // Hàm chuyển đổi LaTeX thành PNG
+    const tex2img = (formula, callback) => {
+      if (!window.MathJax) {
+        console.error("MathJax is not loaded");
+        return;
+      }
+
+      window.MathJax.Hub.Queue(function () {
+        const wrapper = window.MathJax.HTML.Element("span", {}, formula);
+        window.MathJax.Hub.Typeset(wrapper, function () {
+          const svg = wrapper.getElementsByTagName("svg")[0];
+          svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          const imgElement = new Image();
+          imgElement.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+          imgElement.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+            const context = canvas.getContext("2d");
+            context.drawImage(imgElement, 0, 0);
+            const img =
+              '<img src="' +
+              canvas.toDataURL("image/png") +
+              '" alt="Math formula"/>';
+            callback(img);
+          };
+        });
+      });
+    };
+
+    // Hàm xử lý khi người dùng nhấn "Convert to Image"
+    const convertToImage = () => {
+      if (!latexInput.value.trim()) {
+        alert("Please enter a LaTeX formula.");
+        return;
+      }
+
+      tex2img(`\\(${latexInput.value}\\)`, (output) => {
+        image.value = output; // Gán kết quả vào biến hiển thị
+      });
+    };
+
+    // Khởi tạo MathJax
+    onMounted(() => {
+      window.MathJax = {
+        jax: ["input/TeX", "output/SVG"],
+        extensions: ["tex2jax.js"],
+        SVG: {
+          useGlobalCache: false,
+        },
+      };
+    });
 
         const handleAddQuestion = () => {
-            isUpdate.value = false;
-            showModalCreateOrUpdateEditQuestion.value = true;
-            errorMessageUpdateQuestions.value = [];
-            currentQuestion.value = {
-                id: '',
-                title: '',
-                quizze_id: '',
-                answers: [],
-                created_at: ''
-            };
-            for (let i = 0; i < RULES_VALIDATION.QUESTION.MAX_ANSWER; i++) {
-                addAnswerOfQuestion();
-            }
+            // isUpdate.value = false;
+            // showModalCreateOrUpdateEditQuestion.value = true;
+            // errorMessageUpdateQuestions.value = [];
+            // currentQuestion.value = {
+            //     id: '',
+            //     title: '',
+            //     quizze_id: '',
+            //     answers: [],
+            //     created_at: ''
+            // };
+            // for (let i = 0; i < RULES_VALIDATION.QUESTION.MAX_ANSWER; i++) {
+            //     addAnswerOfQuestion();
+            // }
         }
 
         const addAnswerOfQuestion = () => {
@@ -627,11 +718,20 @@ export default defineComponent({
             handleRemoveQuestion,
             handleEditQuestion,
             closeModalCreateOrUpdate,
+            mathfield,
+            getLatex,
         }
     }
 })
 </script>
 <style scoped>
+@import '~/assets/styles/mathlive/core.scss';
+@import '~/assets/styles/mathlive/environment-popover.scss';
+@import '~/assets/styles/mathlive/fonts.scss';
+@import '~/assets/styles/mathlive/keystroke-caption.scss';
+@import '~/assets/styles/mathlive/mathfield.scss';
+@import '~/assets/styles/mathlive/suggestion-popover.scss';
+@import '~/assets/styles/mathlive/virtual-keyboard.scss';
 .upload-icon {
     font-size: 50px;
 }
@@ -652,5 +752,17 @@ export default defineComponent({
     width: 0;
     height: 5px;
     background-color: #4BB543;
-}  
+}
+
+:deep(.ql-editor) {
+    min-height: 200px;
+  }
+  :deep(.ql-toolbar.ql-snow) {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  :deep(.ql-container.ql-snow) {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
 </style>
