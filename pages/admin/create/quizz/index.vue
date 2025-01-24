@@ -3,17 +3,16 @@
         <div class="app-email card h-100-vh">
             <div class="row g-0 h-100-vh">
                 <el-dialog v-model="showModalCreateOrUpdateEditQuestion" close-icon="false"
-                    :close-on-click-modal="false" :title="isUpdate ? 'Cập nhật' : 'Tạo mới'" width="500" align-center>
+                    :close-on-click-modal="false" :title="isUpdate ? 'Cập nhật' : 'Tạo mới'" width="1200" align-center>
                     <div v-for="(error, index) in errorMessageUpdateQuestions" :key="index" class="text-danger"
                         v-show="errorMessageUpdateQuestions.length > 0">
-                        {{ error }}
+                        <el-alert :title="error" type="error" :closable="false" class="mb-1 mt-1" />
                     </div>
                     <label for="inputPassword6" class="col-form-label fw-bold">Câu hỏi</label>
                     <input type="text" class="form-control" v-model="currentQuestion.title" />
                     <div class="row mt-3">
                         <span class="text-primary">
                             <label for="inputPassword6" class="col-form-label fw-bold">Câu trả lời</label>
-                            
                             <span v-if="currentQuestion.answers.length < maxAnswerOFQuestion" class="cursor-pointer"
                                 @click="addAnswerOfQuestion">
                                 <RiAddCircleLine size="18" class="mb-1 ms-1" />
@@ -33,7 +32,7 @@
                     </div>
                     <template #footer>
                         <div class="dialog-footer">
-                            <el-button @click="showModalCreateOrUpdateEditQuestion = false">
+                            <el-button @click="closeModalCreateOrUpdate">
                                 <RiCloseLine size="18" />
                                 Hủy
                             </el-button>
@@ -84,6 +83,7 @@
                             <button @click="handleAddQuestion" class="btn btn-primary me-3 mt-3 mb-2 ps-2 ms-3">
                                 <RiAddCircleFill size="18"/> Tạo câu hỏi
                             </button>
+                            <ckeditor />
                             <div class="players-card main-card">
                                 <div class="row pt-2 rounded rounded-5">
                                     <div class="col-lg-12 px-4 mb-2">
@@ -97,10 +97,10 @@
                                                     </span>
                                                 </div>
                                                 <div class="col-md-3 d-flex justify-content-end mt-2">
-                                                    <!-- <span @click="handleEditQuestion(item)"
+                                                    <span @click="handleEditQuestion(item, index)"
                                                         class="text-primary text-white me-2 mt-2 cursor-pointer">
                                                         <RiEditFill size="18" class="mb-1" />
-                                                    </span> -->
+                                                    </span>
                                                     <span @click="handleRemoveQuestion(index)"
                                                         class="text-danger me-2 mt-2 cursor-pointer">
                                                         <RiDeleteBin2Fill size="18" class="mb-1" />
@@ -142,18 +142,18 @@
                                             class="material-icons-outlined upload-icon fs-1 text-primary"> Tải lên
                                             file csv </span>
                                         <h3 v-if="!fileListQuestion" class="dynamic-message fw-medium">với dung lượng <
-                                                5mb</h3>
-                                                <h3 v-if="fileListQuestion"
-                                                    class="dynamic-message fw-medium text-primary rounded-pill">{{
-                                                    fileListQuestion.name }}</h3>
-                                                <label class="d-block">
-                                                    <span class="browse-files">
-                                                        <input @change="onFileChange" type="file"
-                                                            class="d-none default-file-input" />
-                                                        <span class="text-primary fw-bold">Chọn file</span>
-                                                        từ thiết bị của bạn
-                                                    </span>
-                                                </label>
+                                            5mb</h3>
+                                            <h3 v-if="fileListQuestion"
+                                                class="dynamic-message fw-medium text-primary rounded-pill">{{
+                                                fileListQuestion.name }}</h3>
+                                            <label class="d-block">
+                                                <span class="browse-files">
+                                                    <input @change="onFileChange" type="file"
+                                                        class="d-none default-file-input" />
+                                                    <span class="text-primary fw-bold">Chọn file</span>
+                                                    từ thiết bị của bạn
+                                                </span>
+                                            </label>
                                     </div>
                                     <div class="alert alert-danger d-none cannot-upload-message" role="alert">
                                         <span class="material-icons-outlined">error</span> Please select a file first
@@ -184,10 +184,6 @@
                             </form>
                         </div>
                     </el-tab-pane>
-                    <!-- <el-tab-pane label="Nhập từng câu" name="third">
-                        <h4 class="text-center">Tính năng sắp phát triển ^^
-                        </h4>
-                    </el-tab-pane> -->
                 </el-tabs>
                 <!-- End Create Quizz -->
             </div>
@@ -204,6 +200,7 @@ import type { TabsPaneContext } from 'element-plus'
 import { RiAddCircleFill, RiUploadLine, RiDownloadLine, RiCloseLine, RiAddCircleLine, RiEditFill, RiDeleteBin2Fill, RiCheckFill } from "@remixicon/vue";
 import { RULES_VALIDATION } from "~/constants/application";
 import Papa from 'papaparse';
+import ckeditor from "~/components/admin/dashboard/ckeditor.vue";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -229,6 +226,7 @@ export default defineComponent({
         RiEditFill,
         RiDeleteBin2Fill,
         RiCheckFill,
+        ckeditor,
     },
     setup() {
         const activeName = ref<string>('first')
@@ -253,6 +251,7 @@ export default defineComponent({
             answers: [],
             created_at: ''
         });
+        const currentIndexUpdate = ref<number>(0);
         const maxAnswerOFQuestion = RULES_VALIDATION.QUESTION.MAX_ANSWER;
         const minAnswerOFQuestion = RULES_VALIDATION.QUESTION.MIN_ANSWER;
         const showModalCreateOrUpdateEditQuestion = ref<boolean>(false);
@@ -447,21 +446,29 @@ export default defineComponent({
             currentQuestion.value.answers = currentQuestion.value.answers.filter((answer: Answer) => answer.id != answerId);
         }
 
+
         const updateQuestion = async () => {
             const resultValidate = validateQuestionUpdateOrCreate();
             if (!resultValidate) {
                 return;
             }
 
-            questionArray.value.push(
-                {
-                    title: currentQuestion.value.title,
-                    answers: currentQuestion.value.answers.map(answer => ({
-                        answer: answer.answer,
-                        is_correct: answer.is_correct
-                    }) )
-                }
-            );
+            if (!isUpdate.value) {
+                questionArray.value.push(
+                    {
+                        title: currentQuestion.value.title,
+                        answers: currentQuestion.value.answers.map(answer => ({
+                            answer: answer.answer,
+                            is_correct: answer.is_correct
+                        }) )
+                    }
+                );
+            } else {
+                let question = questionArray.value[currentIndexUpdate.value];
+                question = currentQuestion.value;
+                questionArray.value[currentIndexUpdate.value] = question;
+                isUpdate.value = false;
+            }
 
             showModalCreateOrUpdateEditQuestion.value = false;
         }
@@ -570,10 +577,11 @@ export default defineComponent({
             questionArray.value.splice(index, 1);
         };
 
-        const handleEditQuestion = (item: ItemQuestion) => {
+        const handleEditQuestion = (item: ItemQuestion, index: number) => {
             showModalCreateOrUpdateEditQuestion.value = true;
             isUpdate.value = true;
             errorMessageUpdateQuestions.value = [];
+            currentIndexUpdate.value = index;
             currentQuestion.value = {
                 ...item,
                 answers: item.answers.map(answer => ({
@@ -581,7 +589,12 @@ export default defineComponent({
                     is_correct: !!answer.is_correct
                 }))
             };
-        } 
+        }
+
+        const closeModalCreateOrUpdate = () => {
+            showModalCreateOrUpdateEditQuestion.value = false;
+            isUpdate.value = false;
+        }
 
         return {
             activeName,
@@ -613,6 +626,7 @@ export default defineComponent({
             questionArray,
             handleRemoveQuestion,
             handleEditQuestion,
+            closeModalCreateOrUpdate,
         }
     }
 })
