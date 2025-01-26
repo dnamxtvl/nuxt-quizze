@@ -20,4 +20,7 @@ export default class UserService extends BaseService {
     changePassword = async (userId: string, params: Object, success: any, error: any) => {
         await this.post(API_CONST.USER.CHANGE_PASSWORD + '/' + userId, params, success, error);
     };
+    uploadImage = async (params: Object, success: any, error: any) => {
+        await this.post(API_CONST.USER.UPLOAD_IMAGE, params, success, error);
+    };
 }

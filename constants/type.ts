@@ -55,6 +55,8 @@ export interface ItemQuestion {
     id: string;
     title: string;
     quizze_id: string;
+    image?: string|null;
+    time_reply?: number|null;
     answers: Array<Answer>;
     created_at: string;
 }

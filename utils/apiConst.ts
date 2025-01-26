@@ -68,6 +68,7 @@ const API_CONST = {
         ACTIVE_USER: 'admin/user/active',
         SEARCH_ELK: 'admin/user/search-elk',
         CHANGE_PASSWORD: 'admin/change-password',
+        UPLOAD_IMAGE: 'admin/upload-image',
     }
 };
 

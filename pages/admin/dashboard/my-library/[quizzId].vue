@@ -80,9 +80,11 @@
                         class="question-preview-content border rounded rounded-3 pl-2 mb-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="col-md-9 d-flex justify-content-start mt-2">
-                                <span class="text-black fw-normal fs-5 pt-2 px-4 text-start font-bold">
-                                    {{ (index + 1) + ". " + item.title }}
+                                <span
+                                    class="text-black fw-normal fs-5 pt-2 ps-4 pe-2 text-start font-bold">
+                                    {{ (index + 1) + ". " }}
                                 </span>
+                                <div class="text-black fw-normal fs-5 pt-2 text-start font-bold" v-html="item.title"></div>
                             </div>
                             <div class="col-md-3 d-flex justify-content-end mt-2">
                                 <span v-if="authId == quizDetail.user_id" @click="handleEditQuestion(item)" class="text-primary text-white me-2 mt-2 cursor-pointer">
