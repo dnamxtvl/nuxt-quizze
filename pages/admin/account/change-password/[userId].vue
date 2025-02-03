@@ -142,7 +142,7 @@ export default defineComponent({
           if (userRole.value == USER_TYPE_ENUM.SYSTEM) {
             disabled = authId.value != route.params.userId;
           } else {
-            disabled = true;
+            disabled = false;
           }
 
           return disabled;

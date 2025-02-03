@@ -42,7 +42,7 @@
                       accept="image/png, image/jpeg, image/gif, image/jpg"
                     />
                   </label>
-                  <div class="text-muted">Allowed JPG,JPEG, GIF or PNG. Max size of 5096KB</div>
+                  <div class="text-muted">Allowed JPG,JPEG, GIF or PNG. Max size of 2048KB</div>
                 </div>
               </div>
             </div>

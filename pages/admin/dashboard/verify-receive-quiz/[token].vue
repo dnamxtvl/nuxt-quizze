@@ -127,9 +127,10 @@ export default defineComponent({
                 (res: any) => {
                     userShareQuiz.value = res;
                     quizDetail.value = res.quiz;
-                    if (userShareQuiz.value.is_accept == true) {
-                        return navigateTo("/admin/dashboard/my-library/" + quizDetail.value.id);
-                    }
+                    console.log(res);
+                    // if (userShareQuiz.value.is_accept == true) {
+                    //     return navigateTo("/admin/dashboard/my-library/" + quizDetail.value.id);
+                    // }
 
                     showModalAcceptQuiz.value = true
                 },
@@ -140,8 +141,8 @@ export default defineComponent({
                         if (err.responseCode != CODE.ERROR_RECJECT_QUIZZE) {
                             return navigateTo("/not-found");   
                         }
-
-                        return navigateTo("/admin/dashboard/my-library/");
+                        console.log(err);
+                        //return navigateTo("/admin/dashboard/my-library/");
                     }
 
                     if (err.code == CODE.UNAUTHORIZED) {
@@ -174,7 +175,7 @@ export default defineComponent({
                 (res: any) => {
                     ElLoading.service({ fullscreen: true }).close();
                     ElNotification({title: "Success",message: "Đã từ chối bộ cảu hỏi!",type: "success"});
-                    $bus.$emit('clearNotify', { notifyId: route.query.notification_id as string }) // Phát sự kiện lên Global Event Bus
+                    $bus.$emit('clearNotify', { notifyId: route.query.notification_id as string });
                     return navigateTo("/admin/dashboard/my-library/");
                 },
                 (err: ErrorResponse) => {

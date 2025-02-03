@@ -57,9 +57,9 @@
                 </div>
                 <div class="row d-flex p-4 pb-2 justify-center rounded-b-2xl">
                     <div class="col-md-6">
-                        <button class="btn  w-full fs-5 btn-outline-secondary text-white">
-                            Preview as a Student
-                        </button>
+                        <nuxt-link :to="'/admin/dashboard/reports/' + $route.params.roomId" class="btn  w-full fs-5 btn-outline-secondary text-white">
+                            Xem báo cáo
+                        </nuxt-link>
                     </div>
                     <div class="col-md-6">
                         <button @click="startGame" class="btn btn-primary w-full fs-5">
@@ -67,24 +67,33 @@
                         </button>
                     </div>
                 </div>
-                <div class="row d-flex justify-content-between p-4 pt-0">
-                    <div class="col-md-6 mt-2" v-for="(item, index) in listUserJoined" :key="index">
-                        <button class="btn  text-white w-full text-center btn-light">
-                            <span class="text-primary text-break fs-4 fw-bold">
-                                {{ item.name ?? 'Sóc ẩn danh' }}
-                            </span>
-                        </button>
-                    </div>
+            </div>
+            <div class="row d-flex justify-content-center p-4 pt-0">
+                <div class="col-md-2 mt-2" v-for="(item, index) in listUserJoined" :key="index">
+                    <button class="btn  text-white w-full text-center btn-light">
+                        <span class="text-primary text-break fs-4 fw-bold">
+                            {{ item.name ?? 'Sóc ẩn danh' }}
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
         <div class="w-full d-flex flex-column" v-if="showQuestion">
             <div class="row d-flex flex-wrap justify-content-center align-items-center" style="flex:1;"
                 :class="{ 'question-title': !displayChart }">
-                <p class="text-dark text-center fs-2 py-4 question fw-bold lh-base">{{ listQuestion.findIndex(item =>
-                    item.id ==
-                    currentQuestion.id)
-                    + 1 }}. {{ currentQuestion.title }}</p>
+                <div class="d-flex justify-content-center question-title-html">
+                    <span class="text-dark text-center fs-2 pe-4 py-4 fw-bold lh-base">
+                        {{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}.
+                    </span>
+                    <div class="d-grid lh-1 align-self-center text-black question-html fs-1 pt-2 text-start font-bold" v-html="currentQuestion.title"></div>
+                </div>
+                <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image && !displayChart">
+                    <div class="upload-container">
+                        <img :src="currentQuestion.image" alt="Image Preview">
+                        <label class="cursor-pointer">
+                        </label>
+                    </div>
+                </div>
                 <h3 v-if="displayTime" class="text-warning text-start fs-1 px-5">
                     <span class="remaining_time">{{ remainingTime }}</span>
                 </h3>
@@ -92,7 +101,7 @@
             <div v-if="displayChart" style="background-color: rgba(0, 0, 0, 0.3);" class="pt-2">
                 <BarChart :getDataChart="getDataChart" />
             </div>
-            <div class="row list-answer align-items-center mt-2 px-3" style="flex:1;">
+            <div class="row list-answer align-items-center mt-2 px-3">
                 <div class="col-6 col-sm-6 col-md-6 col-lg-6 cursor-pointer d-flex align-items-center pe-0 ps-0 mb-2"
                     v-for="(item, index) in currentQuestion.answers" :key="index">
                     <div class="list-answer-item w-full ms-2 p-3 d-flex align-items-center justify-content-center position-relative"
@@ -156,11 +165,13 @@
                                 <div class="col-lg-12 px-4 mb-2">
                                     <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
-                                            {{ (index + 1) + ". " + item.title }}
-                                        </p>
-                                        <hr>
-                                        </hr>
+                                        <div class="d-flex justify-content-start">
+                                            <span class="fw-normal fs-5 pt-2 ps-3 pe-2 text-start text-white font-bold">
+                                                {{ (index + 1) + ". " }}
+                                            </span>
+                                            <div class="text-white fw-normal fs-5 pt-2 text-start font-bold" v-html="item.title"></div>
+                                        </div>
+                                        <hr></hr>
                                         <div class="question-answer-review px-4 pt-2 mb-2">
                                             <div class="form-check" v-for="(answer, index) in item.answers">
                                                 <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
@@ -255,6 +266,7 @@ export default defineComponent({
             id: '',
             title: '',
             quizze_id: '',
+            time_reply: 0,
             answers: [],
             created_at: ''
         });
@@ -351,15 +363,11 @@ export default defineComponent({
                 (res: any) => {
                     showPrepare.value = false;
                     showQuestion.value = true;
-                    remainingTime.value = RoomSetting.TIME_REPLY;
+                    remainingTime.value = currentQuestion.value.time_reply as number;
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     showButtonDisplayResult.value = false;
-                    setShowResult(RoomSetting.TIME_REPLY * 1000);
-                    setTimeout(() => {
-                        // showButtonNext.value = true;
-                        showButtonDisplayResult.value = true;
-                    }, RoomSetting.TIME_REPLY * 1000);
+                    setShowResult((currentQuestion.value.time_reply as number) * 1000);
                 },
                 (err: ErrorResponse) => {
                     ElNotification({ title: "Warning", message: err.error.shift(), type: "warning" });
@@ -390,8 +398,8 @@ export default defineComponent({
                     ElLoading.service({ fullscreen: true }).close();
                     showButtonNext.value = false;
                     if (nextQuestionIndex < listQuestion.value.length) {
-                        remainingTime.value = RoomSetting.TIME_REPLY;
                         currentQuestion.value = listQuestion.value[nextQuestionIndex];
+                        remainingTime.value = currentQuestion.value.time_reply as number;
                         showResult.value = false;
                         showQuestion.value = true;
                         displayTime.value = true;
@@ -403,11 +411,7 @@ export default defineComponent({
                             displayChart.value = true;
                             showButtonDisplayResult.value = true;
                             displayTime.value = false;
-                            // showButtonNext.value = true;
-                            // showResult.value = true;
-                            // showQuestion.value = false;
-                            // getCurrentCorrectAnswerText();
-                        }, RoomSetting.TIME_REPLY * 1000);
+                        }, (currentQuestion.value.time_reply as number) * 1000);
                     }
                 },
                 (err: ErrorResponse) => {
@@ -587,70 +591,4 @@ export default defineComponent({
 </script>
 <style scoped lang="scss">
 @import '~/assets/styles/admin/admin-game.scss';
-
-.expand-qr_img {
-    height: 350px;
-}
-
-.expand_qr .content {
-    background-color: #4CAF50 !important;
-}
-
-.qr-code-join-room:hover {
-    opacity: 0.8;
-    cursor: pointer;
-}
-
-.icon-close-model {
-        position: absolute;
-        font-size: 36px;
-        height: 40px;
-        width: 40px;
-        background: #2f2f2f;
-        border-radius: 50%;
-        text-align: center;
-        margin: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        top: -20px;
-        right: -20px;
-        opacity: 0.8;
-        color: #fff;
-}
-
-.icon-close-model:hover {
-    cursor: pointer;
-}
-
-.el-dialog__header{
-    display: none !important;
-}
-
-.score_list {
-    width: 80% ;
-    margin: 12px auto;
-    height: 350px;
-    max-width: 750px ;
-}
-.score_item {
-    width: 128px;
-}
-.content_item {
-    background-color: #e21b3c;
-    height: 230px;
-    width: 100%;
-}
-.footer_item {
-    background-color: #af152e;
-    height: 32px;
-    width: 100%;
-}
-.opacity_5 {
-    opacity: 0.5;
-}
-.list-answer-item {
-    border: 5px solid rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-}
 </style>

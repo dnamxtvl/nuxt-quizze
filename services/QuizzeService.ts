@@ -15,7 +15,7 @@ export default class QuizzeService extends BaseService {
         await this.get(API_CONST.QUIZZE.LIST_QUESTION + '/' + quizzeId, {}, success, error);
     };
     updateQuestion = async (questionId: string, params: Object, success: any, error: any) => {
-        await this.put(API_CONST.QUIZZE.UPDATE_QUESTION + '/' + questionId, params, success, error);
+        await this.post(API_CONST.QUIZZE.UPDATE_QUESTION + '/' + questionId, params, success, error);
     };
     createQuestion = async (quizzeId: string, params: Object, success: any, error: any) => {
         await this.post(API_CONST.QUIZZE.CREATE_QUESTION + '/' + quizzeId, params, success, error);

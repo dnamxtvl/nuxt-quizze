@@ -25,9 +25,19 @@
         <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0">
             <div v-if="showQuestion && currentRoomStatus > 0"
                 class="row question-title d-flex flex-wrap justify-content-center g-0" style="flex:1">
-                <p class="text-dark text-center fs-2 lh-base p-3 mt-4 fw-bold">{{ currentQuestionIndex + 1 }}. {{
-                    currentQuestion?.title }}
-                </p>
+                <div class="d-flex justify-content-center question-title-html">
+                    <span class="d-flex align-items-center text-dark text-center fs-2 pe-4 py-4 fw-bold lh-base">
+                        {{ currentQuestionIndex + 1 }}.
+                    </span>
+                    <div class="d-grid align-self-center lh-1 text-black question-html pe-4 fs-1 pt-2 text-start font-bold" v-html="currentQuestion?.title"></div>
+                </div>
+                <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image">
+                    <div class="upload-container">
+                        <img :src="currentQuestion.image" alt="Image Preview">
+                        <label class="cursor-pointer">
+                        </label>
+                    </div>
+                </div>
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
             <div v-if="showQuestion && currentRoomStatus > 0"
@@ -100,11 +110,13 @@
                                 <div class="col-lg-12 px-4 mb-2">
                                     <div v-for="(item, index) in listQuestion"
                                         class="question-preview-content border border-primary rounded rounded-3 pl-2 mb-3">
-                                        <p class="text-black fw-normal fs-5 pt-2 px-4 text-start text-white font-bold">
-                                            {{ (index + 1) + ". " + item.title }}
-                                        </p>
-                                        <hr>
-                                        </hr>
+                                        <div class="d-flex justify-content-start">
+                                            <span class="fw-normal fs-5 pt-2 ps-3 pe-2 text-start text-white font-bold">
+                                                {{ (index + 1) + ". " }}
+                                            </span>
+                                            <div class="text-white fs-5 pt-2 text-start font-bold" v-html="item.title"></div>
+                                        </div>
+                                        <hr></hr>
                                         <div class="question-answer-review px-4 pt-2 mb-2">
                                             <div class="form-check" v-for="(answer, index) in item.answers">
                                                 <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />
@@ -134,9 +146,6 @@
                 </div>
             </template>
         </el-dialog>
-        <!-- <div class="show-meme d-flex justify-content-center align-items-center">
-        <img src="../../../../public/meme/sad/Screenshot from 2024-07-24 19-03-02.png" alt="meme" with="400" height="400" />
-        </div> -->
     </div>
 </template>
 <script lang="ts">
@@ -421,7 +430,7 @@ export default defineComponent({
             $echo.channel('admin.start-game.' + roomId.value)
                 .listen('StartGameEvent', (e: any) => {
                     currentRoomStatus.value = RoomStatus.HAPPING;
-                    timeReply.value = RoomSetting.TIME_REPLY;
+                    timeReply.value = currentQuestion.value.time_reply as number;
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();
@@ -432,7 +441,7 @@ export default defineComponent({
                     showQuestion.value = true;
                     currentQuestionIndex.value = currentQuestionIndex.value + 1;
                     currentQuestion.value = listQuestion.value[currentQuestionIndex.value];
-                    timeReply.value = RoomSetting.TIME_REPLY;
+                    timeReply.value = currentQuestion.value.time_reply as number;
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
                     calculateTimeReply();

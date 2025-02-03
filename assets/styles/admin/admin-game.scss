@@ -472,3 +472,125 @@
     align-items: center;
     font-size: 40px;
 }
+
+.expand-qr_img {
+    height: 350px;
+}
+
+.expand_qr .content {
+    background-color: #4CAF50 !important;
+}
+
+.qr-code-join-room:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.icon-close-model {
+    position: absolute;
+    font-size: 36px;
+    height: 40px;
+    width: 40px;
+    background: #2f2f2f;
+    border-radius: 50%;
+    text-align: center;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -20px;
+    right: -20px;
+    opacity: 0.8;
+    color: #fff;
+}
+
+.icon-close-model:hover {
+    cursor: pointer;
+}
+
+.el-dialog__header{
+    display: none !important;
+}
+
+.score_list {
+    width: 80% ;
+    margin: 12px auto;
+    height: 350px;
+    max-width: 750px ;
+}
+
+.score_item {
+    width: 128px;
+}
+
+.content_item {
+    background-color: #e21b3c;
+    height: 230px;
+    width: 100%;
+}
+
+.footer_item {
+    background-color: #af152e;
+    height: 32px;
+    width: 100%;
+}
+
+.opacity_5 {
+    opacity: 0.5;
+}
+
+.list-answer-item {
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.question > img {
+    min-width: 30px;
+}
+
+.question-title-html .text-start {
+    text-align: center !important;
+}
+
+.question-title-html .text-end {
+    text-align: center !important;
+}
+
+.upload-container {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.upload-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.upload-container .delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.upload-container:hover {
+    background-color: #e9ecef;
+}

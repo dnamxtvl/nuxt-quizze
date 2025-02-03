@@ -16,6 +16,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
             return navigateTo('/admin/dashboard/my-library');
         }
 
-        return navigateTo("/admin/dashboard/quizzes");
+        return navigateTo("/admin/dashboard");
     }
 });

@@ -129,7 +129,7 @@ export default class helperApp {
     if (type == USER_TYPE_ENUM.USER) {
       return navigateTo("/admin/dashboard/my-library");
     } else {
-      return navigateTo("/admin/dashboard/quizzes");
+      return navigateTo("/admin/dashboard");
     }
   };
 

@@ -12,6 +12,7 @@ const API_CONST = {
         SIGN_IN_CALLBACK: 'auth/google-callback',
         GET_PROFILE: 'admin/get-profile',
         UPDATE_PROFILE: 'admin/update-profile',
+        CREATE_USER: 'admin/create-user',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
@@ -69,7 +70,10 @@ const API_CONST = {
         SEARCH_ELK: 'admin/user/search-elk',
         CHANGE_PASSWORD: 'admin/change-password',
         UPLOAD_IMAGE: 'admin/upload-image',
-    }
+    },
+    DASHBOARD: {
+        INDEX: 'admin/dashboard/index',
+    },
 };
 
 export default API_CONST;

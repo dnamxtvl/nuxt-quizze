@@ -132,7 +132,7 @@
                         </table>
                     </div>
                     <div class="empty-section mt-4" v-if="listRoom.length == 0">
-                        <h4 class="text-center">Không tìm thấy room nào!</h4>
+                        <h4 class="text-center">Không tìm thấy kết quả!</h4>
                     </div>
                     <div class="row pagination mt-1" v-if="listRoom.length > 0">
                         <el-pagination class="d-flex justify-content-center" :page-size="defalutPerpage"

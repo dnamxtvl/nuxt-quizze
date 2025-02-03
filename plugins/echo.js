@@ -9,7 +9,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   let echo;
   const RECONNECT_TIMEOUT = 5000;
   const RECONNECT_MAX_ATTEMPTS = 5;
-  console.log(config.public);
   const initializeEcho = () => {
     echo = new Echo({
       broadcaster: "reverb",
@@ -19,7 +18,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           authorize: (socketId, callback) => {
             axios
               .post(
-                config.public.BACKEND_HOST + "broadcasting/auth",
+                config.public.BACKEND_URL + "broadcasting/auth",
                 {
                   socket_id: socketId,
                   channel_name: channel.name,

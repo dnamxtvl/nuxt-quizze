@@ -242,11 +242,12 @@
                                 class="question-preview-content border rounded rounded-3 pl-2 mb-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="col-md-12 d-flex justify-content-start mt-2">
-                                        <span class="text-black fw-normal fs-5 pt-2 px-4 text-start font-bold">
-                                            {{ (index + 1) + ". " + item.title }}
-                                            <span class="fw-bold">
-                                                {{ roomDetail.type == homeworkType ? "1 điểm" : '1000 điểm' }}
-                                            </span>
+                                        <span class="text-black fw-normal fs-5 pt-2 px-2 text-start font-bold">
+                                            {{ (index + 1) + ". " }}
+                                        </span>
+                                        <div class="text-black fw-normal fs-5 pt-2 text-start font-bold" v-html="item.title"></div>
+                                        <span class="fw-bold text-primary fs-5 pt-2 ps-4 pe-2 text-start">
+                                            {{ roomDetail.type == homeworkType ? "1 điểm" : '1000 điểm' }}
                                         </span>
                                     </div>
                                 </div>

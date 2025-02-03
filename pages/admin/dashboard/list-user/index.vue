@@ -125,6 +125,19 @@
                 /></span>
               </div>
             </div>
+            <div class="row d-flex g-3 justify-content-end">
+              <div class="col-md-3">
+                <el-tooltip content="Cấp tài khoản" placement="top">
+                  <nuxt-link
+                    to="/admin/account/create"
+                    class="btn float-end">
+                    <span class="badge bg-label-success rounded p-2">
+                      <RiAddCircleFill size="18" /> <i class="ti ti-user-plus ti-sm"></i>
+                    </span>
+                  </nuxt-link>
+                </el-tooltip>
+              </div>
+            </div>
             <table class="table" v-if="listUser.length > 0">
               <thead>
                 <tr>
@@ -219,7 +232,7 @@
             </table>
           </div>
           <div class="empty-section mt-4" v-if="listUser.length == 0">
-            <h4 class="text-center">Không tìm thấy User nào!</h4>
+            <h4 class="text-center">Không tìm thấy kết quả!</h4>
           </div>
           <div class="row pagination mt-1" v-if="listUser.length > 0">
             <el-pagination
@@ -250,6 +263,7 @@ import {
   RiEyeCloseFill,
   RiSearchLine,
   RiCloseFill,
+  RiAddCircleFill,
 } from "@remixicon/vue";
 import moment from "moment";
 import { CREATED_BY } from "~/constants/quiz";
@@ -283,6 +297,7 @@ export default defineComponent({
     RiEyeCloseFill,
     RiSearchLine,
     RiCloseFill,
+    RiAddCircleFill,
   },
   setup() {
     const currentPage = ref<number>(1);
@@ -476,6 +491,7 @@ export default defineComponent({
       getUserStatus,
       disableUser,
       activeUser,
+      remoteMethod,
       showModalDelete,
       showModalDisable,
       showModalActive,
@@ -485,7 +501,6 @@ export default defineComponent({
       filterParams,
       defalutPerpage,
       loading,
-      remoteMethod,
       options,
     };
   },

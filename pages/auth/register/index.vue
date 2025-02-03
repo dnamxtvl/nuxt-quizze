@@ -163,7 +163,7 @@
 import { defineComponent, ref } from "vue";
 import api from "~/api/axios";
 import { useValidator } from "#imports";
-import { RULES_VALIDATION, ERROR_CODE, CODE } from "~/constants/application";
+import { RULES_VALIDATION } from "~/constants/application";
 import helperApp from "~/utils/helper";
 import {
   GoogleSignInButton,
@@ -328,21 +328,21 @@ export default defineComponent({
 .authentication-inner
 .auth-cover-bg
 .auth-illustration {
-    max-height: 65%;
-    z-index: 1;
+  max-height: 65%;
+  z-index: 1;
 }
 
 .authentication-wrapper.authentication-cover .authentication-inner .auth-cover-bg {
-    width: 100%;
-    margin: 2rem 0 2rem 2rem;
-    height: calc(100vh - 4rem);
-    border-radius: 1.125rem;
-    position: relative;
-    background-color: #f8f7fa;
+  width: 100%;
+  margin: 2rem 0 2rem 2rem;
+  height: calc(100vh - 4rem);
+  border-radius: 1.125rem;
+  position: relative;
+  background-color: #f8f7fa;
 }
 
 .authentication-wrapper.authentication-cover .authentication-inner {
-height: 100%;
-margin: auto 0;
+  height: 100%;
+  margin: auto 0;
 }
 </style>
