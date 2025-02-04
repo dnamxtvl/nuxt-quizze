@@ -264,7 +264,7 @@ export default defineComponent({
 
             for (let i = 0; i < contentOfFile.value.length; i++) {
                 const row: any = contentOfFile.value[i];
-                const title = row.title?.trim() ?? '';
+                let title = row.title?.trim() ?? '';
                 if (Object.keys(row).filter((key: string) => key == 'title').length != 1) {
                     errorMessagesValidate.push("Format của file không hợp lệ!");
                     isPassValidate = false;
@@ -302,6 +302,7 @@ export default defineComponent({
                     }
                 })
 
+                title = '<p>' + title + '</p>';
                 questionOfFile.push({title, answers});
             }
 
