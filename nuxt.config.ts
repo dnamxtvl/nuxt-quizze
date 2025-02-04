@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   ssr: false,
   devServer: {
     host: '0.0.0.0',
-    port: 8088
+    port: 3002
   },
   app: {
     head: {
@@ -23,6 +23,7 @@ export default defineNuxtConfig({
       BACKEND_URL: process.env.BACKEND_URL,
       REVERB_KEY: process.env.REVERB_KEY,
       BACKEND_HOST: process.env.BACKEND_HOST,
+      FRONTEND_URL: process.env.FRONTEND_URL
     }
   },
 
