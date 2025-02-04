@@ -2,6 +2,17 @@ const API_CONST = {
     AUTH: {
         LOGIN: 'admin/login',
         LOGOUT: 'admin/logout',
+        REGISTER: 'auth/register',
+        VERIFY_OTP_AFTER_LOGIN: 'auth/email/verify-login',
+        VERiFY_OTP_AFTER_REGISTER: 'auth/email/verify-register',
+        RESEND_VERIFY_EMAIL: 'auth/email/resend-verify-email',
+        FORGOT_PASSWORD: 'auth/forgot-password',
+        RESET_PASSWORD: 'auth/reset-password',
+        SIGN_IN_GOOGLE_URL: 'auth/google-sign-in-url',
+        SIGN_IN_CALLBACK: 'auth/google-callback',
+        GET_PROFILE: 'admin/get-profile',
+        UPDATE_PROFILE: 'admin/update-profile',
+        CREATE_USER: 'admin/create-user',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
@@ -15,6 +26,7 @@ const API_CONST = {
         DETAIL_SHARE_QUIZZE: 'admin/quizzes/detail-share',
         ACCEPT_SHARE_QUIZZE: 'admin/quizzes/accept-share',
         REJECT_SHARE_QUIZZE: 'admin/quizzes/reject-share',
+        SEARCH_QUIZZE: 'admin/quizzes/search',
     },
     CATEGORY: {
         LIST_CATEGORY: 'admin/category/list',
@@ -44,11 +56,24 @@ const API_CONST = {
         HOMEWORK: '/user/join/homework',
         REPORT_DETAIL: '/admin/dashboard/reports',
         DETAIL_QUIZ: '/admin/dashboard/my-library',
+        USER_DETAIL: '/admin/account',
     },
     NOTIFICATION: {
         LIST_NOTIFICATION: 'admin/notification/list',
         DELETE_NOTIFICATION: 'admin/notification/delete',
-    }
+    },
+    USER: {
+        LIST_USER: 'admin/user/search',
+        DELETE_USER: 'admin/user/delete',
+        DISABLE_USER: 'admin/user/disable',
+        ACTIVE_USER: 'admin/user/active',
+        SEARCH_ELK: 'admin/user/search-elk',
+        CHANGE_PASSWORD: 'admin/change-password',
+        UPLOAD_IMAGE: 'admin/upload-image',
+    },
+    DASHBOARD: {
+        INDEX: 'admin/dashboard/index',
+    },
 };
 
 export default API_CONST;

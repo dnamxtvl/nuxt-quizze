@@ -4,8 +4,10 @@ export interface LoginInfo {
 }
 
 export interface UserInfo {
+    id: string;
     email: string;
     name: string;
+    type: number;
 }
 
 export interface ItemQuizze {
@@ -13,6 +15,7 @@ export interface ItemQuizze {
     title: string;
     category_id: number;
     user_id: string;
+    code: string;
     questions_count: number;
     rooms_count: number;
     category?: {
@@ -22,7 +25,8 @@ export interface ItemQuizze {
     user: {
         id: string;
         name: string;
-    }
+        email: string;
+    },
     created_at: string;
     updated_at: string;
     deleted_at?: string;
@@ -51,6 +55,8 @@ export interface ItemQuestion {
     id: string;
     title: string;
     quizze_id: string;
+    image?: string|null;
+    time_reply?: number|null;
     answers: Array<Answer>;
     created_at: string;
 }
@@ -76,7 +82,7 @@ export interface GamerToken {
 export interface Quizz {
     id: string;
     title: string;
-    user_id?: string;
+    code: string;
     category_id: number;
     created_at: string
     updated_at: string
@@ -86,4 +92,30 @@ export interface ErrorResponse {
     code: number;
     error: string[];
     responseCode: number;
+}
+
+export interface Category {
+    id: number;
+    name: string,
+    created_at: string
+}
+
+export interface GamerInfo {
+    id: string;
+    name: string;
+    gamer_answers_sum_score: number;
+    gamer_answers: Array<GamerAnswer> | [];
+    gamer_token: GamerToken;
+    created_at: string;
+}
+
+export interface UserProfile extends UserInfo {
+    avatar: string;
+    latest_login: Date;
+    latest_ip_login: string;
+    disabled: boolean;
+    email_verified_at: Date|null;
+    type: number;
+    created_at: Date;
+    updated_at: Date;
 }

@@ -1,7 +1,7 @@
 import helperApp from "~/utils/helper";
 import { useMainStore } from "~/store";
 import axios from 'axios';
-import { CALL_AXIOS_TIMEOUT, CODE } from "~/constants/application";
+import { CODE } from "~/constants/application";
 
 interface ResponseData {
     data: any;
@@ -152,9 +152,9 @@ export default class BaseService {
             headers: { 'Authorization': `Bearer ${store.$state.token}` }
         });
 
-        instance.defaults.headers.post['Content-Type'] = 'application/json';
+        instance.defaults.headers.post['Content-Type'] = 'multipart/form-data';
         instance.defaults.headers.get['Content-Type'] = 'application/json';
-        instance.defaults.headers.put['Content-Type'] = 'application/json';
+        instance.defaults.headers.put['Content-Type'] = 'multipart/form-data';
         instance.defaults.headers.delete['Content-Type'] = 'application/json';
         instance.defaults.headers.delete['Content-Type'] = 'application/json';
 

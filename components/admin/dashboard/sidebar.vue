@@ -35,29 +35,34 @@
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-smart-home"></i>
                     <div data-i18n="Dashboards">Dashboards</div>
-                    <div class="badge bg-label-primary rounded-pill ms-auto">2</div>
+                    <!-- <div class="badge bg-label-primary rounded-pill ms-auto">2</div> -->
                 </a>
                 <ul class="menu-sub">
-                    <!-- <li class="menu-item">
-                        <a href="index.html" class="menu-link">
-                            <div data-i18n="Analytics">Khám phá</div>
-                        </a>
-                    </li> -->
-                    <li class="menu-item">
+                    <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard')">
+                        <nuxt-link to="/admin/dashboard" class="menu-link" exact-active-class="active">
+                            <div data-i18n="CRM">Tổng quan</div>
+                        </nuxt-link>
+                    </li>
+                    <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard/quizzes')">
+                        <nuxt-link to="/admin/dashboard/quizzes" :class="'menu-link ' + (useRoute().path.includes(detailQuizzRoutePath) ? 'active' : '')" exact-active-class="active">
+                            <div data-i18n="CRM">Bộ câu hỏi</div>
+                        </nuxt-link>
+                    </li>
+                    <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard/my-library')">
                         <nuxt-link to="/admin/dashboard/my-library" :class="'menu-link ' + (useRoute().path.includes(detailQuizzRoutePath) ? 'active' : '')" exact-active-class="active">
                             <div data-i18n="CRM">Thư viện của tôi</div>
                         </nuxt-link>
                     </li>
-                    <li class="menu-item">
+                    <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard/reports')">
                         <nuxt-link to="/admin/dashboard/reports" :class="'menu-link ' + (useRoute().path.includes(detailReportRoutePath) ? 'active' : '')" exact-active-class="active">
                             <div data-i18n="CRM">Báo cáo</div>
                         </nuxt-link>
                     </li>
-                    <!-- <li class="menu-item">
-                        <a href="dashboards-crm.html" class="menu-link">
-                            <div data-i18n="CRM">Cài đặt</div>
-                        </a>
-                    </li> -->
+                    <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard/list-user')">
+                        <nuxt-link to="/admin/dashboard/list-user" :class="'menu-link ' + (useRoute().path.includes(userDetailRoutePath) ? 'active' : '')" exact-active-class="active">
+                            <div data-i18n="CRM">Quản lý tài khoản</div>
+                        </nuxt-link>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -67,6 +72,9 @@
 import { RiAddCircleFill } from '@remixicon/vue';
 import { useRoute } from "vue-router";
 import API_CONST from '~/utils/apiConst';
+import { MENU_PERMISSION } from '~/constants/application';
+import { useMainStore } from "~/store";
+import { USER_TYPE_ENUM } from "~/constants/user";
 
 export default defineComponent({
   name: 'AdminDashboardSidebar',
@@ -76,6 +84,17 @@ export default defineComponent({
   setup() {
     const detailReportRoutePath = API_CONST.FRONT_END.REPORT_DETAIL;
     const detailQuizzRoutePath = API_CONST.FRONT_END.DETAIL_QUIZ;
+    const userDetailRoutePath = API_CONST.FRONT_END.USER_DETAIL;
+    const store = useMainStore();
+
+    const checkMenuPermission = (path: string) => {
+        const role = store.$state.user?.type;
+        if (role === USER_TYPE_ENUM.SYSTEM) {
+            return MENU_PERMISSION.SYSTEM.PREFIX_PATH.includes(path);
+        }
+
+        return MENU_PERMISSION.USER.PREFIX_PATH.includes(path);
+    }
 
     onMounted(() => {
         
@@ -84,6 +103,8 @@ export default defineComponent({
     return {
         detailReportRoutePath,
         detailQuizzRoutePath,
+        userDetailRoutePath,
+        checkMenuPermission,
     }
   }
 });

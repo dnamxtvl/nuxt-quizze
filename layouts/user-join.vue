@@ -18,7 +18,7 @@ export default {
 
 <style scoped>
 .layout-user {
-  background-image: linear-gradient(rgb(146, 14, 134) 0%, rgb(19, 2, 18) 100%) !important;
+  background-image: url('/public/background-join.png') !important;
   background-size: cover;
   background-position: center center;
 }

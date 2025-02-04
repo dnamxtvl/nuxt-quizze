@@ -15,3 +15,18 @@ export const QUIZ_TYPE = {
         icon: 'ti ti-file'
     }
 }
+
+export const CREATED_BY = {
+    USER: {
+        id: 1,
+        text: 'Người dùng',
+        color: 'text-primary',
+        bg_color: 'bg-primary',
+    },
+    SYSTEM: {
+        id: 3,
+        text: 'Hệ thống',
+        color: 'text-danger',
+        bg_color: 'bg-danger',
+    }
+}
