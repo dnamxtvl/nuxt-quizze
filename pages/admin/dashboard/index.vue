@@ -15,7 +15,7 @@
             </div>
             <div class="col-5 text-center text-sm-left">
               <div class="card-body pb-0 px-0 px-md-4 pb-4">
-                <img
+                <img class="img-fluid-new-user"
                   :src="latestCustomer.avatar ? latestCustomer.avatar : '/img/avatars/1.png'"
                   height="100"
                   alt="view sales" />
@@ -776,5 +776,9 @@ export default defineComponent({
 <style scoped>
 .demo-progress .el-progress--circle {
   margin-right: 15px;
+}
+
+.img-fluid-new-user {
+  max-width: 100px;
 }
 </style>
