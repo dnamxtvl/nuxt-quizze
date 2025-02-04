@@ -281,8 +281,8 @@ export default defineComponent({
             }
             
             const params = typeRoom.value == RoomType.HOMEWORK ? {
-                start_time: moment(timeRoom.value[0]).format("YYYY-MM-DD HH:mm:ss"),
-                end_time: moment(timeRoom.value[1]).format("YYYY-MM-DD HH:mm:ss"),
+                start_time: moment(new Date(timeRoom.value[0])).format("YYYY-MM-DD HH:mm:ss"),
+                end_time: moment(new Date(timeRoom.value[1])).format("YYYY-MM-DD HH:mm:ss"),
                 type: typeRoom.value
             } : { type: typeRoom.value }
 
@@ -325,12 +325,15 @@ export default defineComponent({
                     isPassValidate = false;
                 }
 
-                if (moment(timeRoom.value[0]) < moment(defaultTime) || moment(timeRoom.value[1]) < moment(defaultTime)) {
+                let startTime = moment(new Date(timeRoom.value[0]));
+                let endTime = moment(new Date(timeRoom.value[1]));
+
+                if (startTime < moment(defaultTime) || endTime < moment(defaultTime)) {
                     errrorMessage.push("Thời gian bắt đầu và kết thúc phải lớn hơn thời gian hiện tại");
                     isPassValidate = false;
                 }
 
-                const rangeTimeSeconds = moment(timeRoom.value[1]).diff(moment(timeRoom.value[0]), 'minutes');
+                const rangeTimeSeconds = endTime.diff(startTime, 'minutes');
                 if (rangeTimeSeconds < RULES_VALIDATION.ROOM.MIN_RANGLE_TIME || rangeTimeSeconds > RULES_VALIDATION.ROOM.MAX_RANGLE_TIME) {
                     errrorMessage.push('Thời gian diễn ra phải từ 1 đến 180 phút!');
                     isPassValidate = false;
@@ -414,6 +417,7 @@ export default defineComponent({
             let errorMessagesValidate: string[] = [];
             const validator = useValidator();
             let requiredEmail = validator.required(emailShare.value, "Email");
+            alert(emailShare.value);
             let isLengthEmail = validator.isLength(
                 emailShare.value,
                 "Email",

@@ -26,8 +26,17 @@
             </template>
         </el-dialog>
         <!-- show current question -->
-        <el-dialog v-model="showModalViewQuestion" :title="(listQuestionRooms.findIndex(item => item.id == currentShowQuestion.id) + 1) + '. ' + currentShowQuestion.title"
-            width="500" align-center>
+        <el-dialog v-model="showModalViewQuestion" width="500" align-center>
+            <template #header="{ titleClass }">
+                <div class="my-header">
+                    <div class="d-flex justify-content-center question-title-html">
+                        <span class="text-dark text-center fs-2 fw-bold lh-base">
+                            {{ (listQuestionRooms.findIndex(item => item.id == currentShowQuestion.id) + 1) + '. ' }}
+                        </span>
+                        <div :class="titleClass" class="d-grid lh-1 align-self-center text-black question-html fs-4 pt-2 text-start font-bold" v-html="currentShowQuestion.title"></div>
+                    </div>
+                </div>
+              </template>
             <div class="col-xl-9 col-lg-9 col-md-8 col-sm-6">
                 <div class="form-check" v-for="(answer, index) in currentShowQuestion.answers">
                     <RiCheckFill :color="answer.is_correct ? 'green' : 'red'" />

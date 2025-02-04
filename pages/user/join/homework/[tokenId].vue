@@ -75,7 +75,14 @@
                             <label for="markQuestion">Đánh dấu</label>
                         </div>
                     </div>
-                    <p class="fs-5">{{ currentQuestion?.title }}</p>
+                    <div class="d-grid lh-1 align-self-center text-black question-html fs-5 text-start font-bold" v-html="currentQuestion.title"></div>
+                    <div class="container mt-2 mb-3 d-flex justify-content-center" v-if="currentQuestion.image">
+                        <div class="upload-container">
+                            <img :src="currentQuestion.image" alt="Image Preview">
+                            <label class="cursor-pointer">
+                            </label>
+                        </div>
+                    </div>
                     <!-- Answer Options -->
                     <form>
                         <div class="form-check" v-for="(item, index) in currentQuestion?.answers" :key="index">
