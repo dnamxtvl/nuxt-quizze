@@ -8,6 +8,7 @@ export interface UserInfo {
     email: string;
     name: string;
     type: number;
+    avatar?: string | null;
 }
 
 export interface ItemQuizze {

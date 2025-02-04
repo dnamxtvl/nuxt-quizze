@@ -40,6 +40,10 @@ export const useMainStore = defineStore({
 
     changeStateOnline(state: any, isOnline: boolean) {
       state.isOnline = isOnline
-    }
+    },
+
+    changeAvatar(state: any, avatar: string) {
+      state.user.avatar = avatar
+    },
   },
 });

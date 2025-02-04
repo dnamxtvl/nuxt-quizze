@@ -140,6 +140,7 @@ export default class helperApp {
       email: data.user.email,
       name: data.user.name,
       type: data.user.type,
+      avatar: data.user.avatar
     };
     await LocalStorageManager.setItemWithKey("isLoggedIn", true);
     await CookieManager.setCookie(JWT_KEY_ACEESS_TOKEN_NAME, data.token);

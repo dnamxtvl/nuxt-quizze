@@ -158,7 +158,7 @@
         <el-dropdown placement="bottom">
           <div class="avatar avatar-online ms-3">
             <img
-              src="https://i1.sndcdn.com/avatars-000269796491-d5i759-t500x500.jpg"
+              :src="avatar ? avatar : '/img/avatars/14.png'"
               alt
               class="h-auto rounded-circle"
             />
@@ -228,6 +228,7 @@ export default defineComponent({
   setup() {
     const store = useMainStore();
     const adminName = store.$state.user?.name;
+    const avatar = ref<string | null>(store.$state.user?.avatar);
     const authId = ref<string>(store.$state.user?.id as string);
     const currentSkipNotify = ref<number>(0);
     const listNotify = ref<ItemNotify[]>([]);
@@ -354,7 +355,12 @@ export default defineComponent({
             }
           }
         }
-      })
+      });
+
+      $bus.$on('changeAvatar', (data: {avatar: string | null}) => {
+        avatar.value = data.avatar;
+      });
+      
       await getListNotify();
     });
 
@@ -372,6 +378,7 @@ export default defineComponent({
       disabledLoadMore,
       deleteNotify,
       authId,
+      avatar,
     };
   },
 });

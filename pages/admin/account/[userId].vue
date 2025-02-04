@@ -156,6 +156,8 @@ import { RULES_VALIDATION } from "~/constants/application";
 import { useValidator } from "#imports";
 import { useMainStore } from "~/store";
 import { cloneDeep } from 'lodash-es';
+import { USER_PROFILE_KEY_NAME } from "~/constants/application";
+import LocalStorageManager from "~/utils/localStorage";
 
 definePageMeta({
   layout: "admin-dashboard",
@@ -290,6 +292,22 @@ export default defineComponent({
             message: "Cập nhật thành công!",
             type: "success",
           });
+
+          if (authId.value == route.params.userId as string) {
+            const userInfo = {
+              id: res.user.id,
+              email: res.user.email,
+              name: res.user.name,
+              type: res.user.type,
+              avatar: res.user.avatar
+            };
+            store.changeAvatar(store.$state, res.user.avatar);
+            LocalStorageManager.setItemWithKey(USER_PROFILE_KEY_NAME, userInfo);
+            const { $bus }: any = useNuxtApp();
+            $bus.$emit('changeAvatar', {
+              avatar: res.user.avatar
+            });
+          }
 
           navigateTo("/admin/dashboard/list-user");
         },
