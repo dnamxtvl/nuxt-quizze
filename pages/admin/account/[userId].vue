@@ -158,6 +158,7 @@ import { useMainStore } from "~/store";
 import { cloneDeep } from 'lodash-es';
 import { USER_PROFILE_KEY_NAME } from "~/constants/application";
 import LocalStorageManager from "~/utils/localStorage";
+import { USER_TYPE_ENUM } from "~/constants/user";
 
 definePageMeta({
   layout: "admin-dashboard",
@@ -192,6 +193,7 @@ export default defineComponent({
     const oldProfileSnapshot = ref<UserProfile>(cloneDeep(profile.value));
     const newAvatar = ref<File | null>(null);
     const validateMessageNameBeforeSubmit = ref<string>("");
+    const userRole = store.$state.user?.type as number;
 
     const formatDate = (date: string) => {
       return moment(date).format("DD/MM/YYYY HH:mm:ss");
@@ -309,7 +311,11 @@ export default defineComponent({
             });
           }
 
-          navigateTo("/admin/dashboard/list-user");
+          if (userRole == USER_TYPE_ENUM.SYSTEM) {
+            navigateTo("/admin/dashboard/list-user"); 
+          } else {
+            navigateTo("/admin/dashboard/my-library");
+          }
         },
         (err: any) => {
           ElNotification({
