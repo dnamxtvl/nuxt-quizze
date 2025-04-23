@@ -494,7 +494,7 @@ export default defineComponent({
 
             $bus.$on('lostConnectionEver', (data: {}) => {
                 ElNotification.closeAll();
-                ElNotification({ title: "Error", message: "Hãy kiểm tra lại kết nối mạng!", type: "error", duration: 0 });
+                ElNotification({ title: "Error", message: "Hãy kiểm tra lại kết nối mạng và tải lại trang!", type: "error", duration: 0 });
             })
         });
 
