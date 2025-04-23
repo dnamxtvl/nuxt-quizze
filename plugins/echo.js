@@ -42,9 +42,9 @@ export default defineNuxtPlugin((nuxtApp) => {
       wsPort: 8080,
       forceTLS: false,
       enabledTransports: ["ws", "wss"],
-      pongTimeout: 1000,
-      activityTimeout: 1000,
-      unavailableTimeout: 2000,
+      pongTimeout: 2500,
+      activityTimeout: 2500,
+      unavailableTimeout: 5000,
     });
 
     return echo;
@@ -82,6 +82,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         } else {
           clearInterval(retryInterval);
           console.log('Không thể kết nối lại sau ' + RECONNECT_MAX_ATTEMPTS + ' lần thử.');
+          nuxtApp.$bus.$emit("lostConnectionEver", {});
         }
       }, RECONNECT_TIMEOUT);
   })
@@ -101,6 +102,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   echo.connector.pusher.connection.bind('state_change', (states) => {
     console.log(`State changed from ${states.previous} to ${states.current}`)
     if (states.previous == 'connected' && states.current === 'connecting') {
+      store.changeStateOnline(store.$state, false);
+      nuxtApp.$bus.$emit("lostConnection", {});
+    }
+
+    if (states.previous === 'connecting' && states.current === 'unavailable') {
       store.changeStateOnline(store.$state, false);
       nuxtApp.$bus.$emit("lostConnection", {});
     }

@@ -34,6 +34,7 @@ export default defineComponent({
     const route = useRoute();
     const code = ref<number | ''>('');
     const store = useMainStore();
+    const countReconnected = ref<number>(0);
 
     const verifyCode = async (e: SubmitEvent) => {
         e.preventDefault();
@@ -65,6 +66,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
+        countReconnected.value = 0;
         if (route.query.gc) {
             code.value = route.query.gc as number;
             const validator = useValidator();
@@ -77,6 +79,24 @@ export default defineComponent({
             ElLoading.service({ fullscreen: true });
             await verifyCodeGamer();
         }
+
+        const { $bus }: any = useNuxtApp();
+            $bus.$on('lostConnection', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Error", message: countReconnected.value == 0 ? "Bạn đang offline!" : "Reconnect lần " + countReconnected.value + " thất bại!", type: "error", duration: 0 });
+                countReconnected.value = countReconnected.value + 1;
+            });
+
+            $bus.$on('reconnected', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Reconected", message: "Đã khôi phục kết nối!", type: "success", duration: 3000 });
+                countReconnected.value = 0;
+            });
+
+            $bus.$on('lostConnectionEver', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Error", message: "Hãy kiểm tra lại kết nối mạng và tải lại trang!", type: "error", duration: 0 });
+            })
     });
 
     return {

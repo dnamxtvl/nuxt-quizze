@@ -241,6 +241,7 @@ export default defineComponent({
             }
         );
         const loadingInstance: Ref<ReturnType<typeof ElLoading.service> | null> = ref(null);
+        const countReconnected = ref<number>(0);
 
         const yourAnswerCorrect = (gamerResult: GamerResult, answerId: number) => {
             if (gamerResult?.gamer_answers.length > 0) {
@@ -341,6 +342,7 @@ export default defineComponent({
                     currentScore.value = res.score;
                     selectedAnswerId.value = id;
                     currentScoreAnswer.value = res.score;
+                    getCurrentResultOrder();
                 },
                 (err: ErrorResponse) => {
                     ElNotification({title: "Oh no!", message: err.error.shift(), type: "warning", duration: RoomSetting.TIME_DISPLAY_TOAST});
@@ -420,6 +422,7 @@ export default defineComponent({
         }
 
         onMounted(async () => {
+            countReconnected.value = 0;
             clearInterval(intervalId);
             const { $echo }: any = useNuxtApp();
             await getListQuestion();
@@ -478,20 +481,28 @@ export default defineComponent({
 
             const { $bus }: any = useNuxtApp();
             $bus.$on('lostConnection', (data: {}) => {
-                ElNotification({ title: "Error", message: "Bạn đang offline!", type: "error", duration: 0 });
+                ElNotification.closeAll();
+                ElNotification({ title: "Error", message: countReconnected.value == 0 ? "Bạn đang offline!" : "Reconnect lần " + countReconnected.value + " thất bại!", type: "error", duration: 0 });
+                countReconnected.value = countReconnected.value + 1;
             });
 
             $bus.$on('reconnected', (data: {}) => {
                 ElNotification.closeAll();
                 ElNotification({ title: "Reconected", message: "Đã khôi phục kết nối!", type: "success", duration: 3000 });
                 getListQuestion();
+                countReconnected.value = 0;
             });
-                
+
+            $bus.$on('lostConnectionEver', (data: {}) => {
+                ElNotification.closeAll();
+                ElNotification({ title: "Error", message: "Hãy kiểm tra lại kết nối mạng và tải lại trang!", type: "error", duration: 0 });
+            })
         });
 
         onBeforeUnmount(() => {
             clearInterval(intervalId);
             ElLoading.service({ fullscreen: true }).close();
+            countReconnected.value = 0;
         });
 
 
