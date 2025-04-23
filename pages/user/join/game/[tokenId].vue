@@ -294,7 +294,6 @@ export default defineComponent({
                         showQuestion.value = false;
                         resultCurrentModel.value = true;
                         currentResult.value.bg_color = currentScore.value > 0 ? 'bg-correct' : 'bg-incorrect';
-                        console.log(123);
                         getCurrentResultOrder();
                     }
                     if (selectedAnswerId.value && res.room.status != RoomStatus.PENDING && res.room.status != RoomStatus.PREPARE_FINISH) {
@@ -402,7 +401,6 @@ export default defineComponent({
         });
 
         const getCurrentResultOrder = () => {
-            console.log(currentScoreAnswer.value);
             if (currentScoreAnswer.value != null) {
                 if (currentScoreAnswer.value > 0) {
                     currentResult.value.score = currentScoreAnswer.value;
@@ -467,7 +465,7 @@ export default defineComponent({
                             return;
                         }
                     });
-console.log(54);
+
                     getCurrentResultOrder();
                     resultCurrentModel.value = true;
 
