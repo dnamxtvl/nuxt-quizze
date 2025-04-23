@@ -111,47 +111,47 @@ export const GROUP_ROUTE = {
 export const BG_DEFAULT = [
     {
         name: "Winter",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/winter.jpeg",
+        link: "/img/winter.jpeg",
         is_default: 1
     },
     {
         name: "Autumn",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/autumn.jpeg",
+        link: "/img/autumn.jpeg",
         is_default: 0
     },
     {
         name: "Beach",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/beach.png",
+        link: "/img/beach.png",
         is_default: 0
     },
     {
         name: "Love",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/love.webp",
+        link: "/img/love.webp",
         is_default: 0
     },
     {
         name: "Racing",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/racing.jpeg",
+        link: "/img/racing.jpeg",
         is_default: 0
     },
     {
         name: "Spring",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/spring.jpeg",
+        link: "/img/spring.jpeg",
         is_default: 0
     },
     {
         name: "Standard",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/standard.webp",
+        link: "/img/standard.webp",
         is_default: 0
     },
     {
         name: "Summer",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/summer.webp",
+        link: "/img/summer.webp",
         is_default: 0
     },
     {
         name: "Volleyball",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/volleyball.jpeg",
+        link: "/img/volleyball.jpeg",
         is_default: 0
     }
 ];
@@ -159,22 +159,22 @@ export const BG_DEFAULT = [
 export const MUSIC_DEFAULT = [
     {
         name: "Lobby-classic",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/lobby-classic-game.mp3",
+        link: "/music/lobby-classic-game.mp3",
         is_default: 0
     },
     {
         name: "Nhac-xuan1",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/ConBuomXuan-HoQuangHieu-2577880.mp3",
+        link: "/music/ConBuomXuan-HoQuangHieu-2577880.mp3",
         is_default: 0
     },
     {
         name: "Nhac-xuan2",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/NuCuoiXuanDaiMeoRemix-HuongLyYUNIBOODaiMeo-13689508.mp3",
+        link: "/music/NuCuoiXuanDaiMeoRemix-HuongLyYUNIBOODaiMeo-13689508.mp3",
         is_default: 0
     },
     {
         name: "Lobby-classic-halloween",
-        link: "https://namdv-storage.s3.ap-southeast-2.amazonaws.com/background/lobby-classic-game-halloween.mp3",
+        link: "/music/lobby-classic-game-halloween.mp3",
         is_default: 1
     }
 ];
