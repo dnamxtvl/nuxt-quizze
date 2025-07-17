@@ -20,6 +20,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "firebase": "^11.10.0",
     "install": "^0.13.0",
     "katex": "^0.16.21",
     "mathjax": "^3.2.2",

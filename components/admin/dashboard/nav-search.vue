@@ -342,6 +342,18 @@ export default defineComponent({
               });
             },
           });
+
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              const notification = new Notification(e.title, {
+                body: e.content,
+                icon: e.avatarNotify ?? '/img/avatars/14.png',
+              });
+              notification.onclick = () => {
+                window.open(e.link + '?notification_id=' + e.notifyId, '_blank');
+              };
+            }
+          });
         });
 
       const { $bus }: any = useNuxtApp();

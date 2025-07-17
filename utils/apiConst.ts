@@ -13,6 +13,7 @@ const API_CONST = {
         GET_PROFILE: 'admin/get-profile',
         UPDATE_PROFILE: 'admin/update-profile',
         CREATE_USER: 'admin/create-user',
+        UPDATE_FCM_TOKEN: 'admin/update-fcm-token',
     },
     QUIZZE: {
         LIST: 'admin/quizzes/list',
