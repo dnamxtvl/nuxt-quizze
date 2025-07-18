@@ -42,4 +42,7 @@ export default class AuthService extends BaseService {
     createUser = async (params: {}, success: any, error: any) => {
         await this.post(API_CONST.AUTH.CREATE_USER, params, success, error);
     };
+    updateFcmToken = async (params: {}, success: any, error: any) => {
+        await this.post(API_CONST.AUTH.UPDATE_FCM_TOKEN, params, success, error);
+    };
 }
