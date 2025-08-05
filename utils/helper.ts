@@ -127,9 +127,9 @@ export default class helperApp {
 
   static redirectToHome = (type: number) => {
     if (type == USER_TYPE_ENUM.USER) {
-      return navigateTo("/admin/dashboard/my-library");
+      window.location.href = "/admin/dashboard/my-library";
     } else {
-      return navigateTo("/admin/dashboard");
+      window.location.href = "/admin/dashboard";
     }
   };
 

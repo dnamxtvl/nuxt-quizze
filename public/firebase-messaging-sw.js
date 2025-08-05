@@ -3,8 +3,6 @@
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
-const config = useRuntimeConfig().public;
-
 firebase.initializeApp({
   apiKey: "AIzaSyCcvYDBndqwtGLlHp4zTRr_60-Uiu6IxcE",
   authDomain: "laravel-nuxt-6a617.firebaseapp.com",
