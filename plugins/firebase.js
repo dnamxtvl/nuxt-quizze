@@ -2,9 +2,11 @@
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import api from '~/api/axios';
+import { useMainStore } from '~/store';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig().public;
+  const store = useMainStore();
   const firebaseConfig = {
     apiKey: config.FIREBASE_API_KEY,
     authDomain: config.FIREBASE_AUTH_DOMAIN,
@@ -29,8 +31,9 @@ export default defineNuxtPlugin((nuxtApp) => {
           serviceWorkerRegistration: registration,
         })
           .then((currentToken) => {
-            if (currentToken) {
+            if (currentToken && store.$state.isLoggedIn) {
               console.log('FCM Token:', currentToken);
+              console.log('Updating FCM Token in the backend...');
               api.auth.updateFcmToken({ token: currentToken })
                 .then(() => {
                   console.log('FCM Token updated successfully');
