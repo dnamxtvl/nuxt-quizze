@@ -20,7 +20,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const app = initializeApp(firebaseConfig);
   const messaging = getMessaging(app);
 
-  if ('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator && store.$state.isLoggedIn) {
     navigator.serviceWorker
       .register('/firebase-messaging-sw.js')
       .then((registration) => {
@@ -31,7 +31,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           serviceWorkerRegistration: registration,
         })
           .then((currentToken) => {
-            if (currentToken && store.$state.isLoggedIn) {
+            if (currentToken) {
               console.log('FCM Token:', currentToken);
               console.log('Updating FCM Token in the backend...');
               api.auth.updateFcmToken({ token: currentToken })
