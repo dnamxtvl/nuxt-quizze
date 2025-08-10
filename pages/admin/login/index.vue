@@ -362,7 +362,9 @@ export default defineComponent({
       });
     };
 
-    onMounted(async () => {});
+    onMounted(async () => {
+      console.log("Test cicd deloy");
+    });
 
     return {
       email,
