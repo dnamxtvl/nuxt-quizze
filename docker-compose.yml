@@ -1,13 +1,9 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  nuxt-app:
+  nuxt:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      restart: always
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app  # Mount the current directory into the container for development
-      - /app/node_modules # Exclude node_modules from the volume mount to prevent issues
+    restart: unless-stopped
