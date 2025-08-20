@@ -88,7 +88,7 @@
           </div>
           <!-- /Logo -->
           <h3 class="mb-1 fw-bold">Chào mừng đến với VibeQuiz! 👋</h3>
-          <p class="mb-4">Được phát triển bới nhóm developer team Hyouban</p>
+          <p class="mb-4">Được phát triển bởi nhóm developer team Hyouban</p>
           <div
             class="valiate-message-error mt-2"
             v-if="errorMessages.length > 0"
