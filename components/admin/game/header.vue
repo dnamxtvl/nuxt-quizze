@@ -15,18 +15,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item me-2">
-                        <el-dropdown trigger="click">
+                        <el-dropdown trigger="click" :key="listBg.length">
                             <span class="text-white btn button-change-option button-change-theme"><i class="fa fa-palette me-1"></i>
                                 Chủ đề
                             </span>
                             <template #dropdown>
                               <el-dropdown-menu>
-                                <el-dropdown-item v-for="(item, index) in BG_DEFAULT" :key="index" @click="changeBackground(item.name, item.link)">
+                                <el-dropdown-item v-for="(item, index) in listBg" :key="`${item.name}-${index}`" @click="changeBackground(item.name, item.link)">
                                     <div class="row justify-content-between">
                                         <div class="col-4">
                                             <img :src="item.link" width="40" height="40" class="rounded-circle" />
                                         </div>
-                                        <div class="col-6 pt-2 text-center" style="width: 70px">{{ item.name }}</div>
+                                        <div class="col-6 pt-2 text-center" style="width: 70px">{{ item.name.length > 10 ? item.name.substring(0, 10) + '...' : item.name }}</div>
                                         <div class="col-2 pt-2 text-center pe-4">
                                             <input class="form-check-input cursor-pointer" type="radio" :value="item.name" v-model="bgSelected" />
                                         </div>
@@ -42,7 +42,7 @@
                             </span>
                             <template #dropdown>
                               <el-dropdown-menu>
-                                <el-dropdown-item v-for="(item, index) in MUSIC_DEFAULT" :key="index" @click="changeMusic(item.link)">
+                                <el-dropdown-item v-for="(item, index) in listMusic" :key="index" @click="changeMusic(item.link)">
                                     <div class="row justify-content-between">
                                         <div class="col-6 pt-2" style="width: 140px">{{ item.name }}</div>
                                         <div class="col-2 pt-2 text-center pe-4">
@@ -75,7 +75,7 @@
     </nav>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useRoute as useNuxtRoute } from 'nuxt/app'
 import api from "~/api/axios";
@@ -83,6 +83,8 @@ import API_CONST from "~/utils/apiConst";
 import type { ErrorResponse } from "~/constants/type";
 import { BG_DEFAULT, MUSIC_DEFAULT, USER_PROFILE_KEY_NAME } from "~/constants/application";
 import CookieManager from "~/utils/cookies";
+import { useMainStore } from "~/store";
+import { watch } from 'vue'
 
 export default defineComponent({
     name: 'AdminGameHeader',
@@ -94,8 +96,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const route = useRoute();
+        const appStore = useMainStore()
         const centerDialogVisible = ref<boolean>(false);
         const bgSelected = ref<string>(BG_DEFAULT[0].name);
+        const listBg = ref<any[]>(BG_DEFAULT);
+        const listMusic = ref<any[]>(MUSIC_DEFAULT);
         const music = ref<string>('');
 
         const outGame = async () => {
@@ -125,11 +130,41 @@ export default defineComponent({
             music.value = link;
         }
 
-        onMounted(() => {
+        const setBackground = () => {
             const bg = CookieManager.getCookie(USER_PROFILE_KEY_NAME + "_bg_admin");
             if (bg) {
                 bgSelected.value = bg;
             }
+        }
+
+        watch(
+            () => appStore.$state.bgSelected,       
+            (newVal, oldVal) => {
+                if (newVal.link) {
+                    const newBg = [{name: newVal.name, link: newVal.link}];
+                    listBg.value = [];
+                    nextTick(() => {
+                        listBg.value = [...newBg, ...BG_DEFAULT];
+                    });
+                }
+            }
+        )
+
+        watch(
+            () => appStore.$state.musicSelected,
+            (newVal, oldVal) => {
+                if (newVal.link) {
+                    const newMusic = [{
+                        name: newVal.name,
+                        link: newVal.link
+                    }];
+                    listMusic.value = [...newMusic, ...MUSIC_DEFAULT];
+                }
+            }
+        )
+
+        onMounted(() => {
+            setBackground();
         });
 
         return {
@@ -137,8 +172,8 @@ export default defineComponent({
             centerDialogVisible,
             showModalEndGame,
             outGame,
-            BG_DEFAULT,
-            MUSIC_DEFAULT,
+            listBg,
+            listMusic,
             bgSelected,
             changeBackground,
             changeMusic,

@@ -182,6 +182,9 @@
                                     </span>
                                     <template #dropdown>
                                         <el-dropdown-menu>
+                                            <el-dropdown-item @click="navigateToSettings(item.id, item.code)">
+                                                <RiSettings3Line size="15" class="me-1" /><span class="mt-1"> Tùy chỉnh</span>
+                                            </el-dropdown-item>
                                             <el-dropdown-item @click="showModalDeleteQuizz(item.id)">
                                                 <RiDeleteBin7Fill size="15" class="me-1" /><span class="mt-1"> Xóa</span>
                                             </el-dropdown-item>
@@ -218,11 +221,12 @@ import { defineComponent, ref } from "vue";
 import type { ErrorResponse, ItemQuizze, Category } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
-import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine, RiEyeCloseFill, RiShare2Fill, RiSearchLine, RiRefreshLine } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine, RiEyeCloseFill, RiShare2Fill, RiSearchLine, RiRefreshLine, RiSettings3Line } from "@remixicon/vue";
 import moment from "moment";
 import { useMainStore } from "~/store";
 import { CODE, RULES_VALIDATION } from "~/constants/application";
 import { CREATED_BY } from "~/constants/quiz";
+import LocalStorageManager from "~/utils/localStorage";
 
 definePageMeta({
   layout: "admin-dashboard",
@@ -242,6 +246,7 @@ export default defineComponent({
     RiShare2Fill,
     RiSearchLine,
     RiRefreshLine,
+    RiSettings3Line,
   },
   setup() {
     const store = useMainStore();
@@ -447,6 +452,27 @@ export default defineComponent({
       }
     }
 
+    const navigateToSettings = async (quizId: string, quizCode: string) => {
+      try {
+        // Tìm quiz trong listQuizzes để lấy title
+        const quiz = listQuizzes.value.find(q => q.id === quizId);
+        
+        // Lưu quiz info vào localStorage sử dụng LocalStorageManager
+        await LocalStorageManager.setItemWithKey('selectedQuizForSettings', {
+          id: quizId,
+          code: quizCode,
+          title: quiz?.title || `Quiz ${quizId}`
+        });
+        
+        // Navigate đến trang settings
+        navigateTo('/admin/dashboard/settings');
+      } catch (error) {
+        console.error('Error saving quiz to localStorage:', error);
+        // Fallback: navigate trực tiếp nếu có lỗi
+        navigateTo('/admin/dashboard/settings');
+      }
+    }
+
     onMounted(async () => {
       ElLoading.service({ fullscreen: true });
       await getCatogory();
@@ -482,6 +508,7 @@ export default defineComponent({
       CREATED_BY,
       loading,
       options,
+      navigateToSettings,
     };
   },
 });

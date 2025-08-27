@@ -53,4 +53,7 @@ export default class QuizzeService extends BaseService {
     search = async (params: Object, success: any, error: any) => {
         await this.get(API_CONST.QUIZZE.SEARCH_QUIZZE, params, success, error);
     };
+    searchByKeyword = async (keyword: string, success: any, error: any) => {
+        await this.get(API_CONST.QUIZZE.SEARCH_BY_KEYWORD + '/' + keyword, {}, success, error);
+    };
 }

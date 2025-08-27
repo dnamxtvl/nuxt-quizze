@@ -5,6 +5,7 @@ import GamerService from "~/services/GamerService";
 import NotificationService from "~/services/NotificationService";
 import UserService from "~/services/UserService";
 import DashboardService from "~/services/DashboardService";
+import SettingService from "~/services/SettingService";
 
 const api = {
   auth: new AuthService('/'),
@@ -14,6 +15,7 @@ const api = {
   notification: new NotificationService('/'),
   user: new UserService('/'),
   dashboard: new DashboardService('/'),
+  setting: new SettingService('/'),
 };
 
 export default api;

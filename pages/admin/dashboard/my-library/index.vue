@@ -154,6 +154,11 @@
                                                             <template #dropdown>
                                                                 <el-dropdown-menu>
                                                                     <el-dropdown-item
+                                                                        @click="navigateToSettings(item.id, item.code)">
+                                                                        <RiSettings3Line size="15" /><span
+                                                                            class="mt-1"> Tùy chỉnh</span>
+                                                                    </el-dropdown-item>
+                                                                    <el-dropdown-item
                                                                         @click="showModalDeleteQuizz(item.id)">
                                                                         <RiDeleteBin7Fill size="15" /><span
                                                                             class="mt-1"> Xóa</span>
@@ -200,12 +205,13 @@ import type { ErrorResponse, ItemQuizze } from "~/constants/type";
 import { ElLoading, ElNotification } from "element-plus";
 import api from "~/api/axios";
 import helperApp from "~/utils/helper";
-import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine } from "@remixicon/vue";
+import { RiMore2Fill, RiDeleteBin7Fill, RiCloseCircleLine, RiSettings3Line } from "@remixicon/vue";
 import { RoomType } from "~/constants/room";
 import moment from "moment";
 import { useMainStore } from '~/store';
 import { CODE, RULES_VALIDATION } from "~/constants/application";
 import { QUIZ_TYPE } from "~/constants/quiz";
+import LocalStorageManager from "~/utils/localStorage";
 
 definePageMeta({
     layout: "admin-dashboard",
@@ -216,6 +222,7 @@ export default defineComponent({
         RiMore2Fill,
         RiDeleteBin7Fill,
         RiCloseCircleLine,
+        RiSettings3Line,
     },
     setup() {
         const store = useMainStore();
@@ -456,6 +463,27 @@ export default defineComponent({
             return QUIZ_TYPE;
         }
 
+        const navigateToSettings = async (quizId: string, quizCode: string) => {
+            try {
+                // Tìm quiz trong listQuizzes để lấy title
+                const quiz = listQuizzes.value.find(q => q.id === quizId);
+                
+                // Lưu quiz info vào localStorage sử dụng LocalStorageManager
+                await LocalStorageManager.setItemWithKey('selectedQuizForSettings', {
+                    id: quizId,
+                    code: quizCode,
+                    title: quiz?.title || `Quiz ${quizId}`
+                });
+                
+                // Navigate đến trang settings
+                navigateTo('/admin/dashboard/settings');
+            } catch (error) {
+                console.error('Error saving quiz to localStorage:', error);
+                // Fallback: navigate trực tiếp nếu có lỗi
+                navigateTo('/admin/dashboard/settings');
+            }
+        }
+
         onMounted(async () => {
             ElLoading.service({ fullscreen: true });
             await getListQuizzes();
@@ -494,6 +522,7 @@ export default defineComponent({
             currentPageCreatedByMe,
             typeSharedWithMe,
             typeCreatedByMe,
+            navigateToSettings,
         }
     }
 })
