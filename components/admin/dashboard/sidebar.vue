@@ -63,6 +63,11 @@
                             <div data-i18n="CRM">Quản lý tài khoản</div>
                         </nuxt-link>
                     </li>
+                     <li class="menu-item" v-if="checkMenuPermission('/admin/dashboard/settings')">
+                        <nuxt-link to="/admin/dashboard/settings" :class="'menu-link ' + (useRoute().path.includes(settingRoutePath) ? 'active' : '')" exact-active-class="active">
+                            <div data-i18n="CRM">Cài đặt tùy chỉnh</div>
+                        </nuxt-link>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -85,6 +90,7 @@ export default defineComponent({
     const detailReportRoutePath = API_CONST.FRONT_END.REPORT_DETAIL;
     const detailQuizzRoutePath = API_CONST.FRONT_END.DETAIL_QUIZ;
     const userDetailRoutePath = API_CONST.FRONT_END.USER_DETAIL;
+    const settingRoutePath = API_CONST.FRONT_END.SETTING;
     const store = useMainStore();
 
     const checkMenuPermission = (path: string) => {
@@ -104,6 +110,7 @@ export default defineComponent({
         detailReportRoutePath,
         detailQuizzRoutePath,
         userDetailRoutePath,
+        settingRoutePath,
         checkMenuPermission,
     }
   }

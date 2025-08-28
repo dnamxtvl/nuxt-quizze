@@ -28,6 +28,7 @@ const API_CONST = {
         ACCEPT_SHARE_QUIZZE: 'admin/quizzes/accept-share',
         REJECT_SHARE_QUIZZE: 'admin/quizzes/reject-share',
         SEARCH_QUIZZE: 'admin/quizzes/search',
+        SEARCH_BY_KEYWORD: 'admin/quizzes/search-keyword',
     },
     CATEGORY: {
         LIST_CATEGORY: 'admin/category/list',
@@ -58,6 +59,7 @@ const API_CONST = {
         REPORT_DETAIL: '/admin/dashboard/reports',
         DETAIL_QUIZ: '/admin/dashboard/my-library',
         USER_DETAIL: '/admin/account',
+        SETTING: '/admin/dashboard/settings',
     },
     NOTIFICATION: {
         LIST_NOTIFICATION: 'admin/notification/list',
@@ -74,6 +76,11 @@ const API_CONST = {
     },
     DASHBOARD: {
         INDEX: 'admin/dashboard/index',
+    },
+    SETTING: {
+        GET_SETTING: 'admin/setting/index',
+        UPDATE_SETTING: 'admin/setting/update',
+        GET_LATEST_UPDATE: 'admin/setting/latest-updated',
     },
 };
 

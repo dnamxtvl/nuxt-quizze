@@ -236,11 +236,12 @@ import type { Answer, ErrorResponse, GamerAnswer, GamerResult, ItemQuestion } fr
 import { HttpStatusCode } from "axios";
 import { RiUser2Fill, RiCheckFill, RiArrowRightUpLine, RiCloseFill, } from "@remixicon/vue";
 import helperApp from "~/utils/helper";
-import { RoomSetting, RoomStatus } from "~/constants/room";
+import { RoomStatus } from "~/constants/room";
 import API_CONST from "~/utils/apiConst";
 import type Echo from "laravel-echo";
 import QRCode from 'qrcode';
 import BarChart from "./BarChart.vue";
+import { useMainStore } from "~/store";
 
 definePageMeta({
     layout: "admin-game",
@@ -257,6 +258,7 @@ export default defineComponent({
     setup() {
         const config = useRuntimeConfig();
         const route = useRoute();
+        const store = useMainStore();
         const code = ref<string>('');
         const showPrepare = ref<boolean>(true);
         const showQuestion = ref<boolean>(false);
@@ -317,7 +319,7 @@ export default defineComponent({
                 roomId,
                 (res: any) => {
                     if (res.list_current_answers.length !== 0) {
-                        getDataChart.value = res.list_current_answers.map((item: any, index : int) => {
+                        getDataChart.value = res.list_current_answers.map((item: any, index : number) => {
                             return item.gamer_answers_count;
                         });
                     }
@@ -335,6 +337,24 @@ export default defineComponent({
                             countReload.value++;
                         }
                     }
+
+                    const roomSettings = res.room.room_settings;
+                    if (roomSettings) {
+                        const settingParse = JSON.parse(roomSettings);
+                        if (settingParse.background) {
+                            store.changeBgSelected(store.$state,{
+                                name: settingParse.background_name,
+                                link: settingParse.background
+                            })
+                        }
+                        if (settingParse.music) {
+                            store.changeMusicSelected(store.$state,{
+                                name: settingParse.music_name,
+                                link: settingParse.music
+                            })
+                        }
+                    }
+
                     if (res.gamers.length > 0) {
                         listGamerResult.value = res.gamers.filter((item: any) => item.name != null);
                     }

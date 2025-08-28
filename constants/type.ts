@@ -120,3 +120,11 @@ export interface UserProfile extends UserInfo {
     created_at: Date;
     updated_at: Date;
 }
+
+export interface availableQuizze {
+    id: string;
+    title: string;
+    code: string;
+    created_at: string;
+    updated_at: string;
+}

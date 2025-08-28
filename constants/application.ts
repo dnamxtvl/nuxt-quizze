@@ -186,12 +186,14 @@ export const MENU_PERMISSION = {
             '/admin/dashboard/quizzes',
             '/admin/dashboard/reports',
             '/admin/dashboard/list-user',
+            '/admin/dashboard/settings'
         ]
     },
     USER: {
         PREFIX_PATH: [
             '/admin/dashboard/my-library',
             '/admin/dashboard/reports',
+            '/admin/dashboard/settings'
         ]
     },
 }
