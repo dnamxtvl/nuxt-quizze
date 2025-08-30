@@ -1,5 +1,33 @@
+# Ignore node modules & build outputs
 node_modules
-.output
 .nuxt
+.output
+dist
+
+# Ignore Docker files
 Dockerfile
 .dockerignore
+docker-compose.yml
+docker-compose*.yml
+
+# Ignore VCS
+.git
+.gitignore
+.gitattributes
+
+# Ignore logs & misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.swp
+*.swo
+
+# IDE/editor stuff
+.vscode
+.idea
+*.iml
+
+# Tests, docs (nếu không cần)
+tests
+docs
