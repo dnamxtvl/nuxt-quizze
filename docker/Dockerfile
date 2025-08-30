@@ -13,8 +13,6 @@ COPY . .
 # Build ra .output
 RUN npm run build
 
----
-
 # Stage 2: runtime
 FROM node:20-alpine
 WORKDIR /app
