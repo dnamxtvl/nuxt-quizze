@@ -45,11 +45,6 @@ docs
 *.swp
 *.swo
 
-# Local configs
-.env
-.env.local
-.env.*.local
-
 # Data & media (nếu có)
 *.log
 *.csv
