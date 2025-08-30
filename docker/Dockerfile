@@ -1,24 +1,34 @@
-# Stage 1: build
+# STAGE 1: Build
 FROM node:20-alpine AS builder
+
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Copy package.json & lockfile
+# Copy các file dependency trước để tận dụng Docker cache.
+# Lớp này chỉ thay đổi khi các file package thay đổi.
 COPY package*.json ./
 
-RUN npm install
+# Cài đặt dependencies. Layer này chỉ bị vô hiệu hóa khi package.json thay đổi.
+RUN npm ci
 
-# Copy source code
+# Copy toàn bộ mã nguồn. Lớp này sẽ thường xuyên thay đổi.
+# Layer này và các layer sau sẽ bị vô hiệu hóa cache khi mã nguồn thay đổi.
 COPY . .
 
-# Build ra .output
+# Chạy lệnh build của bạn.
 RUN npm run build
 
-# Stage 2: runtime
+# STAGE 2: Production
 FROM node:20-alpine
+
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-# Copy output từ builder
+# Sao chép các files cần thiết từ giai đoạn builder
+# Chỉ sao chép những file đã được build và node_modules
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/node_modules ./node_modules
 
-# Chỉ cần Node để chạy
-CMD ["node", ".output/server/index.mjs"]
+# Expose port và chạy ứng dụng
+EXPOSE 3000
+CMD [ "node", ".output/server/index.mjs" ]
