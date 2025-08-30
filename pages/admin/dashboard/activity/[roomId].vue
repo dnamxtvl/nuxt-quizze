@@ -85,7 +85,7 @@
                     <span class="text-dark text-center fs-2 pe-4 py-4 fw-bold lh-base">
                         {{ listQuestion.findIndex(item => item.id == currentQuestion.id) + 1 }}.
                     </span>
-                    <div class="d-grid lh-1 align-self-center text-black question-html fs-1 pt-2 text-start font-bold" v-html="currentQuestion.title"></div>
+                    <div class="d-grid lh-1 align-self-center text-black question-html fs-1 pt-2 text-start font-bold question-text" v-html="currentQuestion.title"></div>
                 </div>
                 <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image && !displayChart">
                     <div class="upload-container">
@@ -169,7 +169,7 @@
                                             <span class="fw-normal fs-5 pt-2 ps-3 pe-2 text-start text-white font-bold">
                                                 {{ (index + 1) + ". " }}
                                             </span>
-                                            <div class="text-white fw-normal fs-5 pt-2 text-start font-bold" v-html="item.title"></div>
+                                            <div class="text-white fw-normal fs-5 pt-2 text-start font-bold question-text" v-html="item.title"></div>
                                         </div>
                                         <hr></hr>
                                         <div class="question-answer-review px-4 pt-2 mb-2">
