@@ -6,8 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Sử dụng cache để giữ node_modules
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+RUN npm ci
 
 # Copy source
 COPY . .
