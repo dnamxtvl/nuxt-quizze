@@ -31,3 +31,29 @@ pnpm-debug.log*
 # Tests, docs (nếu không cần)
 tests
 docs
+
+# Git
+.git
+.git/*
+.gitlab-ci.yml
+.github
+
+# Editor & cache
+.vscode
+.idea
+*.iml
+*.swp
+*.swo
+
+# Local configs
+.env
+.env.local
+.env.*.local
+
+# Data & media (nếu có)
+*.log
+*.csv
+*.sqlite
+storage
+uploads
+
