@@ -363,7 +363,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      console.log("Test cicd deloy");
+      console.log("Test cicd deloy lan 2");
     });
 
     return {
