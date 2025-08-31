@@ -2,22 +2,19 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN corepack enable
+
 # Copy package.json trước
-COPY package*.json ./
+COPY package*.json .npmrc ./
 
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=cache,target=/app/node_modules/.cache \
-    npm ci --prefer-offline
+# Sử dụng cache để giữ node_modules
+RUN npm ci
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Build với cache mount
-RUN --mount=type=cache,target=/app/.nuxt/cache \
-    --mount=type=cache,target=/app/.vite \
-    --mount=type=cache,target=/app/node_modules/.cache \
-    npm run build
-
+# Build
+RUN npm run build
 
 # STAGE 2: Runtime
 FROM node:20-alpine
