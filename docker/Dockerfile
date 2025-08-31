@@ -5,7 +5,7 @@ WORKDIR /app
 RUN corepack enable
 
 # Copy package.json trước
-COPY package*.json .npmrc ./
+COPY package*.json ./
 
 # Sử dụng cache để giữ node_modules
 RUN npm ci
