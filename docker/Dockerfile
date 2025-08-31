@@ -23,5 +23,5 @@ WORKDIR /app
 # Chỉ copy output và node_modules đã build sẵn
 COPY --from=builder /app/.output ./.output
 
-EXPOSE 3000
+EXPOSE 3002
 CMD ["node", ".output/server/index.mjs"]
