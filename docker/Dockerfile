@@ -5,14 +5,19 @@ WORKDIR /app
 # Copy package.json trước
 COPY package*.json ./
 
-# Sử dụng cache để giữ node_modules
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/app/node_modules/.cache \
+    npm ci --prefer-offline
 
-# Copy source
+# Copy source code
 COPY . .
 
-# Build
-RUN npm run build
+# Build với cache mount
+RUN --mount=type=cache,target=/app/.nuxt/cache \
+    --mount=type=cache,target=/app/.vite \
+    --mount=type=cache,target=/app/node_modules/.cache \
+    npm run build
+
 
 # STAGE 2: Runtime
 FROM node:20-alpine
