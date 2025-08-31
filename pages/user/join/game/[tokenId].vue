@@ -206,7 +206,7 @@ export default defineComponent({
         const centerDialogVisible = ref<boolean>(false); 
         const isRoomRunning = ref<boolean>(true);
         const isSubmited = ref<boolean>(false);
-        const selectedAnswerId = ref<number>(0);
+        const selectedAnswerId = ref<number | null>(0);
         const currentScoreAnswer = ref<number | null>(null);
         const backgroundColorAnswers = ref<string[]>([
             '#E21B3C',
@@ -431,6 +431,7 @@ export default defineComponent({
                     timeReply.value = currentQuestion.value.time_reply as number;
                     isSubmited.value = false;
                     currentScoreAnswer.value = null;
+                    selectedAnswerId.value = null;
                     calculateTimeReply();
                 }).listen('AdminEndgameEvent', (e: any) => {
                     if (currentRoomStatus.value == RoomStatus.PREPARE) {
