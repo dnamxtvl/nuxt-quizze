@@ -31,13 +31,13 @@
                                 <RiDashboardLine />
                             </div>
                             <div class="header-text">
-                                <h3 class="card-title">Độ ưu tiên tốc độ</h3>
-                                <p class="card-subtitle">Điều chỉnh cách tính điểm</p>
+                                <h3 class="card-title">Độ ưu tiên</h3>
+                                <p class="card-subtitle">Cách tính điểm</p>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="setting-item">
-                                <label class="setting-label">Hệ số</label>
+                                <label class="setting-label">Trả lời nhanh</label>
                                 
                                 <!-- Mode Selection -->
                                 <div class="mode-selection mb-3">
