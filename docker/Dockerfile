@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Sử dụng cache để giữ node_modules
-RUN npm ci
+RUN npm ci --only=production
 
 # Copy source
 COPY . .
