@@ -29,7 +29,7 @@
                     <span class="d-flex align-items-center text-dark text-center fs-2 pe-4 py-4 fw-bold lh-base">
                         {{ currentQuestionIndex + 1 }}.
                     </span>
-                    <div class="d-grid align-self-center lh-1 text-black question-html pe-4 fs-1 pt-2 text-start font-bold" v-html="currentQuestion?.title"></div>
+                    <!-- <div class="d-grid align-self-center lh-1 text-black question-html pe-4 fs-1 pt-2 text-start font-bold" v-html="currentQuestion?.title"></div> -->
                 </div>
                 <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image">
                     <div class="upload-container">
@@ -47,9 +47,10 @@
                     <div @click="submitAnswer(item.id)"
                         :class="'list-answer-item w-full me-1 d-flex align-items-center justify-content-center position-relative ' + isSelectedAnswer(item.id)"
                         :style="{ background: backgroundColorAnswers[index] }">
-                        <span class="fs-3 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2 border-0"
-                            :style="{ background: backgroundColorAnswers[index] }">{{index +
-                            1}}</span>
+                        <!-- <span class="fs-3 text-white position-absolute right-0 top-0 btn btn-dark mt-2 me-2 border-0"
+                            :style="{ background: backgroundColorAnswers[index] }">
+                            {{index + 1}}
+                        </span> -->
                         <p class="text-white fs-2 lh-base p-3 mt-4 text-center">{{ item.answer }}</p>
                     </div>
                 </div>
