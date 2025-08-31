@@ -25,12 +25,12 @@
         <div class="w-full d-flex show-question-body flex-column" v-if="showQuestion && currentRoomStatus > 0">
             <div v-if="showQuestion && currentRoomStatus > 0"
                 class="row question-title d-flex flex-wrap justify-content-center g-0" style="flex:1">
-                <div class="d-flex justify-content-center question-title-html">
+                <!-- <div class="d-flex justify-content-center question-title-html">
                     <span class="d-flex align-items-center text-dark text-center fs-2 pe-4 py-4 fw-bold lh-base">
                         {{ currentQuestionIndex + 1 }}.
                     </span>
                     <!-- <div class="d-grid align-self-center lh-1 text-black question-html pe-4 fs-1 pt-2 text-start font-bold" v-html="currentQuestion?.title"></div> -->
-                </div>
+                <!-- </div> -->
                 <!-- <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image">
                     <div class="upload-container">
                         <img :src="currentQuestion.image" alt="Image Preview">
