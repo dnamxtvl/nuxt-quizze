@@ -31,13 +31,13 @@
                     </span>
                     <!-- <div class="d-grid align-self-center lh-1 text-black question-html pe-4 fs-1 pt-2 text-start font-bold" v-html="currentQuestion?.title"></div> -->
                 </div>
-                <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image">
+                <!-- <div class="container mt-2 d-flex justify-content-center" v-if="currentQuestion.image">
                     <div class="upload-container">
                         <img :src="currentQuestion.image" alt="Image Preview">
                         <label class="cursor-pointer">
                         </label>
                     </div>
-                </div>
+                </div> -->
                 <!-- <h3 class="text-warning text-center fs-1">{{ timeReply }}</h3> -->
             </div>
             <div v-if="showQuestion && currentRoomStatus > 0"
