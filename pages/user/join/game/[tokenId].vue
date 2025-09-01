@@ -286,9 +286,6 @@ export default defineComponent({
                             showResult.value = false;
                         }
                         showQuestion.value = false;
-                        if (currentQuestionIndex.value == listQuestion.value.length - 1) {
-                            prepareFinish();
-                        }
                     }
 
                 },
