@@ -286,6 +286,9 @@ export default defineComponent({
                             showResult.value = false;
                         }
                         showQuestion.value = false;
+                        if (currentQuestionIndex.value == listQuestion.value.length - 1) {
+                            prepareFinish();
+                        }
                     }
 
                 },
@@ -405,6 +408,13 @@ export default defineComponent({
             }
         }
 
+        const prepareFinish = () => {
+            showQuestion.value = false;
+            showResult.value = true;
+            resultCurrentModel.value = false;
+            loadingInstance.value = null;
+        }
+
         onMounted(async () => {
             countReconnected.value = 0;
             clearInterval(intervalId);
@@ -456,10 +466,7 @@ export default defineComponent({
 
                     if (currentQuestionIndex.value == listQuestion.value.length - 1) {
                         setTimeout(() => {
-                            showQuestion.value = false;
-                            showResult.value = true;
-                            resultCurrentModel.value = false;
-                            loadingInstance.value = null;
+                            prepareFinish();
                         }, 4000)
                     }
                 });
