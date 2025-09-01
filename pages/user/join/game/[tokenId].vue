@@ -413,6 +413,7 @@ export default defineComponent({
             showResult.value = true;
             resultCurrentModel.value = false;
             loadingInstance.value = null;
+            ElLoading.service({ fullscreen: true }).close();
         }
 
         onMounted(async () => {
