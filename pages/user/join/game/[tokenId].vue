@@ -347,6 +347,7 @@ export default defineComponent({
                     timeReply.value = timeReply.value - 1;
                 } else {
                     clearInterval(intervalId);
+                    ElLoading.service({ fullscreen: true }).close();
                 }
             }, 1000);
         }
