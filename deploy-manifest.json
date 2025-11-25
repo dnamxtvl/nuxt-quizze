@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "framework": "nuxt",
+  "buildType": "nitro",
+  "computeResources": {
+    "default": {
+      "runtime": "nodejs20.x",
+      "handler": "server.mjs"
+    }
+  }
+}
