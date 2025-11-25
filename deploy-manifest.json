@@ -1,11 +1,14 @@
 {
   "version": 1,
-  "framework": "nuxt",
-  "buildType": "nitro",
-  "computeResources": {
-    "default": {
+  "computeResources": [
+    {
+      "name": "default",
       "runtime": "nodejs20.x",
-      "handler": "server.mjs"
+      "entrypoint": "server.js"
     }
+  ],
+  "framework": {
+    "name": "nuxt",
+    "version": "3.12.4"
   }
 }
