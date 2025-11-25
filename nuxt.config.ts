@@ -82,6 +82,7 @@ export default defineNuxtConfig({
         domains: [],
         remotePatterns: []
       },
+      runtime: "nodejs20.x"
     }
   },
 
