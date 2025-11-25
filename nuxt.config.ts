@@ -71,10 +71,18 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'aws-amplify',
     awsAmplify: {
-      runtime: "nodejs20.x"
-    },
+      catchAllStaticFallback: true,
+      imageOptimization: {
+        path: '/_image',
+        cacheControl: 'public, max-age=3600, immutable'
+      },
+      imageSettings: {
+        sizes: [16, 32, 48, 64, 96, 128, 256, 320, 384, 640, 768, 1024, 1366, 1600, 1920, 2048, 2560, 3840],
+        domains: [],
+        remotePatterns: []
+      },
+    }
   },
 
   compatibilityDate: '2024-07-23',
