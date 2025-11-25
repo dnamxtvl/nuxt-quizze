@@ -1,5 +1,3 @@
-import VOtpInput from "vue3-otp-input";
-
 export default defineNuxtConfig({
   devtools: { enabled: false },
   ssr: false,
@@ -70,6 +68,16 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     shim: false,
+  },
+
+  nitro: {
+    awsAmplify: {
+      catchAllStaticFallback: true,
+      imageOptimization: {
+        path: '/_image',
+        cacheControl: 'public, max-age=3600, immutable'
+      },
+    }
   },
 
   compatibilityDate: '2024-07-23',
