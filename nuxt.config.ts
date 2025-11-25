@@ -70,5 +70,12 @@ export default defineNuxtConfig({
     shim: false,
   },
 
+  nitro: {
+    preset: 'aws-amplify',
+    awsAmplify: {
+      runtime: "nodejs20.x"
+    },
+  },
+
   compatibilityDate: '2024-07-23',
 })
