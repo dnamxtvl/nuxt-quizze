@@ -2,32 +2,6 @@
   "version": 1,
   "routes": [
     {
-      "path": "/_nuxt/image",
-      "target": {
-        "kind": "ImageOptimization",
-        "cacheControl": "public, max-age=3600, immutable",
-        "imageSettings": {
-          "sizes": [320, 640, 768, 1024, 1366, 1600, 1920],
-          "domains": [],
-          "remotePatterns": []
-        }
-      }
-    },
-    {
-      "path": "/_nuxt/builds/meta/*",
-      "target": {
-        "cacheControl": "public, max-age=31536000, immutable",
-        "kind": "Static"
-      }
-    },
-    {
-      "path": "/_nuxt/builds/*",
-      "target": {
-        "cacheControl": "public, max-age=1, immutable",
-        "kind": "Static"
-      }
-    },
-    {
       "path": "/_nuxt/*",
       "target": {
         "cacheControl": "public, max-age=31536000, immutable",
@@ -38,10 +12,6 @@
       "path": "/*.*",
       "target": {
         "kind": "Static"
-      },
-      "fallback": {
-        "kind": "Compute",
-        "src": "default"
       }
     },
     {
